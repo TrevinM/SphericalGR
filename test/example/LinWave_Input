@@ -1,0 +1,8 @@
+Input parameters for linear wave
+      Amplitude = 1.e-9
+      lambda = 1.0
+      r0 = 2.0
+      l = 2
+      m = 0
+Use Taylor expansion inside
+    r_exp = 0.05

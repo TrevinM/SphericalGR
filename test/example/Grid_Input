@@ -1,0 +1,18 @@
+Size of (interior) grid
+      N_r = 256
+      N_theta = 24
+      N_phi = 2
+Outer boundary r_max
+      initial = 20
+      final = 20
+      courant = 0.4
+Maximum number of grid refinements
+      regrids = 0
+Cutoff for refinement
+      cutoff = 0.4
+Parameters for grid
+      s_param = 2.0
+      t_param = 50.0
+      t_amp = 0.0
+      theta_param = 0.0
+

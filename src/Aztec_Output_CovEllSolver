@@ -1,0 +1,53 @@
+
+		*******************************************************
+		***** Problem: Epetra::CrsMatrix
+		***** Preconditioned GMRES solution
+		***** ILUT( fill-in = 3.000e+00, drop = 0.000e+00)
+ 		***** with overlap = 1 
+		***** No scaling
+		***** NOTE: convergence VARIES when the total number of
+		*****       processors is changed.
+		*******************************************************
+
+                iter:    0           residual = 1.000000e+00
+
+*********************************************************************
+*****  Condition number estimate for subdomain preconditioner on PE 0 = 3.5149e+01
+*********************************************************************
+
+		*******************************************************
+		*****       Subdomain overlapping requires 1.000e+00 times
+		*****       the memory used for the nonoverlapped
+		*****       subdomain matrix.
+		***** ilut: The ilut factors require 3.438e+00 times 
+		*****       the memory of the overlapped subdomain matrix.
+		*******************************************************
+
+                iter:    1           residual = 2.824071e-03
+                iter:    2           residual = 5.126406e-04
+                iter:    3           residual = 1.919727e-04
+                iter:    4           residual = 1.549147e-04
+                iter:    5           residual = 1.538866e-04
+                iter:    6           residual = 1.502996e-04
+                iter:    7           residual = 1.480332e-04
+                iter:    8           residual = 1.450168e-04
+                iter:    9           residual = 1.425540e-04
+                iter:   10           residual = 1.314022e-04
+                iter:   11           residual = 1.231940e-04
+                iter:   12           residual = 5.974447e-05
+                iter:   13           residual = 1.276194e-05
+                iter:   14           residual = 2.727493e-06
+                iter:   15           residual = 1.366123e-06
+                iter:   16           residual = 1.262553e-06
+                iter:   17           residual = 1.262539e-06
+                iter:   18           residual = 1.062357e-06
+                iter:   19           residual = 2.227168e-07
+                iter:   20           residual = 3.113284e-08
+                iter:   21           residual = 6.711811e-09
+                iter:   22           residual = 2.975605e-09
+                iter:   23           residual = 1.157718e-09
+                iter:   24           residual = 5.946787e-10
+
+
+		Solution time: 0.062630 (sec.)
+		total iterations: 24

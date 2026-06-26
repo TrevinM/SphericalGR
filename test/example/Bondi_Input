@@ -1,0 +1,16 @@
+Construct Bondi initial data with
+	  coord type = 4
+	  Gamma = 2.0
+	  kappa = 1.0
+	  a_inf = 1.e-2
+around a black hole with
+       mass = 1.0
+and centered on
+	 x = 0.0
+	 y = 0.0
+	 z = 0.0
+
+NOTE: coord type 1 corresponds to normal Schwarzschild,
+      coord type 2 corresponds to isotropic Schwarzschild,
+      coord type 3 corresponds to Ken's trumpets, and
+      coord type 4 corresponds to maximal trumpets.

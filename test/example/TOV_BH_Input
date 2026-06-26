@@ -1,0 +1,14 @@
+Construct TOV star with central rest-mass density
+       rho_0_c = 0.55
+centered on
+	 x = 0.0
+	 y = 0.0
+	 z = 0.0
+with a BH of mass
+     m = 0.000001
+and scaling exponent 
+    n = -6.0
+under the residual tolerance 
+      tol = 1.e-8
+with maximum  iterations
+     max_it = 50.0
