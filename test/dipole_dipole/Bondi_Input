@@ -1,0 +1,16 @@
+Construct Bondi initial data with
+	  coord type = 4
+	  Gamma = 1.333333333333333
+	  accretion rate = 0.0001
+	  critical radius (multiple of black hole mass) = 10.0
+around a black hole with
+       mass = 1.0
+and centered on
+	 x = 0.0
+	 y = 0.0
+	 z = 0.0
+
+NOTE: coord type 1 corresponds to normal Schwarzschild,
+      coord type 2 corresponds to isotropic Schwarzschild,
+      coord type 3 corresponds to Ken's trumpets, and
+      coord type 4 corresponds to maximal trumpets.

@@ -1,0 +1,16 @@
+Create spherical shock tube initial data
+Initial densities
+       rho_in = 1.0e-9
+       rho_out = 1.0e-10
+Shape = 1
+( 0 : spherical
+  1 : planar )
+Initial radius 
+	R_i = 10.0
+centered on
+	 x = 0.0
+	 y = 0.0
+	 z = -0.1
+
+NOTE: For spherical shock waves, all the above dimensions are relevant,
+for planar shock waves the initial "membrane" will be set up at z.

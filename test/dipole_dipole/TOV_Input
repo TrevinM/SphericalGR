@@ -1,0 +1,9 @@
+Construct TOV star with central rest-mass density
+       rho_c = 215.31830707891277
+for polytrope with
+    Gamma = 2.0
+    Kappa = 1.0
+centered on
+	 x = 0.0
+	 y = 0.0
+	 z = 0.0
