@@ -122,7 +122,9 @@ public:
   // Metric
   //================================================  
   bool Initialize_Metric(state * c) {
+    // cout << "1" << endl;
     if (!initialized) initialized = Initialize(c->h_rr);
+    // cout << "2" << endl;
     double t = 0.0;
     int N_r = c->h_rr.dim1();
     int N_theta = c->h_rr.dim2();

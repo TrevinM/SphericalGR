@@ -172,24 +172,52 @@ public:
 		//
 		psi.equals(1.0);
 		//
-#ifdef NoEllSolver
-		cout << " DUALEMWAVE: Can't construct EM initial data without an Elliptic Solver!! " << endl;
-		return false;
-#else
-		veclaplacian = new VecLaplacian(grid, true);
-		veclaplacian->SetupSolver();
-#endif
-		double res = Solve_Constraints();
+#ifdef SR
+		cout << "DUALWAVE: Running without GR" << endl;
+		Compute_Fields();
 		dump(&psi);
-		if (res < tol) {
-			cout << " DUALEMWAVE: done with initialization! " << endl;
-			return true;
-		}
-		else {
-			cout << " DUALEMWAVE: initialization did not converge... " << endl;
+		s_r.equals(0.0);
+		s_t.equals(0.0);
+		s_p.equals(0.0);
+		rho.equals(0.0);
+
+		W_r.equals(0.0);
+		W_t.equals(0.0);
+		W_p.equals(0.0);
+
+		res_r.equals(0.0);
+		res_p.equals(0.0);
+		res_t.equals(0.0);
+
+		A_rr.equals(0.0);
+		A_rt.equals(0.0);
+		A_rp.equals(0.0);
+		A_tt.equals(0.0);
+		A_tp.equals(0.0);
+		A_pp.equals(0.0);
+		cout << " DUALWAVE: done with initialization!" << endl;
+		return true;
+#else
+	#ifdef NoEllSolver
+			cout << " DUALEMWAVE: Can't construct EM initial data without an Elliptic Solver!! " << endl;
 			return false;
-		}
+	#else
+			veclaplacian = new VecLaplacian(grid, true);
+			veclaplacian->SetupSolver();
+	#endif
+			double res = Solve_Constraints();
+			dump(&psi);
+			if (res < tol) {
+				cout << " DUALEMWAVE: done with initialization! " << endl;
+				return true;
+			}
+			else {
+				cout << " DUALEMWAVE: initialization did not converge... " << endl;
+				return false;
+			}
+#endif
 	}
+
 	//================================================
 	// Solve constraints
 	//================================================
