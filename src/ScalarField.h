@@ -20,6 +20,7 @@ public:
   ofstream monitorfile;
   double eta_KO;   // Kreiss-Oliger coefficient
   CheckPoint * checkpoint;
+  QuadraticPotential* potential;
 public:
   ScalarField(Grid * grid_i, dumper * dump_i, InData * indata_i, 
 	      int cowling_i, Cosmology * cosmology_i, 
@@ -72,6 +73,7 @@ public:
 		<< setw(18) << "rho_ADM_c" 
 		<< setw(18) << "rho_ADM_c_max" 
 		<< endl;
+    potential = new QuadraticPotential();
     monitorfile << "#=======================================================================================================================================================================" << endl;
    //
     rho_center = rho_c_max = drhoddr = 0.0;

@@ -11,7 +11,7 @@ private:
 	FlatEllSolver3D* laplace;
 	VecLaplacian* veclaplacian;
 #endif
-	gf3d psi, rho, res, u, delta_psi, sf, V, K; //CHECK IF V IS OKAY HERE
+	gf3d psi, rho, res, u, delta_psi, sf, K; //CHECK IF V IS OKAY HERE
 	// all vector and tensor components rescaled...
     // gf3d V;
 	gf3d s_r, s_t, s_p;     // components of momentum densities (upstairs)
@@ -32,12 +32,13 @@ private:
 	double phi_0, sigma, epsilon, m, GW_amp;   // parameters for initial data
 	double PI;
 	bool all_clear;
+	QuadraticPotential* potential;
 	ostringstream indata_name;
 public:
 	//================================================
 	// Constructor
 	//================================================
-	DualEMWave(char* indata_input, Grid* grid_i, Cosmology* cosmology) :
+	InflationGW(char* indata_input, Grid* grid_i, Cosmology* cosmology) :
 		InData(grid_i, cosmology) {
 		N_g = grid->N_ghosts();
 		indata_type = em_wave;
@@ -78,11 +79,12 @@ public:
 		analytical = false;
 		PI = acos(-1.0);
 		indata_name << "Inflation GW initial data";
+		potential = new QuadraticPotential();
 	};
 	//================================================
 	// Destructor
 	//================================================
-	~DualEMWave() {};
+	~InflationGW() {};
 	string Name() {
 		return indata_name.str();
 	};
@@ -106,7 +108,6 @@ public:
 		u.setup(grid, 1, "u", gf_counter++, +1, +1, +1);
 		// CHECK if +1 +1 +1 is correct and V and K should be set up this way
 		sf.setup(grid, 1, "sf", gf_counter++, +1, +1, +1);
-		V.setup(grid, 1, "V", gf_counter++, +1, +1, +1);
 		K.setup(grid, 1, "K", gf_counter++, +1, +1, +1);  
 		s_r.setup(grid, 1, "s_r", gf_counter++, -1, +1, +1);
 		s_t.setup(grid, 1, "s_t", gf_counter++, +1, -1, -1);

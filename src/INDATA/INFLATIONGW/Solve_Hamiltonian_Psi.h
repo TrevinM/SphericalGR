@@ -64,7 +64,9 @@ void Compute_u() {
 	// const double rl = rho.r(i);
 	const double psil = psi(i,j,k);
 	const double psi4 = psil*psil*psil*psil;
-  const double Vl = V(i,j,k);
+  const double sfl = sf(i,j,k);
+  const double Vl = potential->V(sfl);
+  // const double Vl = V(i,j,k); 
 	u[i][j][k] = 10. * PI * epsilon * Vl * psi4;
       }
 };
