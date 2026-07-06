@@ -1,0 +1,120 @@
+// Tell emacs that this is -*-c++-*- mode
+//====================================================
+// Numerically Solve for \bar A^ij from W^i NOW /bar A_ij from W^i
+//====================================================
+
+void Compute_Aij() {
+    for (int i = N_g; i < n_r - N_g; i++) {
+        const double rl = rho.r(i);
+        const double r2 = rl * rl;
+        const double r4 = r2 * r2;
+        for (int j = N_g; j < n_theta - N_g; j++) {
+            const double stl = rho.sintheta(j);
+            const double st2 = stl * stl;
+            const double st4 = st2 * st2;
+            const double csl = rho.costheta(j);
+            const double ctl = csl / stl;
+            for (int k = N_g; k < n_phi - N_g; k++) {
+                const double div = W_r.dr(i, j, k) + 2. * W_r(i, j, k) / rl
+                    + W_t.dtheta(i, j, k) / rl + W_t(i, j, k) * ctl / rl;
+                // compute contravariant derivatives D^i W^j
+                const double DrWr = W_r.dr(i, j, k);
+                const double DtWr = (W_r.dtheta(i, j, k) - W_t(i, j, k)) / rl;
+                const double DpWr = -W_p(i, j, k) / rl;
+                const double DrWt = W_t.dr(i, j, k);
+                const double DtWt = (W_t.dtheta(i, j, k) + W_r(i, j, k)) / rl;
+                const double DpWt = -ctl * W_p(i, j, k) / rl;
+                const double DrWp = W_p.dr(i, j, k);
+                const double DtWp = W_p.dtheta(i, j, k) / rl;
+                const double DpWp = (W_r(i, j, k) + ctl * W_t(i, j, k)) / rl;
+                // turn to fully covariant here CHECK IF CORRECT
+                A_rr[i][j][k] = 2.0 * DrWr - 2. / 3. * div + An_rr(rl, thetal);
+                A_rt[i][j][k] = (DrWt + DtWr) * r2 + An_rt(rl, thetal);
+                A_rp[i][j][k] = (DrWp + DpWr) * r2 * st2 + An_rp(rl, thetal);
+                A_tt[i][j][k] = (2.0 * DtWt) * r4 - 2. / 3. * div + An_tt(rl, thetal);
+                A_tp[i][j][k] = (DtWp + DpWt) * r4 * st2 + An_tp(rl, thetal);
+                A_pp[i][j][k] = (2.0 * DpWp) * r4 * st4 - 2. / 3. * div + An_pp(rl, thetal);
+                // if (i == N_g && j == N_g && k == N_g) 
+                //   cout << " reality check: "
+                //        << A_rr(i,j,k) + A_tt(i,j,k) + A_pp(i,j,k) << endl;
+                A2[i][j][k] = A_rr(i, j, k) * A_rr(i, j, k)
+                    + 2.0 * A_rt(i, j, k) * A_rt(i, j, k)
+                    + 2.0 * A_rp(i, j, k) * A_rp(i, j, k)
+                    + A_tt(i, j, k) * A_tt(i, j, k)
+                    + 2.0 * A_tp(i, j, k) * A_tp(i, j, k)
+                    + A_pp(i, j, k) * A_pp(i, j, k);
+            }
+        }
+    }
+
+}
+
+
+//================================================
+  // rescaled spherical polar components of \hat A_{ij} for m=0 version of model (A)
+  // (compare (3.7) in Shibata & Nakamura)
+  //================================================
+  inline double An_rr(double r, double theta) {
+    const double r2 = r*r;
+      if (nakamura_type == 0) {
+	const double costheta = cos(theta);
+	return GW_amp * exp(-r2/2.0) * (1. - 3.0 * costheta * costheta);
+      } else if (nakamura_type == 1) {
+	const double costheta = cos(theta);
+	return GW_amp * exp(-r2/2.0) * (5. - r2) *
+	  (1. - 3.0 * costheta * costheta);
+      }
+    };
+
+  inline double An_rt(double r, double theta) {
+    const double r2 = r*r;
+      if (nakamura_type == 0) {
+	return GW_amp * exp(-r2/2.0) * (3.0 - r2) * sin(theta) * cos(theta);
+      } else if (nakamura_type == 1) {
+	return GW_amp * exp(-r2/2.0) * (15.0 - 10.*r2 + r2*r2) *
+	  sin(theta) * cos(theta);
+      }
+
+    return 0.0;
+  };
+  inline double An_rp(double r, double theta) {
+    return 0.0;
+  }
+  inline double An_tt(double r, double theta) {
+    const double r2 = r*r;
+    const double r4 = r2*r2;
+      if (nakamura_type == 0) {
+	const double costheta = cos(theta);
+	const double sintheta = sin(theta);
+	return - GW_amp * exp(-r2/2.0) *
+	  (2 - 6.*costheta*costheta + (6 - 8*r2 + r4)*sintheta*sintheta) / 4.0;
+      } else if (nakamura_type == 1) {
+      const double cos2theta = cos(2.*theta);
+      const double r6 = r4*r2;
+      return - GW_amp * exp(-r2/2.0) *
+	(20. - 60.*r2 + 17.*r4 - r6 -
+	 (60. - 68.*r2 + 17.*r4 - r6) * cos2theta) / 8.0;
+      }
+    return 0.0;
+  };
+  inline double Antp(double r, double theta) {
+    return 0.0;
+  }
+  inline double An_pp(double r, double theta) {
+    const double r2 = r*r;
+    const double r4 = r2*r2;
+      if (nakamura_type == 0) {
+	const double costheta = cos(theta);
+	const double sintheta = sin(theta);
+	return GW_amp * exp(-r2/2.0) *
+	  (- 2 + 6.*costheta*costheta +
+	   (6 - 8*r2 + r4)*sintheta*sintheta) / 4.0;
+      } else if (nakamura_type == 1) {
+      const double cos2theta = cos(2.*theta);
+      const double r6 = r4*r2;
+	return GW_amp * exp(-r2/2.0) *
+	  ( 40. - 64.*r2 + 17.*r4 - r6 +
+	   r2*(56 - 17.*r2 + r4) * cos2theta ) / 8.0;      
+      }
+    return 0.0;
+  };

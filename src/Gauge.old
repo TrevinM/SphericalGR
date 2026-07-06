@@ -1,0 +1,521 @@
+// Tell emacs that this is -*-c++-*- mode
+//================================================
+// Classes for (spatial) gauge conditions
+//================================================
+#ifndef GAUGE_H
+#define GAUGE_H
+
+#include "Grid.h"
+#include "nr3.h"
+#include "State.h"
+#include "gridfunction.h"
+
+enum { constantshift, gammadriver, advective_gammadriver, jena_driver, advective_jena_driver, covariant_advective_jena_driver };
+//
+//================================================
+// Base class - doesn't do much...
+//================================================
+//
+class Gauge {
+protected:
+  int gauge_type;
+  double eta_KO;
+  Grid *grid;
+  int N_g, N_r, N_t, N_p;
+public:
+  Gauge(Grid *grid_i): grid(grid_i) {
+    eta_KO = 0.0;
+    N_g = grid->N_ghosts();
+    N_r = grid->N_r_tot();
+    N_t = grid->N_theta_tot();
+    N_p = grid->N_phi_tot();
+  };
+  virtual ~Gauge() {};
+  //================================================
+  // Virtual functions that will be overwritten by derived
+  // classes below
+  //================================================
+  virtual const char * Name() = 0;
+  virtual void dot_shift(state * c, state * derivs) = 0;
+  double Set_eta(double eta_in) {
+    cout << " GAUGE: Using Kreiss-Oliger coefficient " << eta_in << " in Gauge.h " << endl;
+    eta_KO = eta_in;
+    return eta_KO;
+  };
+};
+//
+//================================================
+// Derived class for constant shift
+//================================================
+//
+class Constant_Shift : public Gauge {
+public:
+  Constant_Shift(Grid *grid_i) : Gauge(grid_i) {
+    cout << " GAUGE: setting up constant shift..." << endl;
+    gauge_type = constantshift;
+  };
+  ~Constant_Shift() {};
+  const char * Name() {
+    return "constant shift";
+  };
+  //================================================
+  // Overwrite virtual functions
+  //================================================
+  void dot_shift(state * c, state * derivs) {
+    derivs->shift_r.equals(0.0);
+    derivs->shift_t.equals(0.0);
+    derivs->shift_p.equals(0.0);
+    derivs->B_r.equals(0.0);
+    derivs->B_t.equals(0.0);
+    derivs->B_p.equals(0.0);
+  }
+};
+
+//
+//================================================
+// Derived class for (non-advective) Gamma-driver shift, integrates
+//
+// CHECK: eta B^i term...
+//
+//  \partial_t B^i     = mu_S * \partial_t \Lambda^i - eta B^i
+//  \partial_t \beta^i = B^i
+//
+//================================================
+//
+class Gamma_Driver : public Gauge {
+private:
+  double mu_S;
+  double eta;    // coefficient for damping term
+  ostringstream gauge_name;
+public:
+  Gamma_Driver(Grid *grid_i) : Gauge(grid_i) {
+    cout << " GAUGE: setting up non-advective Gamma driver..." << endl;
+    gauge_type = gammadriver;
+    // default values for parameters
+    eta = 2.0;
+    mu_S = 0.75;
+    // look for file "Shift_Driver_Input" for parameters
+    ifstream infile;
+    infile.open("Shift_Driver_Input");
+    if (!infile)
+      cout << " JENA_DRIVER: Can't open Shift_Driver_Input -- will use default values " << endl;
+    else {
+      char buf[100], c;
+      infile.get(buf,100,'='); infile.get(c); infile >> eta;
+      infile.get(buf,100,'='); infile.get(c); infile >> mu_S;
+    }
+    cout << " GAMMA_DRIVER: Using eta = " << eta << " and mu_S = " << mu_S << endl;
+    if (infile) infile.close();
+    gauge_name << "(non-advective) Gamma-driver with eta = " << eta << " and mu_S = " << mu_S << ends; 
+  };
+  ~Gamma_Driver() {};
+  const char * Name() {
+    return gauge_name;
+  };
+  //================================================
+  // Overwrite virtual functions
+  //================================================
+  void dot_shift(state * c, state * derivs) {
+    for (int i = N_g; i < N_r-N_g; i++)    
+      for (int j = N_g; j < N_t-N_g; j++)
+	for (int k = N_g; k < N_p-N_g; k++) {
+	  derivs->shift_r[i][j][k] = c->B_r(i,j,k) + eta_KO * c->shift_r.d6(i,j,k);
+	  derivs->shift_t[i][j][k] = c->B_t(i,j,k) + eta_KO * c->shift_t.d6(i,j,k);
+	  derivs->shift_p[i][j][k] = c->B_p(i,j,k) + eta_KO * c->shift_p.d6(i,j,k);
+	  //
+	  derivs->B_r[i][j][k] = mu_S * derivs->lam_r(i,j,k) - eta * c->B_r(i,j,k)
+	    + eta_KO * c->B_r.d6(i,j,k);
+	  derivs->B_t[i][j][k] = mu_S * derivs->lam_t(i,j,k) - eta * c->B_t(i,j,k)
+	    + eta_KO * c->B_t.d6(i,j,k);
+	  derivs->B_p[i][j][k] = mu_S * derivs->lam_p(i,j,k) - eta * c->B_p(i,j,k)
+	    + eta_KO * c->B_p.d6(i,j,k);
+	}
+  }
+};
+//
+//================================================
+// Derived class for advective Gamma-driver shift, integrates
+//
+// CHECK damping term
+//
+//  \partial_t B^i     - beta^j \partial_j B^i     = mu_S * \partial_t \Lambda^i - eta B^i
+//  \partial_t \beta^i - beta^j \partial_j \beta^i = B^i
+//
+//================================================
+//
+class Advective_Gamma_Driver : public Gauge {
+private:
+  double mu_S; 
+  double eta;    // coefficient for damping term
+  ostringstream gauge_name;
+public:
+  Advective_Gamma_Driver(Grid * grid_i) : Gauge(grid_i) { 
+    cout << " GAUGE: setting up advective Gamma driver..." << endl;
+    gauge_type = advective_gammadriver;
+    eta = 2.0;
+    mu_S = 0.75;
+    // look for file "Shift_Driver_Input" for parameters
+    ifstream infile;
+    infile.open("Shift_Driver_Input");
+    if (!infile)
+      cout << " JENA_DRIVER: Can't open Shift_Driver_Input -- will use default values " << endl;
+    else {
+      char buf[100], c;
+      infile.get(buf,100,'='); infile.get(c); infile >> eta;
+      infile.get(buf,100,'='); infile.get(c); infile >> mu_S;
+    }
+    cout << " GAMMA_DRIVER: Using eta = " << eta << " and mu_S = " << mu_S << endl;
+    if (infile) infile.close();
+    gauge_name << "(advective) Gamma-driver with eta = " << eta << " and mu_S = " << mu_S << ends;     
+  };
+  ~Advective_Gamma_Driver() {};
+  const char * Name() {
+    return gauge_name.str().c_str();
+  };
+  //================================================
+  // Overwrite virtual functions
+  //================================================
+  void dot_shift(state * c, state * derivs) {
+    for (int i = N_g; i < N_r-N_g; i++) {
+      const double rl = grid->r(i);
+      const double r2 = rl*rl;
+      for (int j = N_g; j < N_t-N_g; j++) {
+	const double stl = grid->sintheta(j);
+	const double ctl = grid->costheta(j);
+	const double st2 = stl*stl;
+	for (int k = N_g; k < N_p-N_g; k++) {
+	  const double shift_r = c->shift_r(i,j,k);
+	  const double shift_t = c->shift_t(i,j,k)/rl;
+	  const double shift_p = c->shift_p(i,j,k)/(rl * stl);
+	  //
+	  // Note: compute advective terms in terms of physical quantities - rescale to code units in actual update...
+	  //
+	  double beta_d_beta_r = 
+	    shift_r * c->shift_r.dr(i,j,k,shift_r) + 
+	    shift_t * c->shift_r.dtheta(i,j,k,shift_t) + 
+	    shift_p * c->shift_r.dphi(i,j,k,shift_p);
+	  double beta_d_beta_t = 
+	    shift_r * ( c->shift_t.dr(i,j,k,shift_r)/rl - c->shift_t(i,j,k)/r2 ) +  
+	    shift_t *   c->shift_t.dtheta(i,j,k,shift_t)/rl +
+	    shift_p *   c->shift_t.dphi(i,j,k,shift_p)/rl;
+	  double beta_d_beta_p = 
+	    shift_r * ( c->shift_p.dr(i,j,k,shift_r)/(rl*stl) - c->shift_p(i,j,k)/(r2*stl) )  + 
+	    shift_t * ( c->shift_p.dtheta(i,j,k,shift_t)/(rl*stl) - c->shift_p(i,j,k)/(rl*st2)*ctl ) + 
+	    shift_p *   c->shift_p.dphi(i,j,k,shift_p)/(rl*stl);
+	  //
+	  double beta_d_B_r = 
+	    shift_r * c->B_r.dr(i,j,k,shift_r) + 
+	    shift_t * c->B_r.dtheta(i,j,k,shift_t) + 
+	    shift_p * c->B_r.dphi(i,j,k,shift_p);
+	  double beta_d_B_t = 
+	    shift_r * ( c->B_t.dr(i,j,k,shift_r)/rl - c->B_t(i,j,k)/r2 ) +  
+	    shift_t *   c->B_t.dtheta(i,j,k,shift_t)/rl +
+	    shift_p *   c->B_t.dphi(i,j,k,shift_p)/rl;
+	  double beta_d_B_p = 
+	    shift_r * ( c->B_p.dr(i,j,k,shift_r)/(rl*stl) - c->B_p(i,j,k)/(r2*stl) )  + 
+	    shift_t * ( c->B_p.dtheta(i,j,k,shift_t)/(rl*stl) - c->B_p(i,j,k)/(rl*st2)*ctl ) + 
+	    shift_p *   c->B_p.dphi(i,j,k,shift_p)/(rl*stl);
+	  //
+     	  // rescale derivative terms
+	  //
+	  beta_d_beta_t *= rl;
+	  beta_d_beta_p *= rl * stl;
+	  beta_d_B_t *= rl;
+	  beta_d_B_p *= rl * stl;
+	  //
+	  // now compute derivatives
+	  // 
+	  derivs->shift_r[i][j][k] = c->B_r(i,j,k) + beta_d_beta_r + eta_KO * c->shift_r.d6(i,j,k);
+	  derivs->shift_t[i][j][k] = c->B_t(i,j,k) + beta_d_beta_t + eta_KO * c->shift_t.d6(i,j,k);
+	  derivs->shift_p[i][j][k] = c->B_p(i,j,k) + beta_d_beta_p + eta_KO * c->shift_p.d6(i,j,k);
+	  //
+	  derivs->B_r[i][j][k] = mu_S * derivs->lam_r(i,j,k) + beta_d_B_r - eta * c->B_r(i,j,k)
+	    + eta_KO * c->B_r.d6(i,j,k);
+	  derivs->B_t[i][j][k] = mu_S * derivs->lam_t(i,j,k) + beta_d_B_t - eta * c->B_t(i,j,k)
+	    + eta_KO * c->B_t.d6(i,j,k);
+	  derivs->B_p[i][j][k] = mu_S * derivs->lam_p(i,j,k) + beta_d_B_p - eta * c->B_p(i,j,k)
+	    + eta_KO * c->B_p.d6(i,j,k);
+	}
+      }
+    }
+  };
+};
+//
+//================================================
+// Derived class for Jena version of (non-advective) Gamma-driver shift, integrates
+//
+//  \partial_t \beta^i = mu_S \tilde \Gamma^i - \eta \beta^i
+//
+// (see Thierfelder et.al., arXiv:1104.4751 (TBB) )
+//================================================
+//
+class Jena_Gamma_Driver : public Gauge {
+private:
+  double eta;    // coefficient for damping term
+  double mu_S;   // coefficient; see eq. (15) in TBB
+  bool muequalsalpha2;
+  ostringstream gauge_name;
+public:
+  Jena_Gamma_Driver(Grid * grid_i) : Gauge(grid_i) {
+    cout << " GAUGE: setting up non-advective Jena Gamma driver..." << endl;
+    gauge_type = jena_driver;
+    // default values for parameters
+    eta = 0.0;
+    mu_S = 0.75;
+    muequalsalpha2 = false;
+    // look for file "Jena_Driver_Input" for parameters
+    ifstream infile;
+    infile.open("Shift_Driver_Input");
+    if (!infile)
+      cout << " JENA_DRIVER: Can't open Shift_Driver_Input -- will use default values " << endl;
+    else {
+      char buf[100], c;
+      infile.get(buf,100,'='); infile.get(c); infile >> eta;
+      infile.get(buf,100,'='); infile.get(c); infile >> mu_S;
+      infile.get(buf,100,'='); infile.get(c); infile >> muequalsalpha2;
+    }
+    if (muequalsalpha2)
+      cout << " JENA_DRIVER: Using eta = " << eta << " and mu_S = alpha^2." << endl;
+    else
+      cout << " JENA_DRIVER: Using eta = " << eta << " and mu_S = " << mu_S << endl;
+    if (infile)
+      infile.close();
+    if (muequalsalpha2)
+      gauge_name << "(non-advective) Jena version of Gamma-driver with eta = " << eta << " and mu_S = alpha^2 " << ends;
+    else
+      gauge_name << "(non-advective) Jena version of Gamma-driver with eta = " << eta << " and mu_S = " << mu_S << ends;
+  };
+  ~Jena_Gamma_Driver() {};
+  const char * Name() {
+    return gauge_name.str().c_str();
+  };
+  //================================================
+  // Overwrite virtual functions
+  //================================================
+  void dot_shift(state * c, state * derivs) {
+    for (int i = N_g; i < N_r-N_g; i++)    
+      for (int j = N_g; j < N_t-N_g; j++)
+	for (int k = N_g; k < N_p-N_g; k++) {    
+	  if (muequalsalpha2) mu_S = c->lapse(i,j,k)*c->lapse(i,j,k); 
+	  derivs->shift_r[i][j][k] = mu_S * c->lam_r(i,j,k) - eta * c->shift_r(i,j,k) + eta_KO * c->shift_r.d6(i,j,k);
+	  derivs->shift_t[i][j][k] = mu_S * c->lam_t(i,j,k) - eta * c->shift_t(i,j,k) + eta_KO * c->shift_t.d6(i,j,k);
+	  derivs->shift_p[i][j][k] = mu_S * c->lam_p(i,j,k) - eta * c->shift_p(i,j,k) + eta_KO * c->shift_p.d6(i,j,k);
+	  derivs->B_r[i][j][k] = 0.0;
+	  derivs->B_t[i][j][k] = 0.0;
+	  derivs->B_p[i][j][k] = 0.0;
+	};
+  }
+};
+//
+//================================================
+// Derived class for Jena version of advective Gamma-driver shift, integrates
+//
+//  \partial_t \beta^i - beta^j \partial_j \beta^i = mu_S \tilde \Gamma^i - \eta \beta^i
+//
+// (see Thierfelder et.al., arXiv:1104.4751 (TBB) )
+//================================================
+//
+class Advective_Jena_Gamma_Driver : public Gauge {
+private:
+  double eta;    // coefficient for damping term
+  double mu_S;   // coefficient; see eq. (15) in TBB
+  bool muequalsalpha2;
+  ostringstream gauge_name;
+public:
+  Advective_Jena_Gamma_Driver(Grid *grid_i) : Gauge(grid_i) {
+    cout << " GAUGE: setting up advective Jena Gamma driver..." << endl;
+    gauge_type = advective_jena_driver;
+    // default values for parameters
+    eta = 0.0;
+    mu_S = 0.75;
+    muequalsalpha2 = false;
+    // look for file "Shift_Driver_Input" for parameters
+    ifstream infile;
+    infile.open("Shift_Driver_Input");
+    if (!infile)
+      cout << " JENA_DRIVER: Can't open Shift_Driver_Input -- will use default values " << endl;
+    else {
+      char buf[100], c;
+      infile.get(buf,100,'='); infile.get(c); infile >> eta;
+      infile.get(buf,100,'='); infile.get(c); infile >> mu_S;
+      infile.get(buf,100,'='); infile.get(c); infile >> muequalsalpha2;
+    }
+    if (muequalsalpha2)
+      cout << " JENA_DRIVER: Using eta = " << eta << " and mu_S = alpha^2." << endl;
+    else
+      cout << " JENA_DRIVER: Using eta = " << eta << " and mu_S = " << mu_S << endl;
+    if (infile)
+      infile.close();
+    if (muequalsalpha2)
+      gauge_name << "advective Jena version of Gamma-driver with eta = " << eta << " and mu_S = alpha^2 " << ends;
+    else
+      gauge_name << "advective Jena version of Gamma-driver with eta = " << eta << " and mu_S = " << mu_S << ends;
+  };
+  ~Advective_Jena_Gamma_Driver() {};
+  const char * Name() {
+    return gauge_name.str().c_str();
+  };
+  //================================================
+  // Overwrite virtual functions
+  //================================================
+  void dot_shift(state * c, state * derivs) {
+    for (int i = N_g; i < N_r-N_g; i++) {
+      const double rl = grid->r(i);
+      const double r2 = rl*rl;
+      for (int j = N_g; j < N_t-N_g; j++) {
+	const double stl = grid->sintheta(j);
+	const double ctl = grid->costheta(j);
+	const double st2 = stl*stl;
+	for (int k = N_g; k < N_p-N_g; k++) {    
+	  if (muequalsalpha2) mu_S = c->lapse(i,j,k)*c->lapse(i,j,k);
+	  const double shift_r = c->shift_r(i,j,k);
+	  const double shift_t = c->shift_t(i,j,k)/rl;
+	  const double shift_p = c->shift_p(i,j,k)/(rl * stl);
+	  //
+	  // Note: compute advective terms in terms of physical quantities - rescale to code units in actual update...
+	  //
+	  double beta_d_beta_r = 
+	    shift_r * c->shift_r.dr(i,j,k,shift_r) + 
+	    shift_t * c->shift_r.dtheta(i,j,k,shift_t) + 
+	    shift_p * c->shift_r.dphi(i,j,k,shift_p);
+	  double beta_d_beta_t = 
+	    shift_r * ( c->shift_t.dr(i,j,k,shift_r)/rl - c->shift_t(i,j,k)/r2 ) +  
+	    shift_t *   c->shift_t.dtheta(i,j,k,shift_t)/rl +
+	    shift_p *   c->shift_t.dphi(i,j,k,shift_p)/rl;
+	  double beta_d_beta_p = 
+	    shift_r * ( c->shift_p.dr(i,j,k,shift_r)/(rl*stl) - c->shift_p(i,j,k)/(r2*stl) )  + 
+	    shift_t * ( c->shift_p.dtheta(i,j,k,shift_t)/(rl*stl) - c->shift_p(i,j,k)/(rl*st2)*ctl ) + 
+	    shift_p *   c->shift_p.dphi(i,j,k,shift_p)/(rl*stl);
+	  //
+     	  // rescale derivative terms
+	  //
+	  beta_d_beta_t *= rl;
+	  beta_d_beta_p *= rl * stl;
+	  //
+	  // now compute derivatives
+	  //
+	  derivs->shift_r[i][j][k] = mu_S * c->lam_r(i,j,k) - eta * c->shift_r(i,j,k) + beta_d_beta_r
+	    + eta_KO * c->shift_r.d6(i,j,k);
+	  derivs->shift_t[i][j][k] = mu_S * c->lam_t(i,j,k) - eta * c->shift_t(i,j,k) + beta_d_beta_t
+	    + eta_KO * c->shift_t.d6(i,j,k);
+	  derivs->shift_p[i][j][k] = mu_S * c->lam_p(i,j,k) - eta * c->shift_p(i,j,k) + beta_d_beta_p
+	    + eta_KO * c->shift_p.d6(i,j,k);
+	  derivs->B_r[i][j][k] = 0.0;
+	  derivs->B_t[i][j][k] = 0.0;
+	  derivs->B_p[i][j][k] = 0.0;
+	}
+      }
+    }
+  }
+};
+//
+//================================================
+// Derived class for Jena version of advective Gamma-driver shift, using covariant derivatives (with respect to 
+// reference metric) integrates
+//
+//  \partial_t \beta^i - beta^j \hat D_j \beta^i = mu_S \tilde \Gamma^i - \eta \beta^i
+//
+// (see Thierfelder et.al., arXiv:1104.4751 (TBB) )
+//================================================
+//
+class Covariant_Advective_Jena_Gamma_Driver : public Gauge {
+private:
+  double eta;    // coefficient for damping term
+  double mu_S;   // coefficient; see eq. (15) in TBB
+  bool muequalsalpha2;
+  ostringstream gauge_name;
+public:
+  Covariant_Advective_Jena_Gamma_Driver(Grid *grid_i) : Gauge(grid_i) { 
+    cout << " GAUGE: setting up advective covariant Jena Gamma driver..." << endl;
+    gauge_type = advective_jena_driver;
+    // default values for parameters
+    eta = 0.0;
+    mu_S = 0.75;
+    muequalsalpha2 = false;
+    // look for file "Jena_Driver_Input" for parameters
+    ifstream infile;
+    infile.open("Jena_Driver_Input");
+    if (!infile)
+      cout << " JENA_DRIVER: Can't open Jena_Driver_Input -- will use default values " << endl;
+    else {
+      char buf[100], c;
+      infile.get(buf,100,'='); infile.get(c); infile >> eta;
+      infile.get(buf,100,'='); infile.get(c); infile >> mu_S;
+      infile.get(buf,100,'='); infile.get(c); infile >> muequalsalpha2;
+    }
+    if (muequalsalpha2)
+      cout << " JENA_DRIVER: Using eta = " << eta << " and mu_S = alpha^2." << endl;
+    else
+      cout << " JENA_DRIVER: Using eta = " << eta << " and mu_S = " << mu_S << endl;
+    if (infile)
+      infile.close();
+    if (muequalsalpha2)
+      gauge_name << "covariant advective Jena version of Gamma-driver with eta = " << eta << " and mu_S = alpha^2 " << ends;
+    else
+      gauge_name << "covariant advective Jena version of Gamma-driver with eta = " << eta << " and mu_S = " << mu_S << ends;
+  };
+  ~Covariant_Advective_Jena_Gamma_Driver() {};
+  const char * Name() {
+    return gauge_name.str().c_str();
+  };
+  //================================================
+  // Overwrite virtual functions
+  //================================================
+  void dot_shift(state * c, state * derivs) {
+    for (int i = N_g; i < N_r-N_g; i++) {
+      const double rl = grid->r(i);
+      const double r2 = rl*rl;
+      for (int j = N_g; j < N_t-N_g; j++) {
+	const double stl = grid->sintheta(j);
+	const double ctl = grid->costheta(j);
+	const double st2 = stl*stl;
+	for (int k = N_g; k < N_p-N_g; k++) {    
+	  if (muequalsalpha2) mu_S = c->lapse(i,j,k)*c->lapse(i,j,k);
+	  const double shift_r = c->shift_r(i,j,k);
+	  const double shift_t = c->shift_t(i,j,k)/rl;
+	  const double shift_p = c->shift_p(i,j,k)/(rl * stl);
+	  //
+	  // Note: compute advective terms in terms of physical quantities - rescale to code units in actual update...
+	  //
+	  double beta_d_beta_r = 
+	    shift_r * c->shift_r.dr(i,j,k,shift_r) + 
+	    shift_t * c->shift_r.dtheta(i,j,k,shift_t) + 
+	    shift_p * c->shift_r.dphi(i,j,k,shift_p)
+	    // add covariant derivative terms
+	    - rl * shift_t * shift_t - rl * st2 * shift_p * shift_p;
+	  double beta_d_beta_t = 
+	    shift_r * ( c->shift_t.dr(i,j,k,shift_r)/rl - c->shift_t(i,j,k)/r2 ) +  
+	    shift_t *   c->shift_t.dtheta(i,j,k,shift_t)/rl +
+	    shift_p *   c->shift_t.dphi(i,j,k,shift_p)/rl
+	    // add covariant derivative terms
+	    - stl * ctl * shift_p * shift_p + 2.0 * shift_r * shift_t / rl;
+	  double beta_d_beta_p = 
+	    shift_r * ( c->shift_p.dr(i,j,k,shift_r)/(rl*stl) - c->shift_p(i,j,k)/(r2*stl) )  + 
+	    shift_t * ( c->shift_p.dtheta(i,j,k,shift_t)/(rl*stl) - c->shift_p(i,j,k)/(rl*st2)*ctl ) + 
+	    shift_p *   c->shift_p.dphi(i,j,k,shift_p)/(rl*stl)
+	    // add covariant derivative terms
+	    + 2.0 * shift_r * shift_p / rl + 2.0 * shift_t * shift_p * ctl / stl;
+	  //
+     	  // rescale derivative terms
+	  //
+	  beta_d_beta_t *= rl;
+	  beta_d_beta_p *= rl * stl;
+	  //
+	  // now compute derivatives
+	  //
+	  derivs->shift_r[i][j][k] = mu_S * c->lam_r(i,j,k) - eta * c->shift_r(i,j,k) + beta_d_beta_r
+	    + eta_KO * c->shift_r.d6(i,j,k);
+	  derivs->shift_t[i][j][k] = mu_S * c->lam_t(i,j,k) - eta * c->shift_t(i,j,k) + beta_d_beta_t
+	    + eta_KO * c->shift_t.d6(i,j,k);
+	  derivs->shift_p[i][j][k] = mu_S * c->lam_p(i,j,k) - eta * c->shift_p(i,j,k) + beta_d_beta_p
+	    + eta_KO * c->shift_p.d6(i,j,k);
+	  derivs->B_r[i][j][k] = 0.0;
+	  derivs->B_t[i][j][k] = 0.0;
+	  derivs->B_p[i][j][k] = 0.0;
+	}
+      }
+    }
+  }
+};
+
+#endif /* GAUGE_H */
