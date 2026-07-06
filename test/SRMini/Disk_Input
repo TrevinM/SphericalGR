@@ -1,0 +1,13 @@
+Input variables for Disk initial data
+mass and angular momentum of black hole
+     M = 1.0
+     J = 0.001
+Trumpet type (1: maximal (BN), 2: analytical (DB))
+   type = 2
+Inner and outer edge of disk
+     r_i = 3.0
+     r_o = 4.0
+Polytropic parameters
+     kappa = 1.0
+     n = 1.0
+     

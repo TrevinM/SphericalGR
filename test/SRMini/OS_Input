@@ -1,0 +1,12 @@
+Construct OS initial data with mass
+   M = 1.0
+and initial areal radius 
+   R = 5.0
+centered on
+   x = 0.0
+   y = 0.0
+   z = 0.0
+for heated OS collapse:
+    P_over_rho = 1.e-7
+    E_over_rho = 1.e-5
+
