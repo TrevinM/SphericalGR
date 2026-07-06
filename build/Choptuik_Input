@@ -1,0 +1,10 @@
+Create scalar field initial data for 
+       A = 0.30337599472973
+and deformation parameter
+      eps = 0.0
+Parameters for elliptic solver
+     max_it = 10000
+        tol = 1.e-10
+Two paramters for diagnostics:
+      tau_star = 1.572
+      xi = 0.5

@@ -1,0 +1,10 @@
+Create E&M wave initial data for 
+       A = 0.9
+       r0 = 0.0
+       flat = 0   ( 0 : *not* flat, 1: flat)
+Parameters for elliptic solver
+     max_it = 10000
+        tol = 1.e-10
+Two paramters for diagnostics:
+      tau_star = 1.572
+      xi = 0.5

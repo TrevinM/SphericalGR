@@ -1,0 +1,8 @@
+Input variables for Bona-Masso functions f(alpha)
+Function type = 3
+	( 1 : k / alpha
+          2 : (1 - alpha) / alpha [ Dennison & Baumgarte, 2014]
+	  3 : 1 + kappa / alpha^2     [ Alcubierre, 1997 ]
+  	  4 : a_0^2 / (2 alpha + (a_0 - 2) alpha^2)  [Alcubierre, 2003 ] )
+parameter = 1.0
+
