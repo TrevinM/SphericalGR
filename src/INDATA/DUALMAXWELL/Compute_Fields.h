@@ -33,45 +33,49 @@ void Compute_Fields() {
 }
 
 
-//Arbitrary function used in wave equation solution
+//Arbitrary function used in spherical harmonic solutions
 double f_pm(double x) {
-	return 1/2 * (exp(-pow(x+r0, 2)) + exp(-pow(x-r0, 2))) * x;
+	return 1/2 * exp(-pow(x, 2)) * x;
 }
 
 double f_pm_dx(double x) {
-	return 1/2 * (exp(-pow(x+r0, 2)) + exp(-pow(x-r0, 2)))
-		+ 1/2 * (-2 * (x+r0) * exp(-pow(x+r0, 2)) - 2 * (x-r0) * exp(-pow(x-r0, 2))) * x;
+	return 1/2 * exp(-pow(x, 2)) * (1 - 2 * pow(x, 2))
 }
 
 double f_pm_dx2(double x) {
-	return -2 * (x+r0) * exp(-pow(x+r0, 2)) - 2 * (x-r0) * exp(-pow(x-r0, 2))
-		+ x/2 * (-2 * exp(-pow(x+r0, 2)) - 2 * exp(-pow(x-r0, 2))
-		+ 4 * pow(x+r0, 2) * exp(-pow(x+r0, 2)) + 4 * pow(x-r0, 2) * exp(-pow(x+r0, 2)));
+	return exp(-pow(x, 2)) * x * (-3 + 2 * pow(x, 2))
 }
 
 double f_pm_dx3(double x) {
-	return 	3/2 * (-2 * exp(-pow(x+r0, 2)) - 2 * exp(-pow(x-r0, 2))
-		+ 4 * pow(x+r0, 2) * exp(-pow(x+r0, 2)) + 4 * pow(x-r0, 2) * exp(-pow(x+r0, 2)))
-		+ x/2 * (12 * exp(-pow(x+r0, 2)) * (x+r0) + 12 * exp(-pow(x-r0, 2)) * (x-r0)
-		- 8 * exp(-pow(x+r0, 2)) * pow(x+r0, 3) - 8 * exp(-pow(x-r0, 2)) * pow(x-r0, 3));
+	return 	exp(-pow(x, 2)) * (-3 + 12 * pow(x, 2) - 4 * pow(x, 4))
+}
+
+double f_pm_dx4(double x) {
+	return 2 * exp(-pow(x, 2)) * x * (15 - 20 * pow(x,2) + 4 * pow(x, 4))
 }
 
 //Spherical harmonic solutions
 double l1(double r, double theta) {
-	return sin(theta) * ((f_pm(r) / pow(r, 2)) + f_pm_dx(r) / r);
+	const double rpr0 = r + r0;
+	const double rmr0 = r - r0;
+	return sin(theta) * (((f_pm(rpr0) + f_pm(rmr0)) / pow(r, 2)) + (f_pm_dx(rpr0)) + f_pm_dx(rmr0) / r);
 }
 
 double l2(double r, double theta) {
+	const double rpr0 = r + r0;
+	const double rmr0 = r - r0;
 	return sin(theta) * cos(theta) 
-		* (f_pm(r) / pow(r, 3) - f_pm_dx(r) / pow(r, 2) + f_pm_dx2(r) / (3 * r));
+		* (f_pm(rpr0) + f_pm(rmr0)) / pow(r, 3)
+		- (f_pm_dx(rpr0) + f_pm_dx(rmr0)) / pow(r, 2)
+		+ (f_pm_dx2(rpr0) + f_pm_dx2(rmr0)) / (3 * r));
 }
 
 double l3(double r, double theta) {
-	return (
-		5 * pow(cos(theta), 2) * sin(theta)
-		* (f_pm(r) / pow(r, 4) - f_pm_dx(r) / pow(r, 3)
-		+ 2 * f_pm_dx2(r) / (5 * pow(r, 2)) - f_pm_dx3(r) / (15 * r))
-	);
+	return (5 * pow(cos(theta), 2) * sin(theta)
+		* ((f_pm(rpr0) + f_pm(rmr0)) / pow(r, 4) 
+		- (f_pm_dx(rpr0) + f_pm_dx(rmr0)) / pow(r, 3)
+		+ 2 * (f_pm_dx2(rpr0) + f_pm_dx2(rmr0)) / (5 * pow(r, 2)) 
+		- (f_pm_dx3(rpr0) + f_pm_dx3(rmr0)) / (15 * r)));
 }
 
 //===============================================================
