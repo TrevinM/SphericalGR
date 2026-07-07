@@ -122,18 +122,13 @@ public:
   // Metric
   //================================================  
   bool Initialize_Metric(state * c) {
-		cout << "Here ?" << endl;
 
     if (!initialized) initialized = Initialize(c->h_rr);
-		cout << "Here ?" << endl;
     double t = 0.0;
     int N_r = c->h_rr.dim1();
-		cout << "Here ?" << endl;
     int N_theta = c->h_rr.dim2();
-		cout << "Here ?" << endl;
 
     int N_phi = c->h_rr.dim3();
-		cout << "Here ?" << endl;
 
     for (int i = N_g; i < N_r; i++) { // include outer boundary grid points    
       double rl = c->h_rr.r(i);
@@ -815,5 +810,6 @@ vect Cartesian_to_Spherical_upper(vect V, Doub r, Doub theta, Doub phi) {
 #include "INDATA/ShibataWave.h"
 #include "INDATA/Disk.h"
 #include "INDATA/DualEMWave.h"
+#include "INDATA/InflationGW.h"
 
 #endif  /* INDATA_H */

@@ -4,7 +4,6 @@
 #include "Scalar_Aux.h"
 #include "Monitor.h"
 #include "CheckPoint.h"
-
 //================================================
 //
 // Scalar Field

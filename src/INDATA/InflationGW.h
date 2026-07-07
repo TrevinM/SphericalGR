@@ -1,11 +1,12 @@
-// Tell emacs that this is -*-c++-*- mode
 //
+// Tell emacs that this is -*-c++-*- mode
 //================================================
-// 
 // Initial for Inflaton field with a gravitational wave distrubance
 //================================================
 //
-class DualEMWave : public InData {
+#include "../scalarpotential.h"
+
+class InflationGW : public InData {
 private:
 #ifndef NoEllSolver
 	FlatEllSolver3D* laplace;
@@ -28,6 +29,7 @@ private:
 	int N_g;
 	int max_it;   // parameters for elliptic solver
     int nakamura_type; //0 for A, 1 for B. See BGH 2026
+	int branch;
 	double tol;
 	double phi_0, sigma, epsilon, m, GW_amp;   // parameters for initial data
 	double PI;
@@ -73,12 +75,13 @@ public:
 			<< ", sigma = " << sigma
 			<< ", epsilon = " << epsilon
 			<< ", mass = " << m
-			<< ", branch = " branch
+			<< ", branch = " << branch << endl;
 
 		cout << "      and Nakamura type = " << nakamura_type << " with amplitude " 
             << GW_amp << endl;
 		cout << " INFLATIONGW: Will run elliptic solver with max_it = " << max_it
 			<< " and tol = " << tol << endl;
+		cout << "INFLATIONGW: Could not find nakamura type, using no GW " << endl;
 		analytical = false;
 		PI = acos(-1.0);
 		indata_name << "Inflation GW initial data";
@@ -134,6 +137,8 @@ public:
 		// AE_p.setup(grid, 1, "AE_p", gf_counter++, -1, -1, +1); 
 		// AE_dot_p.setup(grid, 1, "AE_p", gf_counter++, -1, -1, +1); 
 		//
+		int i;
+		psi_r.resize(n_r);
 		for (i = 0; i < n_r; i++) {
 			psi_r[i] = 0.0;
 		}
@@ -173,6 +178,7 @@ public:
 		A_tp.equals(0.0);
 		A_pp.equals(0.0);
 		cout << " INFLATIONGW: done with initialization!" << endl;
+		return true;
 #else
 	#ifdef NoEllSolver
 			cout << " INFLATIONGW: Can't construct Inflation Gw initial data without an Elliptic Solver!! " << endl;
@@ -198,8 +204,6 @@ public:
 	// Solve constraints
 	//================================================
 	double Solve_Constraints(bool verbose = false) {
-		double res = Residual();
-		cout << " InflationGW: initial constraint residual = " << res << endl;
 		int step = 0;
 		const double tol_tri = 1.e-12;
 		cout << " INFLATIONGW: Computing scalar field and sources" << endl;
@@ -208,9 +212,11 @@ public:
 		cout << " INFLATIONGW: Solving for psi" << endl;
 		Solve_Psi(tol_tri); 
 		cout << " INFLATIONGW: Computing initial A_ij" << endl;
-		Compute_Aij(); //Should update to Nakamura data only
+		Compute_Aij(); 
+		double res = Residual();
+		cout << " INFLATIONGW: initial constraint residual = " << res << endl;
 		
-		while (res > tol && step < max_it) {
+		while (abs(res) > tol && step < max_it) {
 			step++;
 			// call individual constraint solver with slightly smaller tolerances
 			double current_tol = max(tol / 3., res / 1.e3);
@@ -343,19 +349,12 @@ public:
 		return 0.0;
 	};
 	//================================================
-	// Analytical solution for gauge (Should lapse just be 1.0?)
+	// Analytical solution for gauge
 	//================================================
 	double lapse_analytical(double rl, double thetal, double phil, double t) {
-		int i = grid->i_ind(rl);
-		int j = grid->j_ind(thetal);
-		int k = grid->k_ind(phil);
-		double psil = psi(i, j, k);
-		// return 0.2 + 0.8*rl*rl/(1.0 + rl*rl);
-		// return 1.0;
-		return 1.0 / (psil * psil);
+		return 1.0;
 	};
 	double shift_r_analytical(double r, double theta, double phi, double t) {
-		// return 2.0 * r / (1.0 + r*r);
 		return 0.0;
 	};
 	double shift_t_analytical(double r, double theta, double phi, double t) {

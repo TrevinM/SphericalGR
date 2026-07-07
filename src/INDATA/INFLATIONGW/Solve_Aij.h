@@ -9,6 +9,7 @@ void Compute_Aij() {
         const double r2 = rl * rl;
         const double r4 = r2 * r2;
         for (int j = N_g; j < n_theta - N_g; j++) {
+            const double thetal = rho.theta(j);
             const double stl = rho.sintheta(j);
             const double st2 = stl * stl;
             const double st4 = st2 * st2;
@@ -64,6 +65,9 @@ void Compute_Aij() {
 	return GW_amp * exp(-r2/2.0) * (5. - r2) *
 	  (1. - 3.0 * costheta * costheta);
       }
+      else {
+        return 0.0;
+      }
     };
 
   inline double An_rt(double r, double theta) {
@@ -74,9 +78,11 @@ void Compute_Aij() {
 	return GW_amp * exp(-r2/2.0) * (15.0 - 10.*r2 + r2*r2) *
 	  sin(theta) * cos(theta);
       }
-
-    return 0.0;
+      else {
+        return 0.0;
+      }
   };
+
   inline double An_rp(double r, double theta) {
     return 0.0;
   }
@@ -95,9 +101,11 @@ void Compute_Aij() {
 	(20. - 60.*r2 + 17.*r4 - r6 -
 	 (60. - 68.*r2 + 17.*r4 - r6) * cos2theta) / 8.0;
       }
-    return 0.0;
+      else {
+        return 0.0;
+      }
   };
-  inline double Antp(double r, double theta) {
+  inline double An_tp(double r, double theta) {
     return 0.0;
   }
   inline double An_pp(double r, double theta) {
@@ -116,5 +124,8 @@ void Compute_Aij() {
 	  ( 40. - 64.*r2 + 17.*r4 - r6 +
 	   r2*(56 - 17.*r2 + r4) * cos2theta ) / 8.0;      
       }
-    return 0.0;
+      else
+      {
+        return 0.0;
+      }
   };

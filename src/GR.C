@@ -222,6 +222,9 @@ int main(int argc, char* argv[])
 	else if (indata_type == 28) {
 		indata = new DualEMWave(indata_input, grid, cosmology);
 	}
+	else if (indata_type == 29) {
+		indata = new InflationGW(indata_input, grid, cosmology);
+	}
 	else {
 		cerr << " No such Indata type! " << endl;
 		return 1;

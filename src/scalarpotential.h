@@ -11,10 +11,11 @@ class QuadraticPotential
   public:
     QuadraticPotential()
     {
+        const char* input_file;
         input_file = "QuadraticPotential_Input";
         ifstream infile;
         infile.open(input_file);
-        if (!input_file)
+        if (!infile)
         {
             cerr << "Couldn't open input for potential :(" << endl;
         }

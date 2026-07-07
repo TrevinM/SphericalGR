@@ -6,7 +6,7 @@ Parameters for the initial inflaton field
         branch (0: weak, 1: strong) = 0
 
 Gravitational wave parameters
-       Nakamura A^ij family (See BGH 2026, 0: A, 1: B) = 0
+       Nakamura A^ij family (See BGH 2026, 0: A, 1: B) = 2
        Wave amplitude = 1.0
 
 Parameters for elliptic solver

@@ -2,41 +2,48 @@
 //====================================================
 // Solve Hamiltonian constraint
 //====================================================
-bool Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
+void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		       bool verbose = true) {	
-	
 	double psi0 = 1.0;
-	const double psi_asym_error_init = Integrate(psi0) - 1.0;
-	double psi_asym_error = psi_asym_error_init;
-	while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_iter) {
+
+	double psi_asym_error_init = Integrate(psi0) - 1.0;
+	cout << " INFLATIONGW: Inital psi_asym_error = " << psi_asym_error_init << endl;
+ 	double psi_asym_error = psi_asym_error_init;
+	int iter = 0;
+	cout << " INFLATIONGW: Finding weak branch bounds for psi0" << endl;
+	while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_it) {
+		iter++;
 		psi0 *= 1.05; //Change from hardcoded
 		psi_asym_error = Integrate(psi0) - 1.0;
 	}
-	if (iter >= max_iter) {
-		cerr << "INFLATIONGW: Could not find bounds on psi0 for weak branch" << endl;
+	if (iter >= max_it) {
+		cerr << " INFLATIONGW: Could not find bounds on psi0 for weak branch" << endl;
 	}
 
 	if (branch == 1) {
-		cout << "INFLATIONGW: Finding strong branch" << endl;
+		cout << " INFLATIONGW: Finding strong branch" << endl;
+		iter = 0;
 		psi_asym_error_init = psi_asym_error;
-		while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_iter) {
+		while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_it) {
+			iter++;
 			psi0 *= 1.05; //Change from hardcoded
 			psi_asym_error = Integrate(psi0) - 1.0;
 		}
-		if (iter >= max_iter) {
-			cerr << "INFLATIONGW: Could not find bounds on psi0 for strong branch" << endl;
+		if (iter >= max_it) {
+			cerr << " INFLATIONGW: Could not find bounds on psi0 for strong branch" << endl;
 		}
 	}
 
 	double psi0_high = psi0;
 	double psi0_low = psi0 / 1.05;
-	double psi_asym_error_low = Integrate(psi0_low);
-	double psi_asym_error_high = Integrate(psi0_high);
+	double psi_asym_error_low = Integrate(psi0_low) - 1.0;
+	double psi_asym_error_high = Integrate(psi0_high) - 1.0;
+	cout << " INFLATIONGW: Narrowed psi0 to between " << psi0_low << " and " << psi0_high << endl;
 
-	while (abs(psi_asym_error) > tol_tri && psi0_high - psi_low > 1.e-2*tol_tri)
+	while (abs(psi_asym_error) > tol_tri && psi0_high - psi0_low > 1.e-2*tol_tri)
 	{
 		double psi0_mid = (psi0_high + psi0_low) / 2.0;
-		double psi_asym_error_mid = Integrate(psi0_mid);
+		double psi_asym_error_mid = Integrate(psi0_mid) - 1.0;
 		if (psi_asym_error_mid * psi_asym_error_low < 0.0) {
 			psi0_high = psi0_mid;
 		}
@@ -46,7 +53,10 @@ bool Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		psi_asym_error = psi_asym_error_mid;
 	}
 	if (psi0_high - psi0_low <= 1.e-2*tol_tri) {
-		cerr << "INFLATIONGW: Root finding failed to converge with bound difference " << psi0_high - psi0_low <<endl;
+		cerr << " INFLATIONGW: ERROR: Root finding failed to converge with bound difference " << psi0_high - psi0_low <<endl;
+	}
+	else {
+		cout << " INFLATIONGW: Found psi0" << endl;
 	}
 	for (int i = N_g; i < n_r - N_g; i++) {
 		const double rl = K.r(i);
@@ -61,20 +71,21 @@ bool Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 }
 
 
-void Integrate(double psi0) {
+double Integrate(double psi0) {
 	pair<double, double> vars = {psi0, 0.0};
-  	for (int i = N_g; i < n_r-N_g; i++) {
-		const double delta_r = grid_i->delta_r(i);
+  	for (int i = N_g; i < n_r - N_g; i++) {
+		const double rl = grid->r(i);
+		const double delta_r = grid->delta_r(i);
 		psi_r[i] = vars.first;
-		pair<double, double> k1 = Ham_RHS(vars, r);
+		pair<double, double> k1 = Ham_RHS(vars, rl);
 		pair<double, double> vars2 = {vars.first + k1.first * delta_r * 0.5, vars.second + k1.second * delta_r * 0.5};
-		pair<double, double> k2 = Ham_RHS(vars2, r + delta_r * 0.5);
+		pair<double, double> k2 = Ham_RHS(vars2, rl + delta_r * 0.5);
 		pair<double, double> vars3 = {vars.first + k2.first * delta_r * 0.5, vars.second + k2.second * delta_r * 0.5};
-		pair<double, double> k3 = Ham_rhs(vars3, r + delta_r * 0.5);
-		pair<double, double> vars4 = {vars.first + k3.first * delta_r, vars.second + k2.second * delta_r};
-		pair<double, double> k4 = Ham_rhs(vars4, r + delta_r);
-		vars.first = vars.first + (k1.first + 2. * k2.first + 2. * k3.first + k4.first) / 6.;
-		vars.seconds = vars.second + (k1.second + 2. * k2.second + 2. * k3.second + k4.second) / 6.;
+		pair<double, double> k3 = Ham_RHS(vars3, rl + delta_r * 0.5);
+		pair<double, double> vars4 = {vars.first + k3.first * delta_r, vars.second + k3.second * delta_r};
+		pair<double, double> k4 = Ham_RHS(vars4, rl + delta_r);
+		vars.first = vars.first + delta_r * (k1.first + 2. * k2.first + 2. * k3.first + k4.first) / 6.;
+		vars.second = vars.second + delta_r * (k1.second + 2. * k2.second + 2. * k3.second + k4.second) / 6.;
 	}
 	return vars.first;
 
@@ -85,6 +96,7 @@ pair<double, double> Ham_RHS(pair<double, double> vars, double r) {
 	const double sf = compute_sf(r);
 	const double V = potential->V(sf);
 	const double psi = vars.first;
+	const double dpsidr = vars.second;
 	const double psi5 = psi * psi * psi * psi * psi;
 	return pair<double, double> {dpsidr, -(2. / r) * dpsidr - 2. * PI * psi5 * V * epsilon};			
 }
@@ -145,13 +157,13 @@ double Hamiltonian_K_Residual() {
   for (int i = N_g; i < n_r-N_g; i++) 
     for (int j = N_g; j < n_theta-N_g; j++) 
       for (int k = N_g; k < n_phi-N_g; k++) {
-	const double psil = psi(i,j,k);
-	const double psi5 = psil*psil*psil*psil*psil;
-	const double psim7 = 1.0/pow(psil, 7);
-  const double sfl = sf(i,j,k);
-  const double Vl = potential->V(sfl);
-	res[i][j][k] = psi.Laplace(i,j,k) 
-	  + 2.0*PI*psi5*epsilon*Vl;
+		const double psil = psi(i,j,k);
+		const double psim12 = pow(psil, -12);
+  		const double sfl = sf(i,j,k);
+  		const double Vl = potential->V(sfl);
+		res[i][j][k] = psi.Laplace(i,j,k) 
+	  	+ 2.0*PI*psi5*epsilon*Vl;
       }
+	  //cout << " INFLATIONGW: Hamiltonian K residual = " << res.L2_norm() << endl;
   return res.L2_norm();
 };

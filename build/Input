@@ -17,7 +17,7 @@ Asymptotic space type = 1
  (1 : Minkowksi
   2 : de Sitter
   3 : radiation-dominated universe )
-Initial data type = 28
+Initial data type = 29
  (1 : Teukolsky wave
   2 : Schwarzschild in isotropic coordinates 
   3 : flat initial data 
@@ -44,9 +44,10 @@ Initial data type = 28
   25 : Wind tunnel 
   26 : Shibata wave 
   27 : Disks
-  28 : Dual EM Wave)
-Initial data input file = DualEM_Input
-Matter type = 8
+  28 : Dual EM Wave
+  29 : Inflation GW)
+Initial data input file = InflationGW_Input
+Matter type = 5
  (1 : vacuum
   3 : hydro
   5 : scalar field 
@@ -60,14 +61,14 @@ EOS type = 0
   3 : piece-polytrope 
   4 : ideal gas
   5 : gas and radiation )
-Slicing type = 8
+Slicing type = 1
  (1 : Geodesic slicing
   2 : (non-advective) 1+log slicing
   3 : advective 1+log slicing
   4 : harmonic slicing
   5 : maximal slicing
   6 : second-order maximal slicing 
-  8 : Bona-Masso
+  8 : Bona-Masso)
 Gauge type = 1
  (1 : constant shift
   2 : (non-advective) Gamma-driver

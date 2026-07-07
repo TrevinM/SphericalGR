@@ -38,18 +38,18 @@ void Compute_Sources() {
 		const double r2 = rl * rl;
 		for (int j = N_g; j < n_theta - N_g; j++) {
 			for (int k = N_g; k < n_phi - N_g; k++) {
-				const double phi = sf(i, j, k);
-				const double phi2 = phi * phi;
+				const double sfl = sf(i, j, k);
+				const double sf2 = sfl * sfl;
 				const double psil = psi(i, j, k);
 				const double psi4 = psil * psil * psil * psil;
 				const double psim4 = 1. / psi4;
 				const double sigma4 = sigma * sigma * sigma * sigma;
 				const double sigmam4 = 1. / sigma4;
-				const double Vl = V(i, j, k); 
+				const double Vl = potential->V(sfl); 
 				//
 				// compute energy density
 				//
-				rho[i][j][k] = (2. * r2 * sigmam4 * psim4 * phi2 + Vl);
+				rho[i][j][k] = (2. * r2 * sigmam4 * psim4 * sf2 + Vl);
 				//
 				// compute *rescaled* upstairs momentum densities 
 				//

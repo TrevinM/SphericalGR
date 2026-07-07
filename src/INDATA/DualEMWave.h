@@ -196,6 +196,7 @@ public:
 		A_tp.equals(0.0);
 		A_pp.equals(0.0);
 		cout << " DUALWAVE: done with initialization!" << endl;
+		return true;
 #else
 	#ifdef NoEllSolver
 			cout << " DUALEMWAVE: Can't construct EM initial data without an Elliptic Solver!! " << endl;

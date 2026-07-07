@@ -207,6 +207,8 @@ int Read_Input(int argc, char * argv[],
       cout << "   Running with disk initial data " << endl;
    else if (indata_type == 28)
       cout << "   Running with dual E&M wave initial data " << endl;
+   else if (indata_type == 29)
+      cout << "   Running with Inflation GW initial data " << endl;
    else {
       cout << "   NO SUCH INITIAL DATA " << endl;
       error = 5;

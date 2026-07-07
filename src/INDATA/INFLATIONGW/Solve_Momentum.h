@@ -12,7 +12,7 @@ bool Solve_Momentum(double tol_tri = 1.e-10, double tol_res = 1.e-8,
   if (verbose) cout << " INFLATIONGW - Momentum constraint: initial residual: "
 		    << res_norm << endl;
   int step = 0;
-  int max_step = 50;
+  int max_step = 500;
   while (res_norm > tol_res && step < max_step) {
     step++;
     veclaplacian->SetupSolver();
@@ -60,8 +60,8 @@ double Momentum_Residual() {
 	      const double psil = psi(i,j,k);
 	      const double psi6 = pow(psil, 6);
 	      const double RHS_r = (2. / 3.) * psi6 * K.dr(i,j,k);
-	      const double RHS_t = (2. / 3.) * psi6 * K.dr(i,j,k);
-	      const double RHS_p = 8.0*PI*psi10*s_p(i,j,k);
+	      const double RHS_t = (2. / 3.) * psi6 * K.dtheta(i,j,k) / rl; // RESCALED, CHECK
+	      const double RHS_p = 0.0; // IN AXISYMMETRY
 	//
 	res_r[i][j][k] = 4./3.*W_r.ddr(i,j,k)
 	  + 8./3.*W_r.dr(i,j,k)/rl
