@@ -1,10 +1,10 @@
 Size of (interior) grid
       N_r = 128
-      N_theta = 64
+      N_theta = 2
       N_phi = 2
 Outer boundary r_max
-      initial = 8
-      final = 8
+      initial = 20
+      final = 20
       courant = 0.4
 Maximum number of grid refinements
       regrids = 10
@@ -15,7 +15,7 @@ self-similar regridding!)
       tau_star = 0.2 
 Parameters for grid
       s_param = 0.0
-      t_param = 50.0
+      t_param = 0.0
       t_amp = 0.0
       theta_param = 0.0
 

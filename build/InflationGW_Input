@@ -1,5 +1,5 @@
 Parameters for the initial inflaton field
-        phi_0 = 1.0
+        phi_0 = 1.e-2
         sigma = 1.0
         epsilon = 0.2
         m = 1.0

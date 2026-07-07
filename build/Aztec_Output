@@ -1,0 +1,30 @@
+
+		*******************************************************
+		***** Problem: Epetra::CrsMatrix
+		***** Preconditioned GMRES solution
+		***** ILUT( fill-in = 3.000e+00, drop = 0.000e+00)
+ 		***** with overlap = 1 
+		***** No scaling
+		***** NOTE: convergence VARIES when the total number of
+		*****       processors is changed.
+		*******************************************************
+
+                iter:    0           residual = 3.600115e+02
+
+*********************************************************************
+*****  Condition number estimate for subdomain preconditioner on PE 0 = 1.0000e+00
+*********************************************************************
+
+		*******************************************************
+		*****       Subdomain overlapping requires 1.000e+00 times
+		*****       the memory used for the nonoverlapped
+		*****       subdomain matrix.
+		***** ilut: The ilut factors require 1.200e+00 times 
+		*****       the memory of the overlapped subdomain matrix.
+		*******************************************************
+
+                iter:    1           residual = 5.652514e-14
+
+
+		Solution time: 0.000030 (sec.)
+		total iterations: 1

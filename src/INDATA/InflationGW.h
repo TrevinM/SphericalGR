@@ -211,6 +211,7 @@ public:
 		Compute_Sources();
 		cout << " INFLATIONGW: Solving for psi" << endl;
 		Solve_Psi(tol_tri); 
+		cout << " INFLATIONGW: psi part of hamiltonian has residual: " << Hamiltonian_Psi_Residual() << endl;
 		cout << " INFLATIONGW: Computing initial A_ij" << endl;
 		Compute_Aij(); 
 		double res = Residual();
