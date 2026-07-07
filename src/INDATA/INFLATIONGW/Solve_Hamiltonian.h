@@ -13,8 +13,10 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 	cout << " INFLATIONGW: Finding weak branch bounds for psi0" << endl;
 	while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_it) {
 		iter++;
-		psi0 *= 1.05; //Change from hardcoded
+		psi0 *= 1.01; //Change from hardcoded
 		psi_asym_error = Integrate(psi0) - 1.0;
+		cout << "INFLATIONGW: psi0 = " << psi0 << " gives asym_error = " << psi_asym_error << endl;
+
 	}
 	if (iter >= max_it) {
 		cerr << " INFLATIONGW: Could not find bounds on psi0 for weak branch" << endl;
@@ -26,8 +28,9 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		psi_asym_error_init = psi_asym_error;
 		while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_it) {
 			iter++;
-			psi0 *= 1.05; //Change from hardcoded
+			psi0 *= 1.01; //Change from hardcoded
 			psi_asym_error = Integrate(psi0) - 1.0;
+			cout << "INFLATIONGW: psi0 = " << psi0 << " gives asym_error = " << psi_asym_error << endl;
 		}
 		if (iter >= max_it) {
 			cerr << " INFLATIONGW: Could not find bounds on psi0 for strong branch" << endl;
@@ -51,6 +54,8 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 			psi0_low = psi0_mid;
 		}
 		psi_asym_error = psi_asym_error_mid;
+		cout << " INFLATIONGW: Narrowed psi0 now " << psi0_mid << endl;
+		cout << " INFLATIONGW: psi_asym_error =  " << psi_asym_error << endl;
 	}
 	if (psi0_high - psi0_low <= 1.e-2*tol_tri) {
 		cerr << " INFLATIONGW: ERROR: Root finding failed to converge with bound difference " << psi0_high - psi0_low <<endl;
@@ -88,6 +93,9 @@ double Integrate(double psi0) {
   	for (int i = N_g; i < n_r; i++) {
 		const double rl = grid->r(i);
 		delta_r = grid->delta_r(i);
+		if (vars.first < 0.0) {
+			//cerr << " INFLATIONGW: ERROR: found some negative psi... Bad..." << endl;
+		} 
 		psi_r[i] = vars.first;
 		pair<double, double> k1 = Ham_RHS(vars, rl);
 		pair<double, double> vars2 = {vars.first + k1.first * delta_r * 0.5, vars.second + k1.second * delta_r * 0.5};
@@ -135,7 +143,6 @@ double Hamiltonian_Psi_Residual() {
 	res[i][j][k] = psi.Laplace(i,j,k) 
 	  + 2.0*PI*psi5*epsilon*Vl;
       }
-	  cout << " dumping residual..." << endl;
 	dump(&res);
 	dump(&psi);
   return res.L2_norm();
