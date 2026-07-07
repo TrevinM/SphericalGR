@@ -226,7 +226,6 @@ class ScalarBlob_Solution
                 if (low + (*psi)[0] < 1)
                     low = 1 - (*psi)[0];
 
-                Integrate(delta_psi, pair<double, double>{low, 0.}, true);
                 // Update psi
                 for (int i = 0; i < N_r; ++i)
                 {

@@ -1,0 +1,157 @@
+// Tell emacs that this is -*-c++-*- mode
+//====================================================
+// Solve Hamiltonian constraint
+//====================================================
+bool Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
+		       bool verbose = true) {	
+	
+	double psi0 = 1.0;
+	const double psi_asym_error_init = Integrate(psi0) - 1.0;
+	double psi_asym_error = psi_asym_error_init;
+	while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_iter) {
+		psi0 *= 1.05; //Change from hardcoded
+		psi_asym_error = Integrate(psi0) - 1.0;
+	}
+	if (iter >= max_iter) {
+		cerr << "INFLATIONGW: Could not find bounds on psi0 for weak branch" << endl;
+	}
+
+	if (branch == 1) {
+		cout << "INFLATIONGW: Finding strong branch" << endl;
+		psi_asym_error_init = psi_asym_error;
+		while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_iter) {
+			psi0 *= 1.05; //Change from hardcoded
+			psi_asym_error = Integrate(psi0) - 1.0;
+		}
+		if (iter >= max_iter) {
+			cerr << "INFLATIONGW: Could not find bounds on psi0 for strong branch" << endl;
+		}
+	}
+
+	double psi0_high = psi0;
+	double psi0_low = psi0 / 1.05;
+	double psi_asym_error_low = Integrate(psi0_low);
+	double psi_asym_error_high = Integrate(psi0_high);
+
+	while (abs(psi_asym_error) > tol_tri && psi0_high - psi_low > 1.e-2*tol_tri)
+	{
+		double psi0_mid = (psi0_high + psi0_low) / 2.0;
+		double psi_asym_error_mid = Integrate(psi0_mid);
+		if (psi_asym_error_mid * psi_asym_error_low < 0.0) {
+			psi0_high = psi0_mid;
+		}
+		else {
+			psi0_low = psi0_mid;
+		}
+		psi_asym_error = psi_asym_error_mid;
+	}
+	if (psi0_high - psi0_low <= 1.e-2*tol_tri) {
+		cerr << "INFLATIONGW: Root finding failed to converge with bound difference " << psi0_high - psi0_low <<endl;
+	}
+	for (int i = N_g; i < n_r - N_g; i++) {
+		const double rl = K.r(i);
+		for (int j = N_g; j < n_theta - N_g; j++) {
+			const double thetal = K.theta(j);
+			for (int k = N_g; k < n_phi - N_g; k++) {
+				psi[i][j][k] = psi_r[i];
+			}
+		}
+	}
+	psi.fill_ghosts();
+}
+
+
+void Integrate(double psi0) {
+	pair<double, double> vars = {psi0, 0.0};
+  	for (int i = N_g; i < n_r-N_g; i++) {
+		const double delta_r = grid_i->delta_r(i);
+		psi_r[i] = vars.first;
+		pair<double, double> k1 = Ham_RHS(vars, r);
+		pair<double, double> vars2 = {vars.first + k1.first * delta_r * 0.5, vars.second + k1.second * delta_r * 0.5};
+		pair<double, double> k2 = Ham_RHS(vars2, r + delta_r * 0.5);
+		pair<double, double> vars3 = {vars.first + k2.first * delta_r * 0.5, vars.second + k2.second * delta_r * 0.5};
+		pair<double, double> k3 = Ham_rhs(vars3, r + delta_r * 0.5);
+		pair<double, double> vars4 = {vars.first + k3.first * delta_r, vars.second + k2.second * delta_r};
+		pair<double, double> k4 = Ham_rhs(vars4, r + delta_r);
+		vars.first = vars.first + (k1.first + 2. * k2.first + 2. * k3.first + k4.first) / 6.;
+		vars.seconds = vars.second + (k1.second + 2. * k2.second + 2. * k3.second + k4.second) / 6.;
+	}
+	return vars.first;
+
+}
+
+
+pair<double, double> Ham_RHS(pair<double, double> vars, double r) {
+	const double sf = compute_sf(r);
+	const double V = potential->V(sf);
+	const double psi = vars.first;
+	const double psi5 = psi * psi * psi * psi * psi;
+	return pair<double, double> {dpsidr, -(2. / r) * dpsidr - 2. * PI * psi5 * V * epsilon};			
+}
+
+
+
+double Hamiltonian_Psi_Residual() {
+  for (int i = N_g; i < n_r-N_g; i++) 
+    for (int j = N_g; j < n_theta-N_g; j++) 
+      for (int k = N_g; k < n_phi-N_g; k++) {
+	const double psil = psi(i,j,k);
+	const double psi5 = psil*psil*psil*psil*psil;
+	const double psim7 = 1.0/pow(psil, 7);
+  const double sfl = sf(i,j,k);
+  const double Vl = potential->V(sfl);
+	res[i][j][k] = psi.Laplace(i,j,k) 
+	  + 2.0*PI*psi5*epsilon*Vl;
+      }
+  return res.L2_norm();
+}
+
+
+void Solve_K() {
+	for (int i = N_g; i < n_r - N_g; i++) {
+		const double rl = K.r(i);
+		for (int j = N_g; j < n_theta - N_g; j++) {
+			const double thetal = K.theta(j);
+			for (int k = N_g; k < n_phi - N_g; k++) {
+				K[i][j][k] = compute_K(rl, thetal);
+
+			}
+		}
+	}
+	K.fill_ghosts();
+}
+
+
+double compute_K(double r, double theta) {
+	int i = grid->i_ind(r);
+	int j = grid->j_ind(theta);
+	int k = N_g;
+  const double sfl = sf(i,j,k);
+	const double sf2 = sfl * sfl;
+  const double Vl = potential->V(sfl);
+  const double r2 = r*r;
+  const double sigma4 = sigma * sigma * sigma * sigma;
+  const double sigmam4 = 1.0 / sigma4;
+  const double psim4 = pow(psi(i,j,k), -4);
+  const double psim12 = pow(psi(i,j,k), -12);
+ 	const double A2l = A2(i,j,k);
+
+	return sqrt(24.0 * PI * (1.0 - epsilon) * Vl + 
+  12.0 * PI * 4.0 * r2 * sigmam4 * psim4 * sf2 + 
+  1.5 * psim12 * A2l);
+}
+
+double Hamiltonian_K_Residual() {
+  for (int i = N_g; i < n_r-N_g; i++) 
+    for (int j = N_g; j < n_theta-N_g; j++) 
+      for (int k = N_g; k < n_phi-N_g; k++) {
+	const double psil = psi(i,j,k);
+	const double psi5 = psil*psil*psil*psil*psil;
+	const double psim7 = 1.0/pow(psil, 7);
+  const double sfl = sf(i,j,k);
+  const double Vl = potential->V(sfl);
+	res[i][j][k] = psi.Laplace(i,j,k) 
+	  + 2.0*PI*psi5*epsilon*Vl;
+      }
+  return res.L2_norm();
+};

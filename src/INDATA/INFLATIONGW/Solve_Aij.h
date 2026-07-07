@@ -27,13 +27,13 @@ void Compute_Aij() {
                 const double DrWp = W_p.dr(i, j, k);
                 const double DtWp = W_p.dtheta(i, j, k) / rl;
                 const double DpWp = (W_r(i, j, k) + ctl * W_t(i, j, k)) / rl;
-                // turn to fully covariant here CHECK IF CORRECT
+                // Contravariant, but should be the same if rescaled as conformally flat
                 A_rr[i][j][k] = 2.0 * DrWr - 2. / 3. * div + An_rr(rl, thetal);
-                A_rt[i][j][k] = (DrWt + DtWr) * r2 + An_rt(rl, thetal);
-                A_rp[i][j][k] = (DrWp + DpWr) * r2 * st2 + An_rp(rl, thetal);
-                A_tt[i][j][k] = (2.0 * DtWt) * r4 - 2. / 3. * div + An_tt(rl, thetal);
-                A_tp[i][j][k] = (DtWp + DpWt) * r4 * st2 + An_tp(rl, thetal);
-                A_pp[i][j][k] = (2.0 * DpWp) * r4 * st4 - 2. / 3. * div + An_pp(rl, thetal);
+                A_rt[i][j][k] = (DrWt + DtWr) + An_rt(rl, thetal);
+                A_rp[i][j][k] = (DrWp + DpWr) + An_rp(rl, thetal);
+                A_tt[i][j][k] = (2.0 * DtWt) - 2. / 3. * div + An_tt(rl, thetal);
+                A_tp[i][j][k] = (DtWp + DpWt) + An_tp(rl, thetal);
+                A_pp[i][j][k] = (2.0 * DpWp) - 2. / 3. * div + An_pp(rl, thetal);
                 // if (i == N_g && j == N_g && k == N_g) 
                 //   cout << " reality check: "
                 //        << A_rr(i,j,k) + A_tt(i,j,k) + A_pp(i,j,k) << endl;

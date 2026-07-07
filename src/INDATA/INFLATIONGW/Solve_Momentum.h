@@ -24,15 +24,15 @@ bool Solve_Momentum(double tol_tri = 1.e-10, double tol_res = 1.e-8,
     veclaplacian->GetSolution(del_W_r, del_W_t, del_W_p);
     update_W();
     res_norm = Momentum_Residual();
-    if (verbose) cout << " DUALEMWAVE - Momentum residual after " << step
+    if (verbose) cout << " INFLATIONGW - Momentum residual after " << step
 		      << " steps = " << res_norm << endl;
   }
   if (res_norm < tol_res) {
-    cout << " DUALEMWAVE - Momentum residual converged to " << res_norm
+    cout << " INFLATIONGW - Momentum residual converged to " << res_norm
 	 << " in " << step << " steps" << endl;
     return true;
   } else {
-    cout << " DUALEMWAVE - Momentum constraint did not converge! " << endl;
+    cout << " INFLATIONGW - Momentum constraint did not converge! " << endl;
     cout << "              Residual " << res_norm << " after " << step
 	 << " steps " << endl;
     return false;
@@ -59,7 +59,7 @@ double Momentum_Residual() {
       for (int k = N_g; k < n_phi - N_g; k++) {
 	      const double psil = psi(i,j,k);
 	      const double psi6 = pow(psil, 6);
-	      const double RHS_r = (2. / 3.) * psi6 * K.dr(i,j,k); //LEFT OFF HERE
+	      const double RHS_r = (2. / 3.) * psi6 * K.dr(i,j,k);
 	      const double RHS_t = (2. / 3.) * psi6 * K.dr(i,j,k);
 	      const double RHS_p = 8.0*PI*psi10*s_p(i,j,k);
 	//

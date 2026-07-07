@@ -11,7 +11,7 @@ private:
 	FlatEllSolver3D* laplace;
 	VecLaplacian* veclaplacian;
 #endif
-	gf3d psi, rho, res, u, delta_psi, sf, K; //CHECK IF V IS OKAY HERE
+	gf3d psi, rho, res, u, delta_psi, sf, K; 
 	// all vector and tensor components rescaled...
     // gf3d V;
 	gf3d s_r, s_t, s_p;     // components of momentum densities (upstairs)
@@ -34,6 +34,7 @@ private:
 	bool all_clear;
 	QuadraticPotential* potential;
 	ostringstream indata_name;
+	VecDoub psi_r;
 public:
 	//================================================
 	// Constructor
@@ -58,6 +59,7 @@ public:
 		infile.get(buf, 100, '='); infile.get(c); infile >> sigma;
 		infile.get(buf, 100, '='); infile.get(c); infile >> epsilon;
 		infile.get(buf, 100, '='); infile.get(c); infile >> m;
+		infile.get(buf, 100, '='); infile.get(c); infile >> branch;
 
 		infile.get(buf, 100, '='); infile.get(c); infile >> nakamura_type;
 		infile.get(buf, 100, '='); infile.get(c); infile >> GW_amp;
@@ -71,6 +73,7 @@ public:
 			<< ", sigma = " << sigma
 			<< ", epsilon = " << epsilon
 			<< ", mass = " << m
+			<< ", branch = " branch
 
 		cout << "      and Nakamura type = " << nakamura_type << " with amplitude " 
             << GW_amp << endl;
@@ -106,7 +109,6 @@ public:
 		rho.setup(grid, 1, "rho", gf_counter++, +1, +1, +1);
 		res.setup(grid, 1, "res", gf_counter++, +1, +1, +1);
 		u.setup(grid, 1, "u", gf_counter++, +1, +1, +1);
-		// CHECK if +1 +1 +1 is correct and V and K should be set up this way
 		sf.setup(grid, 1, "sf", gf_counter++, +1, +1, +1);
 		K.setup(grid, 1, "K", gf_counter++, +1, +1, +1);  
 		s_r.setup(grid, 1, "s_r", gf_counter++, -1, +1, +1);
@@ -132,6 +134,9 @@ public:
 		// AE_p.setup(grid, 1, "AE_p", gf_counter++, -1, -1, +1); 
 		// AE_dot_p.setup(grid, 1, "AE_p", gf_counter++, -1, -1, +1); 
 		//
+		for (i = 0; i < n_r; i++) {
+			psi_r[i] = 0.0;
+		}
 		//================================================
 		// compute source functions and initialize psi etc...
 		//================================================
@@ -187,7 +192,7 @@ public:
 				return false;
 			}
 #endif
-		}
+		};
 
 	//================================================
 	// Solve constraints
@@ -197,7 +202,12 @@ public:
 		cout << " InflationGW: initial constraint residual = " << res << endl;
 		int step = 0;
 		const double tol_tri = 1.e-12;
-		Solve_Psi(); //CHECK if need specific arguments for this
+		cout << " INFLATIONGW: Computing scalar field and sources" << endl;
+		Compute_Fields();
+		Compute_Sources();
+		cout << " INFLATIONGW: Solving for psi" << endl;
+		Solve_Psi(tol_tri); 
+		cout << " INFLATIONGW: Computing initial A_ij" << endl;
 		Compute_Aij(); //Should update to Nakamura data only
 		
 		while (res > tol && step < max_it) {
@@ -208,9 +218,8 @@ public:
 			Solve_K();
 			Solve_Momentum(tol_tri, current_tol, verbose);
 			Compute_Aij();
-			Solve_Hamiltonian(tol_tri, current_tol, verbose);
 			res = Residual();
-			cout << " DUALEMWAVE: after " << step
+			cout << " INFLATIONGW: after " << step
 				<< " steps constraint residual = " << res << endl;
 			if (verbose)
 				cout << " ============================================================"
@@ -223,7 +232,7 @@ public:
 	//================================================
 	double Residual() {
 		const double mom_res = Momentum_Residual();
-		const double ham_res = Hamiltonian_Residual();
+		const double ham_res = Hamiltonian_K_Residual();
 		return sqrt(mom_res * mom_res + ham_res * ham_res);
 	}
 
@@ -334,7 +343,7 @@ public:
 		return 0.0;
 	};
 	//================================================
-	// Analytical solution for gauge
+	// Analytical solution for gauge (Should lapse just be 1.0?)
 	//================================================
 	double lapse_analytical(double rl, double thetal, double phil, double t) {
 		int i = grid->i_ind(rl);
@@ -414,22 +423,22 @@ public:
 	// eq. (16) in Knapp, Walker & Baumgarte, 2002
 	//
 	double a_r_analytical(double r, double theta, double phi, double t) {
-		return compute_a_r(r, theta);
+		return 0.0;
 	};
 	double a_t_analytical(double r, double theta, double phi, double t) {
-		return compute_a_t(r, theta);
+		return 0.0;
 	};
 	double a_p_analytical(double r, double theta, double phi, double t) {
-		return compute_a_p(r, theta);
+		return 0.0;
 	};
 	double as_r_analytical(double r, double theta, double phi, double t) {
-		return compute_as_r(r, theta);
+		return 0.0;
 	};
 	double as_t_analytical(double r, double theta, double phi, double t) {
-		return compute_as_t(r, theta);
+		return 0.0;
 	};
 	double as_p_analytical(double r, double theta, double phi, double t) {
-		return compute_as_p(r, theta);
+		return 0.0;
 	};
 	//================================================
 	// Analytical solution for radiation
@@ -457,8 +466,7 @@ private:
 	//===============================================================
 	// Solve Hamiltonian constraint
 	//===============================================================
-#include "INFLATIONGW/Solve_Hamiltonian_K.h"
-#include "INFLATIONGW/Solve_Hamiltonian_Psi.h"
+#include "INFLATIONGW/Solve_Hamiltonian.h"
 	//===============================================================
 	// Solve momentum constraints
 	//===============================================================
@@ -466,75 +474,7 @@ private:
 	//=============================================================== 
 	// Compute \bar A^{ij} from vector potential W^i
 	//=============================================================== 
-    // ADD NAKAMURA TT COMPONENT
-	void Compute_Aij() {
-		for (int i = N_g; i < n_r - N_g; i++) {
-			const double rl = rho.r(i);
-			const double r2 = rl * rl;
-			for (int j = N_g; j < n_theta - N_g; j++) {
-				const double stl = rho.sintheta(j);
-				const double st2 = stl * stl;
-				const double csl = rho.costheta(j);
-				const double ctl = csl / stl;
-				for (int k = N_g; k < n_phi - N_g; k++) {
-					const double div = W_r.dr(i, j, k) + 2. * W_r(i, j, k) / rl
-						+ W_t.dtheta(i, j, k) / rl + W_t(i, j, k) * ctl / rl;
-					// compute covariant derivatives D^i W^j
-					const double DrWr = W_r.dr(i, j, k);
-					const double DtWr = (W_r.dtheta(i, j, k) - W_t(i, j, k)) / rl;
-					const double DpWr = -W_p(i, j, k) / rl;
-					const double DrWt = W_t.dr(i, j, k);
-					const double DtWt = (W_t.dtheta(i, j, k) + W_r(i, j, k)) / rl;
-					const double DpWt = -ctl * W_p(i, j, k) / rl;
-					const double DrWp = W_p.dr(i, j, k);
-					const double DtWp = W_p.dtheta(i, j, k) / rl;
-					const double DpWp = (W_r(i, j, k) + ctl * W_t(i, j, k)) / rl;
-					//if (nakamura_type == 0):
-					A_rr[i][j][k] = 2.0 * DrWr - 2. / 3. * div;
-					A_rt[i][j][k] = DrWt + DtWr;
-					A_rp[i][j][k] = DrWp + DpWr;
-					A_tt[i][j][k] = 2.0 * DtWt - 2. / 3. * div;
-					A_tp[i][j][k] = DtWp + DpWt;
-					A_pp[i][j][k] = 2.0 * DpWp - 2. / 3. * div;
-					// if (i == N_g && j == N_g && k == N_g) 
-					//   cout << " reality check: "
-					//        << A_rr(i,j,k) + A_tt(i,j,k) + A_pp(i,j,k) << endl;
-					A2[i][j][k] = A_rr(i, j, k) * A_rr(i, j, k)
-						+ 2.0 * A_rt(i, j, k) * A_rt(i, j, k)
-						+ 2.0 * A_rp(i, j, k) * A_rp(i, j, k)
-						+ A_tt(i, j, k) * A_tt(i, j, k)
-						+ 2.0 * A_tp(i, j, k) * A_tp(i, j, k)
-						+ A_pp(i, j, k) * A_pp(i, j, k);
-				}
-			}
-		}
-
-	}
-	//===============================================================
-	// Compute physical curl: returns scaled eps^ijk ( D_j A_k - D_k A_j )
-	// where D_i is covariant derivative with respect to reference metric,
-	// but epsilon is physical (rescaled) 3D epsilon: psi^{-6}[ijk]
-	//===============================================================
-	void curl(gf3d& a_r, gf3d& a_t, gf3d& a_p,
-						double& curl_a_r, double& curl_a_t, double& curl_a_p,
-						int i, int j, int k) {
-		const double rl = a_r.r(i);
-		const double stl = a_r.sintheta(j);
-		const double ctl = a_r.costheta(j);
-		const double cot = ctl / stl;
-		const double psil = psi(i, j, k);
-		const double psim6 = 1. / (psil * psil * psil * psil * psil * psil);
-		// const double D_r_A_t = rl*a_t.dr(i,j,k);
-		// const double D_r_A_p = rl*stl*a_p.dr(i,j,k);
-		// const double D_t_A_r = a_r.dtheta(i,j,k) - a_t(i,j,k);
-		// const double D_t_A_p = rl*stl*a_p.dtheta(i,j,k);
-		// const double D_p_A_r = - stl*a_p(i,j,k);
-		// const double D_p_A_t = - rl*ctl*a_p(i,j,k);
-		curl_a_r = psim6 * (a_p.dtheta(i, j, k) + cot * a_p(i, j, k)) / rl;
-		curl_a_t = -psim6 * (a_p.dr(i, j, k) + a_p(i, j, k) / rl);
-		curl_a_p = psim6 * (a_t.dr(i, j, k) - (a_r.dtheta(i, j, k) - a_t(i, j, k)) / rl);
-	}
-
+#include "INFLATIONGW/Solve_Aij.h"
 	//================================================
 	// Dump function
 	//================================================
