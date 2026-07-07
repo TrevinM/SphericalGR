@@ -60,7 +60,6 @@ public:
 		infile.get(buf, 100, '='); infile.get(c); infile >> phi_0;
 		infile.get(buf, 100, '='); infile.get(c); infile >> sigma;
 		infile.get(buf, 100, '='); infile.get(c); infile >> epsilon;
-		infile.get(buf, 100, '='); infile.get(c); infile >> m;
 		infile.get(buf, 100, '='); infile.get(c); infile >> branch;
 
 		infile.get(buf, 100, '='); infile.get(c); infile >> nakamura_type;
@@ -74,7 +73,6 @@ public:
 		cout << "      inflaton parameters phi_0 = " << phi_0
 			<< ", sigma = " << sigma
 			<< ", epsilon = " << epsilon
-			<< ", mass = " << m
 			<< ", branch = " << branch << endl;
 
 		cout << "      and Nakamura type = " << nakamura_type << " with amplitude " 
