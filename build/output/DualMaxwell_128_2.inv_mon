@@ -1,0 +1,20 @@
+# Constraint monitor file created at Tue Jul  7 15:36:13 2026
+# ======================================== 
+#   Running code assuming AXISYMMETRY     
+# ======================================== 
+# Monitoring evolution of Inflation GW initial data in asymptotic Minkowski spacetime 
+# Evolving with BSSN formalism 
+# Evolving with fourth-order Runge-Kutta 
+# Evolved with (128,2,1) gridpoints (NOT including ghosts),
+# Grid extends to r_max = 20, Courant factor = 0.4
+# Parameters for radial and angular grid : 0 and 0
+# Kreiss-Oliger coefficient = 0.1
+# Using LAGRANGIAN form of evolution equations 
+# Evolution with geodesic slicing and 
+# constant shift
+# Noting values every 10 time steps.
+# time          tau at center   I_re (center)   I_re (cur max)  I_re_int        I_im (center)   I_im (cur max)  I_im_int        J_re (center)   J_re (cur max)  J_re_int        J_im (center)   J_im (cur max)  J_im_int        zeta (center)   zeta (cur max)  
+#============================================================================================================
+0               0               -5.1717583e-08  7.612291e-07    5.270833e-06    0               0               0               -1.0333374e-10  2.8340063e-10   1.3660244e-09   0               0               0               8.6796074e-05   8.4344065e-05   
+# Monitor file closed at Tue Jul  7 15:36:45 2026
+# Bye!
