@@ -1,0 +1,6 @@
+#!/bin/bash
+#SBATCH --mail-type=BEGIN,END,FAIL
+
+export OMP_NUM_THREADS=16
+
+/mnt/research/tbaumgar/Students/pharris/SphericalGR/updated_runs/gamma_2/a_0.1/v_0.1/SphericalGR /mnt/research/tbaumgar/Students/pharris/SphericalGR/updated_runs/gamma_2/a_0.1/v_0.1/Input

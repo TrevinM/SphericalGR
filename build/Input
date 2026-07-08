@@ -1,6 +1,6 @@
 Directory of code source files = /mnt/research/tbaumgar/Work/Disks/src
 Get rid of old output = 1
-Maximum time = 0.0
+Maximum time = 1000.0
 Coefficient for Kreiss-Oliger = 0.1
 Lagrangian (1) or Eulerian (0) formulation = 1
 Cowling Approximation (0: no, 1: fix gravity, 2: fix matter) = 0

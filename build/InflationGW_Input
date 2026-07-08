@@ -1,14 +1,14 @@
 Parameters for the initial inflaton field
-        phi_0 = 3.06744
-        sigma = 0.77
-        epsilon = 0.5
-        branch (0: weak, 1: strong) = 1
+        phi_0 = -0.85089 (60 e-folds: -3.06744, 5 e-folds: -0.85089)
+        sigma = 10.
+        epsilon = 0.
+        branch (0: weak, 1: strong) = 0
 	
 Gravitational wave parameters
        Nakamura A^ij family (See BGH 2026, 0: A, 1: B) = 2
        Wave amplitude = 1.0
 
 Parameters for elliptic solver
-       max_it = 10000
-       tol = 1.e-9
+       max_it = 100000
+       tol = 1.e-4
 

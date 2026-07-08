@@ -109,7 +109,7 @@ void ScalarField::dot_pi(scalar_state *m, state *s, curvature *c, double time) {
 	derivs->pi[i][j][k] = br * m->pi.dr(i,j,k,br) + 
 	  bt * m->pi.dtheta(i,j,k,bt) + 
 	  bp * m->pi.dphi(i,j,k,bp) +
-	  s->lapse(i,j,k) * s->K(i,j,k) * m->pi(i,j,k);
+	  s->lapse(i,j,k) * s->K(i,j,k) * m->pi(i,j,k) + s->lapse(i,j,k) * potential->dVdsf(m->sf[i][j][k]);
 #ifdef FLAT
 	const double e4p = 1.0;
 	tensor gup(1.0, 0.0, 0.0, 1.0/(rl*rl), 0.0, 1.0/(rst*rst));
@@ -190,7 +190,7 @@ void ScalarField::ADM_Sources(state * s, curvature * c)
   	//
   	// Now compute ADM density...
   	// 
-	adm_sources->rho_ADM[i][j][k] = 0.5 * ( pi2 + psi2 );
+	adm_sources->rho_ADM[i][j][k] = 0.5 * ( pi2 + psi2 ) + potential->V(inter->sf[i][j][k]);
 	//
   	// ... fluxes ...
   	//
@@ -200,16 +200,16 @@ void ScalarField::ADM_Sources(state * s, curvature * c)
   	//
   	// ... stresses ...
   	//
-  	adm_sources->S_rr[i][j][k] = psi[0] * psi[0] + 0.5 * e4p * g_conf[0][0] * ( pi2 - psi2 );
-	adm_sources->S_rt[i][j][k] = psi[0] * psi[1] + 0.5 * e4p * g_conf[0][1] * ( pi2 - psi2 );
-  	adm_sources->S_rp[i][j][k] = psi[0] * psi[2] + 0.5 * e4p * g_conf[0][2] * ( pi2 - psi2 );
-  	adm_sources->S_tt[i][j][k] = psi[1] * psi[1] + 0.5 * e4p * g_conf[1][1] * ( pi2 - psi2 );
-  	adm_sources->S_tp[i][j][k] = psi[1] * psi[2] + 0.5 * e4p * g_conf[1][2] * ( pi2 - psi2 );
-  	adm_sources->S_pp[i][j][k] = psi[2] * psi[2] + 0.5 * e4p * g_conf[2][2] * ( pi2 - psi2 );
+  	adm_sources->S_rr[i][j][k] = psi[0] * psi[0] + 0.5 * e4p * g_conf[0][0] * ( pi2 - psi2 ) - e4p * g_conf[0][0] * potential->V(inter->sf[i][j][k]);
+	adm_sources->S_rt[i][j][k] = psi[0] * psi[1] + 0.5 * e4p * g_conf[0][1] * ( pi2 - psi2 ) - e4p * g_conf[0][1] * potential->V(inter->sf[i][j][k]);
+  	adm_sources->S_rp[i][j][k] = psi[0] * psi[2] + 0.5 * e4p * g_conf[0][2] * ( pi2 - psi2 ) - e4p * g_conf[0][2] * potential->V(inter->sf[i][j][k]);
+  	adm_sources->S_tt[i][j][k] = psi[1] * psi[1] + 0.5 * e4p * g_conf[1][1] * ( pi2 - psi2 ) - e4p * g_conf[1][1] * potential->V(inter->sf[i][j][k]);
+  	adm_sources->S_tp[i][j][k] = psi[1] * psi[2] + 0.5 * e4p * g_conf[1][2] * ( pi2 - psi2 ) - e4p * g_conf[1][2] * potential->V(inter->sf[i][j][k]);
+  	adm_sources->S_pp[i][j][k] = psi[2] * psi[2] + 0.5 * e4p * g_conf[2][2] * ( pi2 - psi2 ) - e4p * g_conf[2][2] * potential->V(inter->sf[i][j][k]);
   	//
   	// ... and trace of stress: 
   	//
-  	adm_sources->trace_S[i][j][k] = 1.5 * pi2 - 0.5 * psi2;
+  	adm_sources->trace_S[i][j][k] = 1.5 * pi2 - 0.5 * psi2 - 3.0 * potential->V(inter->sf[i][j][k]);
       } 
     }
   }

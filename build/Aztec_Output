@@ -9,7 +9,7 @@
 		*****       processors is changed.
 		*******************************************************
 
-                iter:    0           residual = 1.839780e-02
+                iter:    0           residual = 9.256949e-01
 
 *********************************************************************
 *****  Condition number estimate for subdomain preconditioner on PE 0 = 1.0000e+00
@@ -23,8 +23,8 @@
 		*****       the memory of the overlapped subdomain matrix.
 		*******************************************************
 
-                iter:    1           residual = 4.332937e-18
+                iter:    1           residual = 7.267133e-17
 
 
-		Solution time: 0.000049 (sec.)
+		Solution time: 0.000076 (sec.)
 		total iterations: 1

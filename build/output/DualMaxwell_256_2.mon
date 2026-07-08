@@ -1,4 +1,4 @@
-# Monitor file created at Tue Jul  7 17:09:33 2026
+# Monitor file created at Wed Jul  8 12:05:30 2026
 # ======================================== 
 #   Running code assuming AXISYMMETRY     
 # ======================================== 
@@ -10,7 +10,7 @@
 # Implementing Sommerfeld BCs with derivatives 
 # Evolved with (256,2,1) gridpoints (NOT including ghosts),
 # using eighth-order spatial differencing with 4 ghost zones 
-# Grid extends to r_max = 15.4, Courant factor = 0.4
+# Grid extends to r_max = 200, Courant factor = 0.4
 # Parameters for radial and angular grid : 0 and 0
 # Kreiss-Oliger coefficient = 0.1
 # Using LAGRANGIAN form of evolution equations 
@@ -19,3 +19,5 @@
 # Noting values every 10 time steps.
 # time          tau at center   ADM mass        Ang. Mom.       Lin. Mom.       phi at r=0      lapse at r=0    minimum lapse   K at r=0        regrid crit.    
 #=============================================================================================================================================
+# Monitor file closed at Wed Jul  8 12:27:37 2026
+# Bye!

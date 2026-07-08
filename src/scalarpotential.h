@@ -17,7 +17,7 @@ class QuadraticPotential
         infile.open(input_file);
         if (!infile)
         {
-            cerr << "Couldn't open input for potential :(" << endl;
+            cerr << "Couldn't open input for quadratic potential :(" << endl;
         }
         char buf[100], c;
         infile.get(buf, 100, '='); infile.get(c); infile >> mass;

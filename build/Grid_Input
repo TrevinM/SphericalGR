@@ -3,11 +3,11 @@ Size of (interior) grid
       N_theta = 2
       N_phi = 2
 Outer boundary r_max
-      initial = 15.4
-      final = 15.4
+      initial = 200
+      final = 200
       courant = 0.4
 Maximum number of grid refinements
-      regrids = 10
+      regrids = 0
 Cutoff for refinement (<< 1 for accuracy regridding, > 1 for selfsimilar regridding)
       cutoff = 1.2
 Esimate for accumulation time (choose positive for
