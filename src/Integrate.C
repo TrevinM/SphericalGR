@@ -76,7 +76,7 @@ bool Manager::Integrate(double t_max) {
       // Also force a search for horizon, so that we have
       // horizon data at the same time
       //================================================ 
-      bool force = true;
+      bool force = false;
       double lin_mom_guess = 0.0;
       constraints->FindHorizon(step, t, tau_c, last, curve,
 			       matter->adm_sources, matter->fluxes,

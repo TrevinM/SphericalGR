@@ -5,18 +5,19 @@
 void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		       bool verbose = true) {	
 	double psi0 = 1.0;
-
+	double psi0_last = psi0;
 	double psi_asym_error_init = Integrate(psi0) - 1.0;
 	cout << " INFLATIONGW: Inital psi_asym_error = " << psi_asym_error_init << endl;
  	double psi_asym_error = psi_asym_error_init;
 	int iter = 0;
 	cout << " INFLATIONGW: Finding weak branch bounds for psi0" << endl;
+
 	while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_it) {
 		iter++;
+		psi0_last = psi0;
 		psi0 *= 1.01; //Change from hardcoded
 		psi_asym_error = Integrate(psi0) - 1.0;
 		cout << "INFLATIONGW: psi0 = " << psi0 << " gives asym_error = " << psi_asym_error << endl;
-
 	}
 	if (iter >= max_it) {
 		cerr << " INFLATIONGW: Could not find bounds on psi0 for weak branch" << endl;
@@ -28,6 +29,7 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		psi_asym_error_init = psi_asym_error;
 		while (psi_asym_error * psi_asym_error_init > 0.0 && iter < max_it) {
 			iter++;
+			psi0_last = psi0;
 			psi0 *= 1.01; //Change from hardcoded
 			psi_asym_error = Integrate(psi0) - 1.0;
 			cout << "INFLATIONGW: psi0 = " << psi0 << " gives asym_error = " << psi_asym_error << endl;
@@ -38,7 +40,7 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 	}
 
 	double psi0_high = psi0;
-	double psi0_low = psi0 / 1.05;
+	double psi0_low = psi0_last;
 	double psi_asym_error_low = Integrate(psi0_low) - 1.0;
 	double psi_asym_error_high = Integrate(psi0_high) - 1.0;
 	cout << " INFLATIONGW: Narrowed psi0 to between " << psi0_low << " and " << psi0_high << endl;
@@ -57,7 +59,7 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		cout << " INFLATIONGW: Narrowed psi0 now " << psi0_mid << endl;
 		cout << " INFLATIONGW: psi_asym_error =  " << psi_asym_error << endl;
 	}
-	if (psi0_high - psi0_low <= 1.e-2*tol_tri) {
+	if (abs(psi_asym_error) > tol_tri) {
 		cerr << " INFLATIONGW: ERROR: Root finding failed to converge with bound difference " << psi0_high - psi0_low <<endl;
 	}
 	else {

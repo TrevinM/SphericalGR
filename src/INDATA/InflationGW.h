@@ -218,14 +218,16 @@ public:
 		while (abs(res) > tol && step < max_it) {
 			step++;
 			// call individual constraint solver with slightly smaller tolerances
-			double current_tol = max(tol / 3., res / 1.e3);
+			double current_tol = res / 1.e3;
 			cout << " INFLATIONGW: current tolerance = " << current_tol << endl;
 			Solve_K();
 			Solve_Momentum(tol_tri, current_tol, verbose);
 			Compute_Aij();
 			res = Residual();
 			cout << " INFLATIONGW: after " << step
-				<< " steps constraint residual = " << res << endl;
+				<< " steps constraint residual = " << res 
+				<< " and momentum residual = " << Momentum_Residual() 
+				<< " and K residual = " << Hamiltonian_K_Residual() <<endl;
 			if (verbose)
 				cout << " ============================================================"
 				<< endl;
@@ -345,7 +347,10 @@ public:
 		return A_pp(i, j, k) / psi6;
 	};
 	double K_analytical(double r, double theta, double phi, double t) {
-		return 0.0;
+		int i = grid->i_ind(r);
+		int j = grid->j_ind(theta);
+		int k = grid->k_ind(phi);
+		return K(i,j,k);
 	};
 	//================================================
 	// Analytical solution for gauge

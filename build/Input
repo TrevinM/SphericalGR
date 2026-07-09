@@ -8,8 +8,8 @@ BSSN (0) or Z4 (1) = 0
 Z4 parameters kappa_11 = 0.0, kappa_12 = 0.0, kappa_2 = 0.0, kappa_ric = 0.0
 Runge-Kutta order (2, 3 or 4) = 4
 Apply "characteristic" BCs (rather than derivs - 0: no, 1: yes) = 0
-Dumping data every dump_step = 100 time steps
-Monitor filename  = DualMaxwell
+Dumping data every dump_step = 1 time steps
+Monitor filename  = InflationGw
 Monitoring every notestep = 10 time step
 Starting from check-point at timestep = 0 ('0' if none!) 
 Writing check-points every chkpt_step = 100000 time steps

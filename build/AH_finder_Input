@@ -1,7 +1,7 @@
 Input parameters for horizon finder
 Find horizons after timesteps or times (don't search for Horizons: findtimes < 0)
       findsteps = 0
-      findtimes = 0.1
+      findtimes = -0.1
 Parameter eta in expansion equation
       eta = -1.0
 Parameters for elliptic solver
