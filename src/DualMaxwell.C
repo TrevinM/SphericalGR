@@ -112,6 +112,15 @@ void DualMaxwell::dot_a_as(dualmaxwell_state *m, state *s, double time) {
 	derivs->as_r[i][j][k] += lapsel * curl_a_down[0];
 	derivs->as_t[i][j][k] += lapsel * curl_a_down[1];
 	derivs->as_p[i][j][k] += lapsel * curl_a_down[2];
+	//
+	// finally add Kreiss-Oliger terms
+	// 
+	derivs->a_r[i][j][k] += eta_KO * m->a_r.KO(i,j,k);
+	derivs->a_t[i][j][k] += eta_KO * m->a_t.KO(i,j,k);
+	derivs->a_p[i][j][k] += eta_KO * m->a_p.KO(i,j,k);
+	derivs->as_r[i][j][k] += eta_KO * m->as_r.KO(i,j,k);
+	derivs->as_t[i][j][k] += eta_KO * m->as_t.KO(i,j,k);
+	derivs->as_p[i][j][k] += eta_KO * m->as_p.KO(i,j,k);
       }
     }
   }
