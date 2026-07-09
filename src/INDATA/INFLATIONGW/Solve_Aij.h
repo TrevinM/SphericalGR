@@ -47,6 +47,24 @@ void Compute_Aij() {
             }
         }
     }
+    for (int j = N_g; j < n_theta - N_g; j++) {
+      for (int k = N_g; k < n_phi - N_g; k++) {
+        for (int i = n_r - N_g; i < n_r; i++) {
+          const double rl = rho.r(i);
+          A_rr[i][j][k] = (A_rr[n_r - N_g - 1][j][k] * rho.r(n_r - N_g - 1) * rho.r(n_r - N_g - 1)) / (rl * rl);
+          A_rt[i][j][k] = (A_rt[n_r - N_g - 1][j][k] * rho.r(n_r - N_g - 1) * rho.r(n_r - N_g - 1)) / (rl * rl);
+          A_tt[i][j][k] = (A_tt[n_r - N_g - 1][j][k] * rho.r(n_r - N_g - 1) * rho.r(n_r - N_g - 1)) / (rl * rl);
+          A_rp[i][j][k] = (A_rp[n_r - N_g - 1][j][k] * rho.r(n_r - N_g - 1) * rho.r(n_r - N_g - 1)) / (rl * rl);
+          A_pp[i][j][k] = (A_pp[n_r - N_g - 1][j][k] * rho.r(n_r - N_g - 1) * rho.r(n_r - N_g - 1)) / (rl * rl);
+          A2[i][j][k] = A_rr(i, j, k) * A_rr(i, j, k)
+                    + 2.0 * A_rt(i, j, k) * A_rt(i, j, k)
+                    + 2.0 * A_rp(i, j, k) * A_rp(i, j, k)
+                    + A_tt(i, j, k) * A_tt(i, j, k)
+                    + 2.0 * A_tp(i, j, k) * A_tp(i, j, k)
+                    + A_pp(i, j, k) * A_pp(i, j, k);
+        }
+      }
+    }
 
 }
 

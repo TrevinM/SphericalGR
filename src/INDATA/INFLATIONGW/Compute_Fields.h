@@ -4,7 +4,7 @@
 // Compute fields...
 //===============================================================
 void Compute_Fields() {
-	for (int i = N_g; i < n_r - N_g; i++) {
+	for (int i = N_g; i < n_r; i++) {
 		const double rl = rho.r(i);
 		for (int j = N_g; j < n_theta - N_g; j++) {
 			const double thetal = rho.theta(j);
@@ -33,7 +33,7 @@ double compute_sf(double r) {
 // Compute only once after solving for psi
 //===============================================================
 void Compute_Sources() {
-	for (int i = N_g; i < n_r - N_g; i++) {
+	for (int i = N_g; i < n_r; i++) {
 		const double rl = rho.r(i);
 		const double r2 = rl * rl;
 		for (int j = N_g; j < n_theta - N_g; j++) {

@@ -1,10 +1,10 @@
 Size of (interior) grid
-      N_r = 1048
+      N_r = 248
       N_theta = 6
       N_phi = 2
 Outer boundary r_max
-      initial = 200.
-      final = 200.
+      initial = 15.4
+      final = 15.4
       courant = 0.4
 Maximum number of grid refinements
       regrids = 0

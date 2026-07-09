@@ -152,14 +152,14 @@ double Hamiltonian_Psi_Residual() {
 
 
 void Solve_K() {
-	const double w = 1.0; // Relaxation factor, 1.0 for none
-	for (int i = N_g; i < n_r - N_g; i++) {
+	const double w = step_factor;
+	for (int i = N_g; i < n_r; i++) {
 		const double rl = K.r(i);
 		for (int j = N_g; j < n_theta - N_g; j++) {
 			const double thetal = K.theta(j);
 			const double Knew = compute_K(rl, thetal);
 			for (int k = N_g; k < n_phi - N_g; k++) {
-				K[i][j][k] = (w * Knew) + ((1.0 - w) * K[i][j][k]);
+				K[i][j][k] = w * Knew + (1.0 - w) * K[i][j][k];
 			}
 		}
 	}

@@ -31,7 +31,7 @@ private:
     int nakamura_type; //0 for A, 1 for B. See BGH 2026
 	int branch;
 	double tol;
-	double phi_0, sigma, epsilon, m, GW_amp;   // parameters for initial data
+	double phi_0, sigma, epsilon, m, GW_amp, step_factor;   // parameters for initial data
 	double PI;
 	bool all_clear;
 	QuadraticPotential* potential;
@@ -68,6 +68,8 @@ public:
 		infile.get(buf, 100, '='); infile.get(c); infile >> max_it;
 		infile.get(buf, 100, '='); infile.get(c); infile >> tol;
 
+		infile.get(buf, 100, '='); infile.get(c); infile >> step_factor;
+
 
 		cout << " INFLATIONGW: Will set up Inflation GW initial data with" << endl;
 		cout << "      inflaton parameters phi_0 = " << phi_0
@@ -79,7 +81,8 @@ public:
             << GW_amp << endl;
 		cout << " INFLATIONGW: Will run elliptic solver with max_it = " << max_it
 			<< " and tol = " << tol << endl;
-		cout << "INFLATIONGW: Could not find nakamura type, using no GW " << endl;
+		
+		cout << " INFLATIONGW: Solving with step factor = " << step_factor << endl;
 		analytical = false;
 		PI = acos(-1.0);
 		indata_name << "Inflation GW initial data";
@@ -111,7 +114,7 @@ public:
 		res.setup(grid, 1, "res", gf_counter++, +1, +1, +1);
 		u.setup(grid, 1, "u", gf_counter++, +1, +1, +1);
 		sf.setup(grid, 1, "sf", gf_counter++, +1, +1, +1);
-		K.setup(grid, 1, "K", gf_counter++, +1, +1, +1);  
+		K.setup(grid, 2, "K", gf_counter++, +1, +1, +1);  
 		s_r.setup(grid, 1, "s_r", gf_counter++, -1, +1, +1);
 		s_t.setup(grid, 1, "s_t", gf_counter++, +1, -1, -1);
 		s_p.setup(grid, 1, "s_p", gf_counter++, -1, -1, +1);

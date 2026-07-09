@@ -9,34 +9,24 @@
 		*****       processors is changed.
 		*******************************************************
 
-                iter:    0           residual = 6.614859e+00
+                iter:    0           residual = 7.119464e-01
 
 *********************************************************************
-*****  Condition number estimate for subdomain preconditioner on PE 0 = 1.3456e+04
+*****  Condition number estimate for subdomain preconditioner on PE 0 = 7.9783e+01
 *********************************************************************
 
 		*******************************************************
 		*****       Subdomain overlapping requires 1.000e+00 times
 		*****       the memory used for the nonoverlapped
 		*****       subdomain matrix.
-		***** ilut: The ilut factors require 2.926e+00 times 
+		***** ilut: The ilut factors require 2.920e+00 times 
 		*****       the memory of the overlapped subdomain matrix.
 		*******************************************************
 
-                iter:    1           residual = 1.286563e-05
-                iter:    2           residual = 2.093958e-10
-                iter:    3           residual = 3.149704e-17
-
-	Solver:			gmres
-	number of iterations:	3
-
-	Actual residual =  1.8850e-19	Recursive residual =  4.8170e-25
-
-	Calculated Norms				Requested Norm
-	--------------------------------------------	--------------
-
-	||r||_2 / ||b||_2:		1.232519e-11	1.000000e-12
+                iter:    1           residual = 2.032585e-06
+                iter:    2           residual = 3.430156e-10
+                iter:    3           residual = 1.125687e-16
 
 
-		Solution time: 0.097539 (sec.)
+		Solution time: 0.018687 (sec.)
 		total iterations: 3

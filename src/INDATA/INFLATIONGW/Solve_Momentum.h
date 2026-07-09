@@ -5,7 +5,7 @@
 bool Solve_Momentum(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		    bool verbose = true) {
 #ifdef NoEllSolver
-  cout << " INFLATIONGW: Can't construct Inflation Gw initial data without an Elliptic Solver!! " << endl;
+  cout << " INFLATIONGW: Can't construct Inflation GW initial data without an Elliptic Solver!! " << endl;
   return false;
 #else
   double res_norm = Momentum_Residual();
