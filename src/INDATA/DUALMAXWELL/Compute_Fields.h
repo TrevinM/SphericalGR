@@ -33,55 +33,38 @@ void Compute_Fields() {
 }
 
 
-//Arbitrary function used in spherical harmonic solutions
-double f_pm(double x) {
-	const double rpr0 = x + r0;
-	const double rmr0 = x - r0;
-	return 0.5 * (exp(-rpr0*rpr0) + exp(-rmr0*rmr0))* x;
-}
-
-double f_pm_dx(double x) {
-	const double rpr0 = x + r0;
-	const double rmr0 = x - r0;
-	return 0.5 * (exp(-rpr0*rpr0) + exp(-rmr0*rmr0)) * (1. - 2. * x*x);
-}
-
-double f_pm_dx2(double x) {
-	const double rpr0 = x + r0;
-	const double rmr0 = x - r0;
-	return (exp(-rpr0*rpr0) + exp(-rmr0*rmr0)) * x * (-3. + 2. * x*x);
-}
-
-double f_pm_dx3(double x) {
-	const double rpr0 = x + r0;
-	const double rmr0 = x - r0;
-	return (exp(-rpr0*rpr0) + exp(-rmr0*rmr0)) * (-3. + 12. * x*x - 4. * x*x*x*x);
-}
-
-double f_pm_dx4(double x) {
-	const double rpr0 = x + r0;
-	const double rmr0 = x - r0;
-	return 2. * (exp(-rpr0*rpr0) + exp(-rmr0*rmr0)) * x * (15. - 20. * x*x + 4. * x*x*x*x);
-}
-
-//Spherical harmonic solutions
-double l1(double r, double theta) {
-	return sin(theta) * ((f_pm(r) / (r*r)) - f_pm_dx(r) / r);
-}
 
 double l2(double r, double theta) {
-	return sin(theta) * cos(theta) 
-		* (f_pm(r) / (r*r*r)
-		- f_pm_dx(r) / (r*r)
-		+ f_pm_dx2(r) / (3. * r));
+	double Em = std::exp(-(r - r0) * (r - r0));
+	double Ep = std::exp(-(r + r0) * (r + r0));
+
+	double xm = r - r0;
+	double xp = r + r0;
+
+	return (1.0 / (3.0 * r)) 
+		* (
+			Em * (xm + 2.0 * xm * xm - r)
+			+ Ep * (xp + 2.0 * xp * xp - r)
+		)
+		* std::cos(theta)
+		* std::sin(theta);
 }
 
 double l3(double r, double theta) {
-	return (5. * pow(cos(theta), 2) - 1.) * sin(theta)
-		* (f_pm(r) / (r*r*r*r) 
-		- f_pm_dx(r) / (r*r*r)
-		+ 2.* f_pm_dx2(r) / (5. * r*r) 
-		- f_pm_dx3(r) / (15. * r));
+	double Em = std::exp(-(r - r0) * (r - r0));
+	double Ep = std::exp(-(r + r0) * (r + r0));
+
+	double xm = r - r0;
+	double xp = r + r0;
+
+	// Final simplified expression
+	return (
+			Em * (6.0 * xm + 12.0 * xm * xm + 4.0 * xm * xm * xm - 6.0 * r)
+			+ Ep * (6.0 * xp + 12.0 * xp * xp + 4.0 * xp * xp * xp - 6.0 * r)
+		)
+		/ (15.0 * r * r)
+		* (5.0 * std::cos(theta) * std::cos(theta) - 1.0)
+		* std::sin(theta);
 }
 
 //===============================================================
