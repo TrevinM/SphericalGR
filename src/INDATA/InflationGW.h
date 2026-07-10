@@ -31,7 +31,7 @@ private:
     int nakamura_type; //0 for A, 1 for B. See BGH 2026
 	int branch;
 	double tol;
-	double phi_0, sigma, epsilon, m, GW_amp, step_factor;   // parameters for initial data
+	double phi_0, sigma, epsilon, m, GW_amp, step_factor, wave_sigma, mom_step_factor;   // parameters for initial data
 	double PI;
 	bool all_clear;
 	QuadraticPotential* potential;
@@ -64,11 +64,13 @@ public:
 
 		infile.get(buf, 100, '='); infile.get(c); infile >> nakamura_type;
 		infile.get(buf, 100, '='); infile.get(c); infile >> GW_amp;
+		infile.get(buf, 100, '='); infile.get(c); infile >> wave_sigma;
 
 		infile.get(buf, 100, '='); infile.get(c); infile >> max_it;
 		infile.get(buf, 100, '='); infile.get(c); infile >> tol;
 
 		infile.get(buf, 100, '='); infile.get(c); infile >> step_factor;
+		infile.get(buf, 100, '='); infile.get(c); infile >> mom_step_factor;
 
 
 		cout << " INFLATIONGW: Will set up Inflation GW initial data with" << endl;
@@ -82,7 +84,8 @@ public:
 		cout << " INFLATIONGW: Will run elliptic solver with max_it = " << max_it
 			<< " and tol = " << tol << endl;
 		
-		cout << " INFLATIONGW: Solving with step factor = " << step_factor << endl;
+		cout << " INFLATIONGW: Solving with step factor = " << step_factor 
+		<< " and momentum step factor = " << mom_step_factor << endl;
 		analytical = false;
 		PI = acos(-1.0);
 		indata_name << "Inflation GW initial data";

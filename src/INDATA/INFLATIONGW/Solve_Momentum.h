@@ -97,9 +97,9 @@ void update_W() {
   for (int i = 0; i < n_r; i++) 
     for (int j = 0; j < n_theta; j++) 
       for (int k = 0; k < n_phi; k++) {
-	W_r[i][j][k] += del_W_r(i,j,k);
-	W_t[i][j][k] += del_W_t(i,j,k);
-	W_p[i][j][k] += del_W_p(i,j,k);
+	W_r[i][j][k] += mom_step_factor * del_W_r(i,j,k);
+	W_t[i][j][k] += mom_step_factor * del_W_t(i,j,k);
+	W_p[i][j][k] += mom_step_factor * del_W_p(i,j,k);
       }
 }
 

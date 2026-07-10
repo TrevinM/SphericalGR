@@ -9,24 +9,31 @@
 		*****       processors is changed.
 		*******************************************************
 
-                iter:    0           residual = 7.119464e-01
+                iter:    0           residual = 1.447785e+00
 
 *********************************************************************
-*****  Condition number estimate for subdomain preconditioner on PE 0 = 7.9783e+01
+*****  Condition number estimate for subdomain preconditioner on PE 0 = 6.4459e+01
 *********************************************************************
 
 		*******************************************************
 		*****       Subdomain overlapping requires 1.000e+00 times
 		*****       the memory used for the nonoverlapped
 		*****       subdomain matrix.
-		***** ilut: The ilut factors require 2.920e+00 times 
+		***** ilut: The ilut factors require 3.080e+00 times 
 		*****       the memory of the overlapped subdomain matrix.
 		*******************************************************
 
-                iter:    1           residual = 2.032585e-06
-                iter:    2           residual = 3.430156e-10
-                iter:    3           residual = 1.125687e-16
+                iter:    1           residual = 1.180854e+00
+                iter:    2           residual = 5.496114e-02
+                iter:    3           residual = 1.757884e-03
+                iter:    4           residual = 1.183376e-04
+                iter:    5           residual = 5.803239e-06
+                iter:    6           residual = 2.528373e-07
+                iter:    7           residual = 2.727005e-08
+                iter:    8           residual = 1.680328e-09
+                iter:    9           residual = 4.487300e-11
+                iter:   10           residual = 8.181762e-13
 
 
-		Solution time: 0.018687 (sec.)
-		total iterations: 3
+		Solution time: 0.121188 (sec.)
+		total iterations: 10
