@@ -224,7 +224,7 @@ public:
 		while (abs(res) > tol && step < max_it) {
 			step++;
 			// call individual constraint solver with slightly smaller tolerances
-			double current_tol = res / 1.e3;
+			double current_tol = res / 1.e2;
 			cout << " INFLATIONGW: current tolerance = " << current_tol << endl;
 			Solve_K();
 			Solve_Momentum(tol_tri, current_tol, verbose);

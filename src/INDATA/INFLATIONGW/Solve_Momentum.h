@@ -12,7 +12,7 @@ bool Solve_Momentum(double tol_tri = 1.e-10, double tol_res = 1.e-8,
   if (verbose) cout << " INFLATIONGW - Momentum constraint: initial residual: "
 		    << res_norm << endl;
   int step = 0;
-  int max_step = 50;
+  int max_step = 75;
   while (res_norm > tol_res && step < max_step) {
     step++;
     veclaplacian->SetupSolver();
