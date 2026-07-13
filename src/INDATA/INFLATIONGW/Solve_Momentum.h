@@ -103,6 +103,42 @@ void update_W() {
       }
 }
 
+double Total_Momentum_Residual() { 
+  double res_r_norm2 = 0.0; 
+  double res_t_norm2 = 0.0; 
+  double res_p_norm2 = 0.0; 
+  for (int i = N_g; i < n_r - N_g; i++) { 
+    const double rl = A2.r(i); 
+    const double r2 = rl*rl; 
+    const double rm2 = 1. / r2; 
+    for (int j = N_g; j < n_theta - N_g; j++) { 
+      const double sintheta = A2.sintheta(j); 
+      const double costheta = A2.costheta(j); 
+      const double sin2theta = sintheta*sintheta; 
+      const double sinm2theta = 1. / sin2theta; 
+      const double cottheta = costheta / sintheta; 
+      for (int k = N_g; k < n_phi - N_g; k++) { 
+        const double psil = psi(i,j,k); 
+        const double psi6 = pow(psil, 6); 
+        const double RHS_r = (2. / 3.) * psi6 * K.dr(i,j,k); 
+        const double RHS_t = (2. / 3.) * psi6 * K.dtheta(i,j,k) / rl; // RESCALED, CHECK
+          const double RHS_p = 0.0; // IN AXISYMMETRY
+          res_r[i][j][k] = A_rr.dr(i,j,k) + A_rt.dtheta(i,j,k) / rl + 2.0 * A_rr(i,j,k) / rl
+           - A_tt(i,j,k) / rl - A_pp(i,j,k) / rl + cottheta * A_rt(i,j,k) / rl - RHS_r; 
+           res_r_norm2 += res_r(i,j,k) * res_r(i,j,k); 
+           
+          res_t[i][j][k] = A_rt.dr(i,j,k) + A_tt.dtheta(i,j,k) / rl + 3.0 * A_rt(i,j,k) / rl
+            + cottheta * (A_tt(i,j,k) - A_pp(i,j,k)) / rl - RHS_t;
+            res_t_norm2 += res_t(i,j,k) * res_t(i,j,k);
+
+          res_p[i][j][k] = A_rp.dr(i,j,k) + A_tp.dtheta(i,j,k) / rl + 3.0 * A_rp(i,j,k) / rl
+            + 2.0 * cottheta * A_tp(i,j,k) / rl - RHS_p;
+            res_p_norm2 += res_p(i,j,k) * res_p(i,j,k);
+           }
+        }
+      }
+    return sqrt(res_r_norm2 + res_t_norm2 + res_p_norm2); 
+    }
 
 
 

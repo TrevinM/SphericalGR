@@ -191,6 +191,8 @@ public:
 			veclaplacian->SetupSolver();
 	#endif
 			double res = Solve_Constraints();
+			cout << " INFLATIONGW: Solved constraints with total momentum residual = " << Total_Momentum_Residual() << endl;
+			cout << "				And tested momentum residual = " << Momentum_Residual() << endl;
 			dump(&psi);
 			if (res < tol) {
 				cout << " INFLATIONGW: done with initialization! " << endl;
