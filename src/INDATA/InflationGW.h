@@ -31,7 +31,7 @@ private:
     int nakamura_type; //0 for A, 1 for B. See BGH 2026
 	int branch;
 	double tol;
-	double phi_0, sigma, epsilon, m, GW_amp, step_factor, wave_sigma, mom_step_factor;   // parameters for initial data
+	double phi_0, sigma, epsilon, m, GW_amp, step_factor, mom_step_factor;   // parameters for initial data
 	double PI;
 	bool all_clear;
 	QuadraticPotential* potential;
@@ -64,7 +64,6 @@ public:
 
 		infile.get(buf, 100, '='); infile.get(c); infile >> nakamura_type;
 		infile.get(buf, 100, '='); infile.get(c); infile >> GW_amp;
-		infile.get(buf, 100, '='); infile.get(c); infile >> wave_sigma;
 
 		infile.get(buf, 100, '='); infile.get(c); infile >> max_it;
 		infile.get(buf, 100, '='); infile.get(c); infile >> tol;

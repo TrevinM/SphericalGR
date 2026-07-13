@@ -65,7 +65,13 @@ void Compute_Aij() {
         }
       }
     }
-
+  A_rr.fill_ghosts();
+  A_rt.fill_ghosts();
+  A_tt.fill_ghosts();
+  A_rp.fill_ghosts();
+  A_tp.fill_ghosts();
+  A_pp.fill_ghosts();
+  A2.fill_ghosts();
 }
 
 
@@ -75,13 +81,12 @@ void Compute_Aij() {
   //================================================
   inline double An_rr(double r, double theta) {
     const double r2 = r*r;
-    const double sigma2 = wave_sigma * wave_sigma;
       if (nakamura_type == 0) {
 	const double costheta = cos(theta);
-	return GW_amp * exp(-r2/sigma2) * (1. - 3.0 * costheta * costheta);
+	return GW_amp * exp(-r2/2.0) * (1. - 3.0 * costheta * costheta);
       } else if (nakamura_type == 1) {
 	const double costheta = cos(theta);
-	return GW_amp * exp(-r2/sigma2) * (5. - r2) *
+	return GW_amp * exp(-r2/2.0) * (5. - r2) *
 	  (1. - 3.0 * costheta * costheta);
       }
       else {
@@ -91,11 +96,10 @@ void Compute_Aij() {
 
   inline double An_rt(double r, double theta) {
     const double r2 = r*r;
-    const double sigma2 = wave_sigma * wave_sigma;
       if (nakamura_type == 0) {
-	return GW_amp * exp(-r2/wave_sigma) * (3.0 - r2) * sin(theta) * cos(theta);
+	return GW_amp * exp(-r2/2.0) * (3.0 - r2) * sin(theta) * cos(theta);
       } else if (nakamura_type == 1) {
-	return GW_amp * exp(-r2/wave_sigma) * (15.0 - 10.*r2 + r2*r2) *
+	return GW_amp * exp(-r2/2.0) * (15.0 - 10.*r2 + r2*r2) *
 	  sin(theta) * cos(theta);
       }
       else {
@@ -109,16 +113,15 @@ void Compute_Aij() {
   inline double An_tt(double r, double theta) {
     const double r2 = r*r;
     const double r4 = r2*r2;
-    const double sigma2 = wave_sigma * wave_sigma;
       if (nakamura_type == 0) {
 	const double costheta = cos(theta);
 	const double sintheta = sin(theta);
-	return - GW_amp * exp(-r2/wave_sigma) *
+	return - GW_amp * exp(-r2/2.0) *
 	  (2 - 6.*costheta*costheta + (6 - 8*r2 + r4)*sintheta*sintheta) / 4.0;
       } else if (nakamura_type == 1) {
       const double cos2theta = cos(2.*theta);
       const double r6 = r4*r2;
-      return - GW_amp * exp(-r2/wave_sigma) *
+      return - GW_amp * exp(-r2/2.0) *
 	(20. - 60.*r2 + 17.*r4 - r6 -
 	 (60. - 68.*r2 + 17.*r4 - r6) * cos2theta) / 8.0;
       }
@@ -132,17 +135,16 @@ void Compute_Aij() {
   inline double An_pp(double r, double theta) {
     const double r2 = r*r;
     const double r4 = r2*r2;
-    const double sigma2 = wave_sigma * wave_sigma;
       if (nakamura_type == 0) {
 	const double costheta = cos(theta);
 	const double sintheta = sin(theta);
-	return GW_amp * exp(-r2/wave_sigma) *
+	return GW_amp * exp(-r2/2.0) *
 	  (- 2 + 6.*costheta*costheta +
 	   (6 - 8*r2 + r4)*sintheta*sintheta) / 4.0;
       } else if (nakamura_type == 1) {
       const double cos2theta = cos(2.*theta);
       const double r6 = r4*r2;
-	return GW_amp * exp(-r2/wave_sigma) *
+	return GW_amp * exp(-r2/2.0) *
 	  ( 40. - 64.*r2 + 17.*r4 - r6 +
 	   r2*(56 - 17.*r2 + r4) * cos2theta ) / 8.0;      
       }
