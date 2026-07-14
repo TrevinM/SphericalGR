@@ -8,11 +8,12 @@ bool Solve_Momentum(double tol_tri = 1.e-10, double tol_res = 1.e-8,
   cout << " INFLATIONGW: Can't construct Inflation GW initial data without an Elliptic Solver!! " << endl;
   return false;
 #else
-  double res_norm = Momentum_Residual();
+  //set_nakamura();
+  double res_norm = Total_Momentum_Residual();
   if (verbose) cout << " INFLATIONGW - Momentum constraint: initial residual: "
 		    << res_norm << endl;
   int step = 0;
-  int max_step = 75;
+  int max_step = 50;
   while (res_norm > tol_res && step < max_step) {
     step++;
     veclaplacian->SetupSolver();
@@ -23,7 +24,8 @@ bool Solve_Momentum(double tol_tri = 1.e-10, double tol_res = 1.e-8,
     veclaplacian->Solve(max_it, num_it, tol_tri);
     veclaplacian->GetSolution(del_W_r, del_W_t, del_W_p);
     update_W();
-    res_norm = Momentum_Residual();
+    Compute_Aij();
+    res_norm = Total_Momentum_Residual();
     if (verbose) cout << " INFLATIONGW - Momentum residual after " << step
 		      << " steps = " << res_norm << endl;
   }
@@ -51,6 +53,7 @@ double Momentum_Residual() {
     const double r2 = rl*rl;
     const double rm2 = 1. / r2;
     for (int j = N_g; j < n_theta - N_g; j++) {
+      const double thetal = A2.theta(j);
       const double sintheta = A2.sintheta(j);
       const double costheta = A2.costheta(j);
       const double sin2theta = sintheta*sintheta;
@@ -62,26 +65,36 @@ double Momentum_Residual() {
 	      const double RHS_r = (2. / 3.) * psi6 * K.dr(i,j,k);
 	      const double RHS_t = (2. / 3.) * psi6 * K.dtheta(i,j,k) / rl; // RESCALED, CHECK
 	      const double RHS_p = 0.0; // IN AXISYMMETRY
-	//
+  //
+        const double div_r = A_rr.dr(i,j,k) + A_rt.dtheta(i,j,k) / rl + 2.0 * A_rr(i,j,k) / rl
+           - A_tt(i,j,k) / rl - A_pp(i,j,k) / rl + cottheta * A_rt(i,j,k) / rl;
+        //cout << " div_r = " << div_r << endl;
+        const double div_t = A_rt.dr(i,j,k) + A_tt.dtheta(i,j,k) / rl + 3.0 * A_rt(i,j,k) / rl
+            + cottheta * (A_tt(i,j,k) - A_pp(i,j,k)) / rl;
+        //cout << " div_t = " << div_t << endl;
+        const double div_p = A_rp.dr(i,j,k) + A_tp.dtheta(i,j,k) / rl + 3.0 * A_rp(i,j,k) / rl
+            + 2.0 * cottheta * A_tp(i,j,k) / rl;
+        //cout << " div_p = " << div_p << endl;
+  //
 	res_r[i][j][k] = 4./3.*W_r.ddr(i,j,k)
 	  + 8./3.*W_r.dr(i,j,k)/rl
 	  + W_r.ddtheta(i,j,k)/r2 + cottheta*W_r.dtheta(i,j,k)/r2 
 	  - 8./3.*W_r(i,j,k)/r2 + 1./3.*W_t.drdtheta(i,j,k)/rl
 	  - 7./3.*W_t.dtheta(i,j,k)/r2 - 7./3.*cottheta*W_t(i,j,k)/r2
 	  + cottheta/3.*W_t.dr(i,j,k)/rl
-	  - RHS_r;
+	  + div_r - RHS_r;
 	res_r_norm2 += res_r(i,j,k)*res_r(i,j,k);
 	res_t[i][j][k] = W_t.ddr(i,j,k) + 2.*W_t.dr(i,j,k)/rl
 	  + 4./3.*W_t.ddtheta(i,j,k)/r2
 	  + 4.*cottheta/3.*W_t.dtheta(i,j,k)/r2
 	  - 4./3.*W_t(i,j,k)/(r2*sin2theta) + 8./3.*W_r.dtheta(i,j,k)/r2
 	  + 1./3.*W_r.drdtheta(i,j,k)/rl
-	  - RHS_t;
+	  + div_t - RHS_t;
 	res_t_norm2 += res_t(i,j,k)*res_t(i,j,k);
 	res_p[i][j][k] = W_p.ddr(i,j,k) + 2.*W_p.dr(i,j,k)/rl
 	  + W_p.ddtheta(i,j,k)/r2 + cottheta*W_p.dtheta(i,j,k)/r2
 	  - W_p(i,j,k)/(r2*sin2theta)
-	  - RHS_p;
+	  + div_p - RHS_p;
 	res_p_norm2 += res_p(i,j,k)*res_p(i,j,k);
       }
     }
@@ -90,17 +103,53 @@ double Momentum_Residual() {
 }
 
 
+
+void set_nakamura() {
+  for (int i = N_g; i < n_r; i++){
+  const double rl = A2.r(i); 
+    for (int j = N_g; j < n_theta; j++) {
+    const double thetal = A2.theta(j);
+      for (int k = N_g; k < n_phi; k++) {
+	      A_rr[i][j][k] = An_rr(rl, thetal);
+        A_rt[i][j][k] = An_rt(rl, thetal);
+        A_rp[i][j][k] = An_rp(rl, thetal);
+        A_tt[i][j][k] = An_tt(rl, thetal);
+        A_tp[i][j][k] = An_tp(rl, thetal);
+        A_pp[i][j][k] = An_pp(rl, thetal);
+        A2[i][j][k] = A_rr(i, j, k) * A_rr(i, j, k)
+                    + 2.0 * A_rt(i, j, k) * A_rt(i, j, k)
+                    + 2.0 * A_rp(i, j, k) * A_rp(i, j, k)
+                    + A_tt(i, j, k) * A_tt(i, j, k)
+                    + 2.0 * A_tp(i, j, k) * A_tp(i, j, k)
+                    + A_pp(i, j, k) * A_pp(i, j, k);
+
+      }
+    }
+  }
+  A_rr.fill_ghosts();
+  A_rt.fill_ghosts();
+  A_rp.fill_ghosts();
+  A_tt.fill_ghosts();
+  A_tp.fill_ghosts();
+  A_pp.fill_ghosts();
+  A2.fill_ghosts();
+}
+
+
+
 //====================================================
 // Update W's
 //====================================================
 void update_W() {
-  for (int i = 0; i < n_r; i++) 
-    for (int j = 0; j < n_theta; j++) 
+  for (int i = 0; i < n_r; i++) {
+    for (int j = 0; j < n_theta; j++) {
       for (int k = 0; k < n_phi; k++) {
 	W_r[i][j][k] += mom_step_factor * del_W_r(i,j,k);
 	W_t[i][j][k] += mom_step_factor * del_W_t(i,j,k);
 	W_p[i][j][k] += mom_step_factor * del_W_p(i,j,k);
       }
+    }
+  }
 }
 
 double Total_Momentum_Residual() { 

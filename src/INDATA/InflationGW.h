@@ -193,6 +193,7 @@ public:
 			double res = Solve_Constraints();
 			cout << " INFLATIONGW: Solved constraints with total momentum residual = " << Total_Momentum_Residual() << endl;
 			cout << "				And tested momentum residual = " << Momentum_Residual() << endl;
+			Compute_Aij();
 			dump(&psi);
 			if (res < tol) {
 				cout << " INFLATIONGW: done with initialization! " << endl;
@@ -216,25 +217,21 @@ public:
 		Compute_Sources();
 		cout << " INFLATIONGW: Solving for psi" << endl;
 		Solve_Psi(tol_tri); 
+		cout << " INFLATIONGW: Finding initial A_ij" << endl;
+		Compute_Aij();
 		cout << " INFLATIONGW: psi part of hamiltonian has residual: " << Hamiltonian_Psi_Residual() << endl;
-		cout << " INFLATIONGW: Computing initial A_ij" << endl;
-		Compute_Aij(); 
 		double res = Residual();
 		cout << " INFLATIONGW: initial constraint residual = " << res << endl;
-		
 		while (abs(res) > tol && step < max_it) {
 			step++;
 			// call individual constraint solver with slightly smaller tolerances
-			double current_tol = res / 1.e2;
+			double current_tol = res / 1.e3;
 			cout << " INFLATIONGW: current tolerance = " << current_tol << endl;
 			Solve_K();
 			Solve_Momentum(tol_tri, current_tol, verbose);
-			Compute_Aij();
 			res = Residual();
 			cout << " INFLATIONGW: after " << step
-				<< " steps constraint residual = " << res 
-				<< " and momentum residual = " << Momentum_Residual() 
-				<< " and K residual = " << Hamiltonian_K_Residual() <<endl;
+				<< " steps constraint residual = " << res << endl;
 			if (verbose)
 				cout << " ============================================================"
 				<< endl;
@@ -245,8 +242,11 @@ public:
 	// Total residual
 	//================================================
 	double Residual() {
-		const double mom_res = Momentum_Residual();
+		const double mom_res = Total_Momentum_Residual();
+		cout << " INFLATIONGW: Momentum residual = " << mom_res << endl;
+		//Compute_Aij();
 		const double ham_res = Hamiltonian_K_Residual();
+		cout << " INFLATIONGW: Hamiltonian K residual = " << ham_res << endl;
 		return sqrt(mom_res * mom_res + ham_res * ham_res);
 	}
 

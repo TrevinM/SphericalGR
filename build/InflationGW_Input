@@ -11,7 +11,7 @@ Gravitational wave parameters
 
 Parameters for elliptic solver
        max_it = 1000
-       tol = 1.e-9
-       step_factor = 0.85
+       tol = 1.e-5
+       step_factor = 0.6
        mom_step_factor = 0.85
 
