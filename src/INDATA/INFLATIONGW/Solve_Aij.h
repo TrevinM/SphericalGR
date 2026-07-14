@@ -26,7 +26,7 @@ void Compute_Aij() {
                 const double DtWt = (W_t.dtheta(i, j, k) + W_r(i, j, k)) / rl;
                 const double DpWt = -ctl * W_p(i, j, k) / rl;
                 const double DrWp = W_p.dr(i, j, k);
-                const double DtWp = (W_p.dtheta(i, j, k) - ctl * W_p(i,j,k)) / rl;
+                const double DtWp = (W_p.dtheta(i, j, k) + ctl * W_p(i,j,k)) / rl;
                 const double DpWp = (W_r(i, j, k) + ctl * W_t(i, j, k)) / rl;
                 // Contravariant, but should be the same if rescaled as conformally flat
                 A_rr[i][j][k] = 2.0 * DrWr - 2. / 3. * div + An_rr(rl, thetal);
