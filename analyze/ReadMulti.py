@@ -10,10 +10,11 @@ def PATH(test):
 
 #The test directories to read from
 TESTS = [
-    'SR_RES_32_4',
-    'SR_RES_64_8',
-    'SR_RES_128_16',
-    'SR_RES_256_32'
+    'SR_128_16',
+    'SR_256_32',
+    'SR_512_64',
+    'SR_1024_128'
+    # 'SR_RES_64_8'
 ]
 
 #The dump function name to be read.
@@ -25,8 +26,8 @@ READ_VALUE = 'a_p'
 FILE_TYPE = 'rays'
 
 #Limits of the plot
-XLIMITS = [5, 11]
-YLIMITS = [-0.5, 0.5]
+XLIMITS = None
+YLIMITS = None
 
 #Whether or not to plut each function
 PLOT_NUMERICAL = False
@@ -49,7 +50,7 @@ AUXILIARY = [
     lambda num, an: num - an,
     lambda num, an: 16 * (num - an),
     lambda num, an: 16 * 16 * (num - an),
-    lambda num, an: 16 * 16 * 16 * (num - an)
+    lambda num, an: 16 * 16* 16 * (num - an)
 ]
 
 #The horizontal axis of the plot to be created
@@ -68,15 +69,8 @@ SERIES_GRID = [1]
 #MOVIE: 'r', 'theta', or 't'
 #MOVIE_GRID: list containing animation gridpoint(s) or None to get all available
 MOVIE = 't'
-MOVIE_GRID = [1]
-
-#Scaling the time step for simulations that run at different resolutions
-MOVIE_SCALAR = [
-    1,
-    4,
-    16,
-    64
-]
+MOVIE_GRID = [10]
+MOVIE_PLOT = [0]
 
 #initialize list
 movie_length = [0 for _ in range(len(TESTS))]
@@ -84,12 +78,12 @@ movie_length = [0 for _ in range(len(TESTS))]
 if FILE_TYPE.lower() == 'slice':
     readers = [
         ReaderSlice.SliceReader(PATH(TESTS[i]), READ_VALUE, HORIZONTAL, HORIZONTAL_GRID, SERIES, SERIES_GRID, 
-                                MOVIE, [val * MOVIE_SCALAR[i] for val in MOVIE_GRID]) for i in range(len(TESTS))
+                                MOVIE, MOVIE_GRID) for i in range(len(TESTS))
     ]
 elif FILE_TYPE.lower() == 'rays':
      readers = [
         ReaderRay.RayReader(PATH(TESTS[i]), READ_VALUE, HORIZONTAL, HORIZONTAL_GRID, SERIES, SERIES_GRID, 
-                                MOVIE, [val * MOVIE_SCALAR[i] for val in MOVIE_GRID]) for i in range(len(TESTS))
+                                MOVIE, MOVIE_GRID) for i in range(len(TESTS))
     ] 
 else:
     print(f"File type {FILE_TYPE} not recognized as 'slice'or 'rays'.")
@@ -101,24 +95,44 @@ for i, reader in enumerate(readers):
     reader.set_auxiliary(AUXILIARY[i])
 
     reader.read()
+    # reader.abs_integrate_plot(reader.aux_plot, 'x')
+
     reader.set_xlimits(XLIMITS)
     reader.set_ylimits(YLIMITS)
     reader.set_legend_prefix(TESTS[i])
 
-    movie_length[i] = len(reader.z_grid)
-
+    if MOVIE_PLOT == None:
+        movie_length[i] = len(reader.z_grid)
+    else:
+        movie_length[i] = len(MOVIE_PLOT)
 
 if all(length == movie_length[0] for length in movie_length):
     print("All movie steps length match! Plotting . . .")
-    _, ax = plt.subplots(1)
 
-    for movie_iteration in range(movie_length[0]):
-        ax.clear()
-        for i in range(len(TESTS)):
-            readers[i].plot_z(movie_iteration, ax, PLOT_NUMERICAL, (PLOT_ANALYTICAL and ANALYTICAL != None), (PLOT_AUXILIARY and AUXILIARY != None))
-        plt.pause(0.01)
-    plt.show()
+    if MOVIE_PLOT == None:
+        MOVIE_PLOT = range(movie_length[0])
+
+    fig, ax = plt.subplots(1)
+
+    plot_active = True
+    def on_close(event):
+        global plot_active
+        print("Figure Closed")
+        plot_active = False
+    fig.canvas.mpl_connect('close_event', on_close)
+
+    for movie_iteration in MOVIE_PLOT:
+        if plot_active:
+            ax.clear()
+            for i in range(len(TESTS)):
+                readers[i].plot_z(movie_iteration, ax, PLOT_NUMERICAL, (PLOT_ANALYTICAL and ANALYTICAL != None), (PLOT_AUXILIARY and AUXILIARY != None))
+            plt.pause(0.01)
+        else:
+            break
+    if plot_active:
+        plt.show()
 else:
     print("Movie length mismatch !!!!!")
 
+print("Deleting Readers")
 del readers

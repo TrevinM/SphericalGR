@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 class Reader(ThreeDPlotter, ABC):
 
     def __init__(self, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid):
-        super(Reader, self).__init__()
+        super(Reader, self).__init__(var_name, x_var, x_grid, y_var, y_grid, z_var, z_grid)
 
         #Abstract
         self._files: list
@@ -16,13 +16,6 @@ class Reader(ThreeDPlotter, ABC):
 
         #Public
         self.resolution = self._grid_resolution()
-        self.var_name = var_name
-        self.x_var = x_var.lower()
-        self.x_grid = x_grid
-        self.y_var = y_var.lower()
-        self.y_grid = y_grid
-        self.z_var = z_var.lower()
-        self.z_grid = z_grid
     
     
     @abstractmethod
@@ -184,3 +177,4 @@ class Reader(ThreeDPlotter, ABC):
                                 self.z_val.append(t)
                             else:
                                 self.z_val.append(vals[self.z_index])  
+                                print(f"z_val appended {self.z_val[-1]}")

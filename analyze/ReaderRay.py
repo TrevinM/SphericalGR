@@ -51,7 +51,7 @@ class RayReader(Reader):
             else:
                 break
             
-        vals = [float(x) for x in lines[r_step + 4].split()]
+        vals = [float(x) for x in lines[r_step].split()]
         r = vals[0]
         th = [0, pi/2][th_step]
         var = vals[th_step + 1]
