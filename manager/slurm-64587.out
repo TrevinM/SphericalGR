@@ -1,0 +1,20 @@
+QxDO
+
+========= Iteration 0 =========
+Tue Jul 14 03:03:17 PM EDT 2026
+
+Bounds: 0 and 100
+Previous data: 0
+Using standard convergence
+Submitted batch job 64588
+Submitted batch job 64589
+Submitted batch job 64590
+Submitted batch job 64591
+Submitted batch job 64592
+Submitted batch job 64593
+Submitted batch job 64594
+Submitted batch job 64595
+Submitted batch job 64596
+Finished in .36 hours
+Converged by 1x
+ERROR: Did not converge...
