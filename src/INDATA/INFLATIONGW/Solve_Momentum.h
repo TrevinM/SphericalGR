@@ -9,7 +9,7 @@ bool Solve_Momentum(double tol_tri = 1.e-10, double tol_res = 1.e-8,
   return false;
 #else
   //set_nakamura();
-  double res_norm = Total_Momentum_Residual();
+  double res_norm = Momentum_Residual();
   if (verbose) cout << " INFLATIONGW - Momentum constraint: initial residual: "
 		    << res_norm << endl;
   int step = 0;
@@ -24,8 +24,8 @@ bool Solve_Momentum(double tol_tri = 1.e-10, double tol_res = 1.e-8,
     veclaplacian->Solve(max_it, num_it, tol_tri);
     veclaplacian->GetSolution(del_W_r, del_W_t, del_W_p);
     update_W();
-    Compute_Aij();
-    res_norm = Total_Momentum_Residual();
+    //Compute_Aij();
+    res_norm = Momentum_Residual();
     if (verbose) cout << " INFLATIONGW - Momentum residual after " << step
 		      << " steps = " << res_norm << endl;
   }
@@ -51,30 +51,59 @@ double Momentum_Residual() {
   for (int i = N_g; i < n_r - N_g; i++) {
     const double rl = A2.r(i);
     const double r2 = rl*rl;
+    const double r4 = rl * rl * rl * rl;
     const double rm2 = 1. / r2;
     for (int j = N_g; j < n_theta - N_g; j++) {
       const double thetal = A2.theta(j);
       const double sintheta = A2.sintheta(j);
       const double costheta = A2.costheta(j);
+      const double cos2theta = costheta * costheta;
       const double sin2theta = sintheta*sintheta;
       const double sinm2theta = 1. / sin2theta;
       const double cottheta = costheta / sintheta;
       for (int k = N_g; k < n_phi - N_g; k++) {
+        const double pl = A2.phi(k);
 	      const double psil = psi(i,j,k);
 	      const double psi6 = pow(psil, 6);
 	      const double RHS_r = (2. / 3.) * psi6 * K.dr(i,j,k);
 	      const double RHS_t = (2. / 3.) * psi6 * K.dtheta(i,j,k) / rl; // RESCALED, CHECK
 	      const double RHS_p = 0.0; // IN AXISYMMETRY
+  // Compute analytical values for type A nakamura data
+        //const double F = GW_amp * exp(- r2 / 2.0);
+        //const double A_rr_dr_term = F * (- rl * (1.0 - 3.0 * cos2theta));
+        //const double A_rt_dt_term = F * ((3.0 - r2) * (cos2theta - sin2theta) / rl);
+        //const double A_rr_term = F * (2.0 * (1.0 - 3.0 * cos2theta) / rl);
+        //const double A_rt_term = F * ((3.0 - r2) * cos2theta / rl);
+        //const double A_tt_term = F * (- (- 2.0 + 6. * cos2theta - (6. - 8. * r2 + r4) * sin2theta) / (4. * rl));
+        //const double A_pp_term = F * (- (- 2.0 + 6. * cos2theta + (6. - 8. * r2 + r4) * sin2theta) / (4. * rl));
+        //const double div_r_ana = A_rr_dr_term + A_rt_dt_term + A_rr_term + A_rt_term + A_tt_term + A_pp_term;
+        //cout << " div_r_ana = " << div_r_ana << endl; // INDEED GIVES ZERO
   //
-        const double div_r = A_rr.dr(i,j,k) + A_rt.dtheta(i,j,k) / rl + 2.0 * A_rr(i,j,k) / rl
-           - A_tt(i,j,k) / rl - A_pp(i,j,k) / rl + cottheta * A_rt(i,j,k) / rl;
-        //cout << " div_r = " << div_r << endl;
-        const double div_t = A_rt.dr(i,j,k) + A_tt.dtheta(i,j,k) / rl + 3.0 * A_rt(i,j,k) / rl
-            + cottheta * (A_tt(i,j,k) - A_pp(i,j,k)) / rl;
-        //cout << " div_t = " << div_t << endl;
-        const double div_p = A_rp.dr(i,j,k) + A_tp.dtheta(i,j,k) / rl + 3.0 * A_rp(i,j,k) / rl
-            + 2.0 * cottheta * A_tp(i,j,k) / rl;
-        //cout << " div_p = " << div_p << endl;
+        //const double div_r = A_rr.dr(i,j,k) + A_rt.dtheta(i,j,k) / rl + 2.0 * A_rr(i,j,k) / rl
+        //   - A_tt(i,j,k) / rl - A_pp(i,j,k) / rl + cottheta * A_rt(i,j,k) / rl;
+        //if (div_r > .01){ 
+        //  cout << " OOPS: div_r = " << div_r << " at r = " << rl << " theta = " << thetal << " and phi = " << pl << endl;
+        //}
+        //const double div_t = A_rt.dr(i,j,k) + A_tt.dtheta(i,j,k) / rl + 3.0 * A_rt(i,j,k) / rl
+        //    + cottheta * (A_tt(i,j,k) - A_pp(i,j,k)) / rl;
+        //if (div_t > .01) {
+        //    cout << " OOPS: div_t = " << div_t << " at r = " << rl << " theta = " << thetal << " and phi = " << pl << endl;
+        //}
+        //const double div_p = A_rp.dr(i,j,k) + A_tp.dtheta(i,j,k) / rl + 3.0 * A_rp(i,j,k) / rl
+        //    + 2.0 * cottheta * A_tp(i,j,k) / rl;
+        //if (div_p > .01) {
+        //  cout << " OOPS: div_p = " << div_p << " at r = " << rl << " theta = " << thetal  << " and phi = " << pl << endl;
+        //}
+        //cout << " At r = " << rl << " and theta = " << thetal << ", have: " << endl;
+        //cout << " A_rr_dr_term difference = " << A_rr.dr(i,j,k) - A_rr_dr_term << endl;
+        //cout << " A_rt_dt_term difference = " << A_rt.dtheta(i,j,k) / rl - A_rt_dt_term << endl;
+        //cout << " A_rt_dt_term analytical = " << A_rt_dt_term << endl;
+        //cout << " A_rt_dt_term numerical = " << A_rt.dtheta(i,j,k) / rl << endl;
+        //cout << " A_rr_term difference = " << 2.0 * A_rr(i,j,k) / rl - A_rr_term << endl;
+        //cout << " A_rt_term difference = " << cottheta * A_rt(i,j,k) / rl - A_rt_term << endl;
+        //cout << " A_tt_term difference = " << -A_tt(i,j,k) / rl - A_tt_term << endl;
+        //cout << " A_pp_term difference = " << -A_pp(i,j,k) / rl - A_pp_term << endl;
+
   //
 	res_r[i][j][k] = 4./3.*W_r.ddr(i,j,k)
 	  + 8./3.*W_r.dr(i,j,k)/rl
@@ -82,19 +111,19 @@ double Momentum_Residual() {
 	  - 8./3.*W_r(i,j,k)/r2 + 1./3.*W_t.drdtheta(i,j,k)/rl
 	  - 7./3.*W_t.dtheta(i,j,k)/r2 - 7./3.*cottheta*W_t(i,j,k)/r2
 	  + cottheta/3.*W_t.dr(i,j,k)/rl
-	  + div_r - RHS_r;
+	  - RHS_r;
 	res_r_norm2 += res_r(i,j,k)*res_r(i,j,k);
 	res_t[i][j][k] = W_t.ddr(i,j,k) + 2.*W_t.dr(i,j,k)/rl
 	  + 4./3.*W_t.ddtheta(i,j,k)/r2
 	  + 4.*cottheta/3.*W_t.dtheta(i,j,k)/r2
 	  - 4./3.*W_t(i,j,k)/(r2*sin2theta) + 8./3.*W_r.dtheta(i,j,k)/r2
 	  + 1./3.*W_r.drdtheta(i,j,k)/rl
-	  + div_t - RHS_t;
+	  - RHS_t;
 	res_t_norm2 += res_t(i,j,k)*res_t(i,j,k);
 	res_p[i][j][k] = W_p.ddr(i,j,k) + 2.*W_p.dr(i,j,k)/rl
 	  + W_p.ddtheta(i,j,k)/r2 + cottheta*W_p.dtheta(i,j,k)/r2
 	  - W_p(i,j,k)/(r2*sin2theta)
-	  + div_p - RHS_p;
+	  - RHS_p;
 	res_p_norm2 += res_p(i,j,k)*res_p(i,j,k);
       }
     }
@@ -105,6 +134,7 @@ double Momentum_Residual() {
 
 
 void set_nakamura() {
+  cout << " INFLATIONGW: Setting A_ij to nakamura values " << endl;
   for (int i = N_g; i < n_r; i++){
   const double rl = A2.r(i); 
     for (int j = N_g; j < n_theta; j++) {

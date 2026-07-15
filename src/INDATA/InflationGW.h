@@ -242,9 +242,9 @@ public:
 	// Total residual
 	//================================================
 	double Residual() {
-		const double mom_res = Total_Momentum_Residual();
+		const double mom_res = Momentum_Residual();
 		cout << " INFLATIONGW: Momentum residual = " << mom_res << endl;
-		//Compute_Aij();
+		Compute_Aij();
 		const double ham_res = Hamiltonian_K_Residual();
 		cout << " INFLATIONGW: Hamiltonian K residual = " << ham_res << endl;
 		return sqrt(mom_res * mom_res + ham_res * ham_res);

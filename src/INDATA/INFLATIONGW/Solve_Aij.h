@@ -35,9 +35,9 @@ void Compute_Aij() {
                 A_tt[i][j][k] = (2.0 * DtWt) - 2. / 3. * div + An_tt(rl, thetal);
                 A_tp[i][j][k] = (DtWp + DpWt) + An_tp(rl, thetal);
                 A_pp[i][j][k] = (2.0 * DpWp) - 2. / 3. * div + An_pp(rl, thetal);
-                // if (i == N_g && j == N_g && k == N_g) 
-                //   cout << " reality check: "
-                //        << A_rr(i,j,k) + A_tt(i,j,k) + A_pp(i,j,k) << endl;
+                //if (i == N_g && j == N_g && k == N_g) 
+                //  cout << " reality check: "
+                //       << A_rr(i,j,k) + A_tt(i,j,k) + A_pp(i,j,k) << endl;
                 A2[i][j][k] = A_rr(i, j, k) * A_rr(i, j, k)
                     + 2.0 * A_rt(i, j, k) * A_rt(i, j, k)
                     + 2.0 * A_rp(i, j, k) * A_rp(i, j, k)
