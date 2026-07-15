@@ -1,9 +1,0 @@
-Parameters for Jena Gamma Driver
-   eta = 0.0
-   mu = 0.75
-   muequalsalpha2 = 0
-Keep shift zero at a fixed-point?
-    fix = 1
-    z_fix = 0.0
-    sigma = 0.2
-    

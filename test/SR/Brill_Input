@@ -1,9 +1,0 @@
-Create Brill wave with amplitude
-       a = 1.0
-"wavelength"
-    lambda = 1
-and offset
-    rho_0 = 0.0
-Parameters for elliptic solver
-     max_it = 10000
-        tol = 1.e-10

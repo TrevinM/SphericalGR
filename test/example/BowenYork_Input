@@ -1,8 +1,0 @@
-Create black hole of mass
-       Mass = 1.0
-and angular momentum parameter
-       a = 0.0001
-Maximum number of iterations for elliptic solver
-      it_max = 100
-Tolerance
-      tol = 1.e-8
