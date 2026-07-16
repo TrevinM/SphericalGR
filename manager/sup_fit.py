@@ -14,7 +14,7 @@ def main():
     lower = float(sys.argv[1])
     upper = float(sys.argv[2])
 
-    with open("data", 'r') as f:
+    with open("data_sup", 'r') as f:
         for line in f.readlines():
             vals = line.split()
             eta.append(vals[0])
@@ -22,7 +22,7 @@ def main():
 
     popt, pcov = curve_fit(power_law, eta, data, p0=[lower, 0.377], bounds=([lower, 0], [upper, 1]))
 
-    print(popt[0])
+    print(f"{popt[0]} {popt[1]}")
 
 if __name__ == "__main__":
     main()

@@ -4,7 +4,11 @@ QxDO
 Tue Jul 14 03:03:17 PM EDT 2026
 
 Bounds: 0 and 100
-Previous data: 0
+Previous data (sub): 0
+Previous data (sup): 0
+Eta (sub): 10.000000000000
+Eta (sup): 10.000000000000
+Delta: 10.000000000000
 Using standard convergence
 Submitted batch job 64588
 Submitted batch job 64589
