@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 class ThreeDPlotter:
 
-    def __init__(self, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid):
+    def __init__(self, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid, c):
         self.var_name = var_name
         self.x_var = x_var.lower()
         self.x_grid = x_grid
@@ -10,6 +10,7 @@ class ThreeDPlotter:
         self.y_grid = y_grid
         self.z_var = z_var.lower()
         self.z_grid = z_grid
+        self.c = c
 
         self.xlimits = None
         self.ylimits = None
@@ -65,7 +66,7 @@ class ThreeDPlotter:
             print(f"Intrgration axis {d_ax.lower()} not recognized as 'x', 'y', or 'z'")
 
 
-    def abs_integrate_plot(self, plot, d_ax='x', start=1):
+    def abs_integrate_plot(self, plot, d_ax='x', start=0):
         if d_ax.lower() == 'x':
             for z_iter in range(len(self.z_grid)):
                 for y_iter in range(len(self.y_grid)):
@@ -106,18 +107,15 @@ class ThreeDPlotter:
                 label = self.legend_prefix
 
             if numerical:
-                ax.scatter(self.x_val, self.num_plot[z][y_iter], label=f'num {label}', marker='.')
+                ax.scatter(self.x_val, self.num_plot[z][y_iter], label=f'num {label}', marker='.', c=self.c)
 
             if analytical:
-                ax.plot(self.x_val, self.an_plot[z][y_iter], label=f'an {label}')
+                ax.plot(self.x_val, self.an_plot[z][y_iter], label=f'an {label}', c=self.c)
                     
             if auxiliary:
-                ax.plot(self.x_val, self.aux_plot[z][y_iter], label=f'aux {label}', marker='x')
+                ax.plot(self.x_val, self.aux_plot[z][y_iter], label=f'aux {label}', marker='x', c=self.c)
 
         ax.set(xlabel=f'{self.x_var}', ylabel=f'{self.var_name}')
-        ax.set_xlim(self.xlimits)
-        ax.set_ylim(self.ylimits)
-        plt.legend()
         plt.title(f"{self.z_var} = {round(self.z_val[z], 2)}")
     
     def plot(self, numerical=True, analytical=False, auxiliary=False):
@@ -126,6 +124,8 @@ class ThreeDPlotter:
         for z_iter in range(len(self.z_grid)): #type: ignore
             ax.clear()
             self.plot_z(z_iter, ax, numerical, analytical, auxiliary)
+            ax.set_xlim(self.xlimits)
+            ax.set_ylim(self.ylimits)
+            plt.legend()
             plt.pause(self._delay)
-
         plt.show()

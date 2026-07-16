@@ -4,10 +4,11 @@ from math import pi
 
 class RayReader(Reader):
 
-    def __init__(self, path, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid):
+    def __init__(self, path, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid, color=None):
         self._files = glob.glob(path+'/'+var_name+'_rays_*')
+        self._find_ghosts()
 
-        super(RayReader, self).__init__(var_name, x_var, x_grid, y_var, y_grid, z_var, z_grid)
+        super(RayReader, self).__init__(var_name, x_var, x_grid, y_var, y_grid, z_var, z_grid, color)
 
 
     def _grid_resolution(self):
@@ -41,6 +42,13 @@ class RayReader(Reader):
         return t
 
 
+    def _find_ghosts(self):
+        with open(self._files[0]) as f:
+            for line in f.readlines():
+                if '(including ' in line:
+                    self._n_g = int(line.split('(including')[1].split()[0])
+                    break
+
     def _find_value(self, lines, r_step, th_step):
         """Assuming grids index from 0
         Returns [r, theta, func_val]
@@ -51,7 +59,7 @@ class RayReader(Reader):
             else:
                 break
             
-        vals = [float(x) for x in lines[r_step].split()]
+        vals = [float(x) for x in lines[r_step + self._n_g].split()]
         r = vals[0]
         th = [0, pi/2][th_step]
         var = vals[th_step + 1]

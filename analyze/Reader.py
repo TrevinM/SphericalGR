@@ -1,11 +1,11 @@
-import glob
+import math
 from ThreeDPlotter import ThreeDPlotter
 from abc import ABC, abstractmethod
 
 class Reader(ThreeDPlotter, ABC):
 
-    def __init__(self, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid):
-        super(Reader, self).__init__(var_name, x_var, x_grid, y_var, y_grid, z_var, z_grid)
+    def __init__(self, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid, c):
+        super(Reader, self).__init__(var_name, x_var, x_grid, y_var, y_grid, z_var, z_grid, c)
 
         #Abstract
         self._files: list
@@ -13,6 +13,9 @@ class Reader(ThreeDPlotter, ABC):
         #Protected
         self._analytical = None
         self._aux = None
+        self._x_in = x_grid
+        self._y_in = y_grid
+        self._z_in = z_grid
 
         #Public
         self.resolution = self._grid_resolution()
@@ -52,6 +55,54 @@ class Reader(ThreeDPlotter, ABC):
         func : A function f(r, theta, time)
         """
         self._aux = func
+
+    
+    def rescale_x(self, min_resolution):
+        "Adjust the scaling of the x grid so that it more closely matches the min resolution given"
+        if self._x_in != None:
+            self.x_grid = list(self.x_grid)
+            scale = self.resolution[0]/min_resolution[0]
+            for x_iter in range(len(self.x_grid)):
+                self.x_grid[x_iter] = round(scale * self.x_grid[x_iter] + scale/2 - 1)
+        else:
+            print("Not scaling x")
+
+
+    def rescale_y(self, min_resolution):
+        "Adjust the scaling of the y grid so that it more closely matches the min resolution given"
+        if self._y_in != None:
+            self.y_grid = list(self.y_grid)
+            scale = self.resolution[1]/min_resolution[1]
+            for x_iter in range(len(self.x_grid)):
+                self.x_grid[x_iter] = round(scale * self.x_grid[x_iter] + scale/2 - 1) #type: ignore
+        else:
+            print("Not scaling y")
+
+
+    def rescale_z(self, min_resolution):
+        "Adjust the scaling of the z grid so that it more closely matches the min resolution given"
+        if self._z_in != None:
+            self.z_grid = list(self.z_grid)
+            scale = self.resolution[2]/min_resolution[2]
+            for x_iter in range(len(self.x_grid)):
+                self.x_grid[x_iter] = round(scale * self.x_grid[x_iter] + scale/2 - 1) #type: ignore
+        else:
+            print("Not scaling z")
+
+
+    def fill_x(self):
+        """Fills any missing internal points of the grid"""
+        self.x_grid = range(min(self.x_grid), max(self.x_grid))
+
+
+    def fill_y(self):
+        """Fills any missing internal points of the grid"""
+        self.y_grid = range(min(self.y_grid), max(self.y_grid))
+
+
+    def fill_z(self):
+        """Fills any missing internal points of the grid"""
+        self.y_grid = range(min(self.y_grid), max(self.y_grid))
 
 
     def read(self):

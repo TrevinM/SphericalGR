@@ -57,7 +57,7 @@ AUXILIARY = [
 #HORIZONTAL: 'r', 'theta', or 't'
 #HORIZONTAL_GRID: range of gridpoint(s) or None to get all available
 HORIZONTAL = 'r'
-HORIZONTAL_GRID = None
+HORIZONTAL_GRID = range(8, 128)
 
 #Plot multiple different lines in the same plot
 #SERIES: 'r', 'theta', or 't'
@@ -69,7 +69,7 @@ SERIES_GRID = [1]
 #MOVIE: 'r', 'theta', or 't'
 #MOVIE_GRID: list containing animation gridpoint(s) or None to get all available
 MOVIE = 't'
-MOVIE_GRID = [10]
+MOVIE_GRID = [0]
 MOVIE_PLOT = [0]
 
 #initialize list
@@ -80,6 +80,7 @@ if FILE_TYPE.lower() == 'slice':
         ReaderSlice.SliceReader(PATH(TESTS[i]), READ_VALUE, HORIZONTAL, HORIZONTAL_GRID, SERIES, SERIES_GRID, 
                                 MOVIE, MOVIE_GRID) for i in range(len(TESTS))
     ]
+
 elif FILE_TYPE.lower() == 'rays':
      readers = [
         ReaderRay.RayReader(PATH(TESTS[i]), READ_VALUE, HORIZONTAL, HORIZONTAL_GRID, SERIES, SERIES_GRID, 
@@ -89,17 +90,22 @@ else:
     print(f"File type {FILE_TYPE} not recognized as 'slice'or 'rays'.")
     raise TypeError
 
+min_resolution = [min([readers[i].resolution[j] for i in range(len(readers))]) for j in range(3)]
 
 for i, reader in enumerate(readers):
     reader.set_analytical(ANALYTICAL[i])
     reader.set_auxiliary(AUXILIARY[i])
-
-    reader.read()
-    # reader.abs_integrate_plot(reader.aux_plot, 'x')
-
     reader.set_xlimits(XLIMITS)
     reader.set_ylimits(YLIMITS)
     reader.set_legend_prefix(TESTS[i])
+
+    reader.rescale_x(min_resolution)
+    reader.fill_x()
+
+    reader.read()
+
+    reader.abs_integrate_plot(reader.aux_plot, 'x')
+
 
     if MOVIE_PLOT == None:
         movie_length[i] = len(reader.z_grid)
@@ -126,6 +132,9 @@ if all(length == movie_length[0] for length in movie_length):
             ax.clear()
             for i in range(len(TESTS)):
                 readers[i].plot_z(movie_iteration, ax, PLOT_NUMERICAL, (PLOT_ANALYTICAL and ANALYTICAL != None), (PLOT_AUXILIARY and AUXILIARY != None))
+            ax.set_xlim(XLIMITS)
+            ax.set_ylim(XLIMITS)
+            plt.legend()
             plt.pause(0.01)
         else:
             break
