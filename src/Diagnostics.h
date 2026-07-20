@@ -20,7 +20,7 @@ public:
   gf3d Mom_r, Mom_t, Mom_p;     // components of momentum constraint violations (rescaled, indices down)
   gf3d CFC_r, CFC_t, CFC_p;     // violation of connection constraints (rescaled, indices down)
   gf3d R_prop, s_axial;         // proper distance of from origin, computed on current slice, along lines 
-                                // of constant angle, and axial radius 
+                                // of constant angle, axial radius, 
   gf3d E_rr, E_rt, E_rp, E_tt, E_tp, E_pp;  // electric and magnetic parts of Weyl tensor
   gf3d B_rr, B_rt, B_rp, B_tt, B_tp, B_pp;  // *not* rescaled
   gf3d I_Re, I_Im, J_Re, J_Im;  // curvature invariants, I_Re = R_{abcd} R^{abcd} / 16 

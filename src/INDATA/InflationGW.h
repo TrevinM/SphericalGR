@@ -191,8 +191,7 @@ public:
 			veclaplacian->SetupSolver();
 	#endif
 			double res = Solve_Constraints();
-			cout << " INFLATIONGW: Solved constraints with total momentum residual = " << Total_Momentum_Residual() << endl;
-			cout << "				And tested momentum residual = " << Momentum_Residual() << endl;
+			cout << " INFLATIONGW: Solved constraints momentum residual = " << Momentum_Residual() << endl;
 			Compute_Aij();
 			dump(&psi);
 			if (res < tol) {
@@ -518,6 +517,16 @@ private:
 		}
 		outfile_rays.close();
 	}
+	//================================================
+	// K Error function
+	//================================================
+	void dump_error_monitor(double K_variable) {
+    	ofstream outfile("output/error_monitor", ios::app);
 
+    	outfile << setprecision(16)
+            	<< K_variable << endl;
+
+    	outfile.close();
+}
 };
 

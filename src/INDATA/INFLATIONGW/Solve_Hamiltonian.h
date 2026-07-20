@@ -160,9 +160,13 @@ void Solve_K() {
 			const double Knew = compute_K(rl, thetal);
 			for (int k = N_g; k < n_phi - N_g; k++) {
 				K[i][j][k] = w * Knew + (1.0 - w) * K[i][j][k];
+
 			}
 		}
 	}
+	cout << " INFLATIONGW: K_error at r = " << K.r(10) << " and theta = " << K.theta(n_theta / 2) 
+	<< " is " << K(10, n_theta/2, 0) + 3.296513422807648 << endl;
+	dump_error_monitor(K(10, n_theta/2, 0) + 3.296513422807648);
 	K.fill_ghosts();
 }
 

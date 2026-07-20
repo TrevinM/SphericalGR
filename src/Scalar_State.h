@@ -39,9 +39,9 @@ public:
     //
     int gf_counter = 0;
     //
-    fct_list[gf_counter] = sf.setup(grid, 0, "scalarfield", gf_counter, +1, +1, +1);
+    fct_list[gf_counter] = sf.setup(grid, 1, "scalarfield", gf_counter, +1, +1, +1);
     gf_counter++;
-    fct_list[gf_counter] = pi.setup(grid, 0, "pi", gf_counter, +1, +1, +1);
+    fct_list[gf_counter] = pi.setup(grid, 1, "pi", gf_counter, +1, +1, +1);
     gf_counter++;
     //
     // sanity check
