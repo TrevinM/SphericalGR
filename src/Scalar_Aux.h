@@ -17,9 +17,9 @@ public:
   //
   // Note: will add functions to scalar_aux through derived classes
   //
-  gf3d Omega;
+  gf3d Omega, gradient_parts, pi_parts, potential_parts, K_parts, A2_parts, R_parts, X;
   //
-  int N_fcts, N_dump;
+  int N_fcts, N_dump, n_r, n_theta, n_phi;
   gf3d ** fct_list;   // list of all grid functions in scalar_aux
   gf3d ** dump_list;  // list of all grid functions to be dumped
   Grid *grid;
@@ -32,7 +32,7 @@ public:
   scalar_aux(Grid *grid_i, dumper *dump_i, const char * name_i) :
     grid(grid_i), dump(dump_i), name(name_i)
   {
-    N_fcts = 1;
+    N_fcts = 8;
     fct_list = new gf3d*[N_fcts];
     dump_list = new gf3d*[N_fcts];   // allow for N_fcts, but restrict loops to N_dump...
     N_dump = 0;                      // set in assemble_dump_list
@@ -41,6 +41,31 @@ public:
     //
     fct_list[gf_counter] = Omega.setup(grid, 1, "Omega", gf_counter, -1, -1, 1);
     gf_counter++;
+
+    fct_list[gf_counter] = gradient_parts.setup(grid, 1, "gradient_parts", gf_counter, +1, +1, +1);
+    gf_counter++;
+
+    fct_list[gf_counter] = pi_parts.setup(grid, 1, "pi_parts", gf_counter, +1, +1, +1);
+    gf_counter++;
+
+    fct_list[gf_counter] = potential_parts.setup(grid, 1, "potential_parts", gf_counter, +1, +1, +1);
+    gf_counter++;
+
+    fct_list[gf_counter] = K_parts.setup(grid, 1, "K_parts", gf_counter, +1, +1, +1);
+    gf_counter++;
+
+    fct_list[gf_counter] = A2_parts.setup(grid, 1, "A2_parts", gf_counter, +1, +1, +1);
+    gf_counter++;
+
+    fct_list[gf_counter] = R_parts.setup(grid, 1, "R_parts", gf_counter, +1, +1, +1);
+    gf_counter++;
+
+    fct_list[gf_counter] = X.setup(grid, 1, "X", gf_counter, +1, +1, +1);
+    gf_counter++;
+
+    n_r = Omega.dim1();
+		n_theta = Omega.dim2();
+		n_phi = Omega.dim3();
     //
     // sanity check
     //
@@ -127,6 +152,18 @@ public:
     }
     return N_dump;
   };
+
+  //===============================================
+  // Compute X
+  //===============================================
+
+  void Compute_X(state * s, double a_friedmann) {
+    for (int i = 0; i < n_r; i++)    
+      for (int j = 0; j < n_theta; j++)
+	      for (int k = 0; k < n_phi; k++) {
+	        X[i][j][k] = exp(-2.0*s->phi(i,j,k)) / a_friedmann;
+	  }
+  }
   //===============================================
   // Destructor
   //===============================================

@@ -24,6 +24,12 @@ K
 scalarfield
 h_pp
 s_axial
+gradient_parts
+pi_parts
+potential_parts
+K_parts
+A2_parts
+R_parts
 
 
 

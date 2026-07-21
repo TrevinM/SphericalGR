@@ -3,13 +3,14 @@
 #include "Scalar_State.h"
 #include "Scalar_Aux.h"
 #include "Monitor.h"
-#include "CheckPoint.h"
+#include "Potential.h"
+
 //================================================
 //
 // Scalar Field
 //
 //================================================
-class ScalarField : public Matter {
+class ScalarFieldWithPotential : public Matter {
 public:
   double rho_center, rho_c_max, drhoddr;    // diagnostics 
   double sf_center_new, sf_center_old, sf_center_previous;
@@ -18,21 +19,19 @@ public:
   Monitor * monitor;
   ofstream monitorfile;
   double eta_KO;   // Kreiss-Oliger coefficient
-  CheckPoint * checkpoint;
-  QuadraticPotential* potential;
+  Potential* potential;
 public:
-  ScalarField(Grid * grid_i, dumper * dump_i, InData * indata_i, 
+  ScalarFieldWithPotential(Grid * grid_i, dumper * dump_i, InData * indata_i, 
 	      int cowling_i, Cosmology * cosmology_i, 
-	      Monitor *monitor_i, double eta_KO_i,
-	      CheckPoint *checkpoint_i) :
+	      Monitor *monitor_i, double eta_KO_i, Potential * potential_i) :
   Matter(grid_i, dump_i, indata_i, cowling_i, cosmology_i),
-  monitor(monitor_i), eta_KO(eta_KO_i), checkpoint(checkpoint_i)
+  monitor(monitor_i), eta_KO(eta_KO_i), potential(potential_i)
   {
-    cout << " SCALARFIELD: setting up scalar field... " << endl;
+    cout << " SCALARFIELDWITHPOTENTIAL: setting up scalar field... " << endl;
     // 
     // create states for dynamical variables
     // 
-    cout << " SCALARFIELD: setting up states... " << endl;
+    cout << " SCALARFIELDWITHPOTENTIAL: setting up states... " << endl;
     last = new scalar_state(grid, dump, "scalar_last");
     derivs = new scalar_state(grid, dump, "scalar_derivs");
     inter = new scalar_state(grid, dump, "scalar_inter");
@@ -40,12 +39,10 @@ public:
     // create dump list for state last:
     last->function_names();
     last->assemble_dump_list("Dump_List");
-    // let checkpointer know about last:
-    checkpoint->CollectDynVariables(last);
     //
     // create ADM sources
     // 
-    adm_sources = new ADM_Source_Terms(grid,dump,"scalar_souces");
+    adm_sources = new ADM_Source_Terms(grid,dump,"scalar_sources");
     adm_sources->assemble_dump_list("Dump_List");
     //
     // create auxiliary variables
@@ -65,20 +62,19 @@ public:
     time(&clocktime);
     currenttime=localtime(&clocktime);
     monitorfile << "# File created on " << asctime(currenttime);  
-    monitorfile << "# ScalarField evolution " << endl;
+    monitorfile << "# ScalarFieldWithPotential evolution " << endl;
     monitorfile << "# " << setw(18) << "time" 
 		<< setw(18) << "pr time (r=0)" 
 		<< setw(18) << "scal_fld_c" 
 		<< setw(18) << "rho_ADM_c" 
 		<< setw(18) << "rho_ADM_c_max" 
 		<< endl;
-    potential = new QuadraticPotential();
     monitorfile << "#=======================================================================================================================================================================" << endl;
    //
     rho_center = rho_c_max = drhoddr = 0.0;
     sf_center_new = sf_center_old = sf_center_previous = 0.0;
   };
-  ~ScalarField() {
+  ~ScalarFieldWithPotential() {
     delete last;
     delete derivs;
     delete inter;
@@ -86,9 +82,9 @@ public:
     delete adm_sources;
     delete aux;
     monitorfile.close();
-    cout << " SCALARFIELD: destructing derived class ScalarField " << endl;
+    cout << " SCALARFIELDWITHPOTENTIAL: destructing derived class ScalarFieldWithPotential " << endl;
   };
-  const char * Name() { return "ScalarField's equations"; }
+  const char * Name() { return "ScalarFieldWithPotential's equations"; }
   //================================================
   // initialize
   //================================================
@@ -161,7 +157,7 @@ public:
 		 const char * suffix = "") 
   {
     if (dump->time_to_dump(timestep) || strcmp(suffix,"") ) {
-      cout << " SCALARFIELD: Dumping matter functions at time t = " 
+      cout << " SCALARFIELDWITHPOTENTIAL: Dumping matter functions at time t = " 
 	   << time  << endl;
       last->dump_fcts(time, prop_time, timestep, suffix);
       adm_sources->dump_fcts(time, prop_time, timestep, suffix);
@@ -199,8 +195,5 @@ public:
   void rho_components(state * s, curvature * c);
 
   void Hamiltonian_components(state *s, curvature *curve);
+
 };
-
-
-
-

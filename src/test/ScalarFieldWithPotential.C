@@ -1,6 +1,6 @@
 //================================================
 //
-// File that contains routines for class ScalarField
+// File that contains routines for class ScalarFieldWithPotential
 //
 //================================================
 #include "Grid.h"
@@ -13,13 +13,17 @@
 //================================================
 // #define FLAT
 
-void ScalarField::Initialize(state *s, curvature *c, diagnostics *d) {
+void ScalarFieldWithPotential::Initialize(state *s, curvature *c, diagnostics *d) {
   //
   // set up initial data 
   //
   // NOTE: we'll assume that time derivative and shift vanish initially
   // 
-  indata->Initialize_Scalar_Field(last->sf, last->pi);
+  indata->Initialize_Scalar_Field(last->sf);
+  //
+  // set to zero time derivative (true only if shift is zero initially!)
+  // 
+  last->pi.equals(0.0);
   //
   // also: set matter state inter to last so that correct
   // values are used in initial evaluation of ADM sources
@@ -37,7 +41,7 @@ void ScalarField::Initialize(state *s, curvature *c, diagnostics *d) {
 //===============================================
 // Compute RHS sides for matter equations
 //===============================================
-void ScalarField::Compute_RHS(state *s, curvature *c, double time) {
+void ScalarFieldWithPotential::Compute_RHS(state *s, curvature *c, double time) {
   //
   // compute time derivative of vector potential A
   // 
@@ -52,7 +56,7 @@ void ScalarField::Compute_RHS(state *s, curvature *c, double time) {
 // derivative of scalar field itself
 //===============================================
 //
-void ScalarField::dot_sf(scalar_state *m, state *s, double time) {
+void ScalarFieldWithPotential::dot_sf(scalar_state *m, state *s, double time) {
   for (int i = N_g; i < N_r - N_g; i++ ) {
     const double rl = grid->r(i);
     for (int j = N_g; j < N_t - N_g; j++ ) {
@@ -81,7 +85,7 @@ void ScalarField::dot_sf(scalar_state *m, state *s, double time) {
 //===============================================
 // derivative of time derivative pi
 //===============================================
-void ScalarField::dot_pi(scalar_state *m, state *s, curvature *c, double time) {
+void ScalarFieldWithPotential::dot_pi(scalar_state *m, state *s, curvature *c, double time) {
   const double a_friedmann = cosmology->a(time);
   //
   // just to make sure...
@@ -109,7 +113,7 @@ void ScalarField::dot_pi(scalar_state *m, state *s, curvature *c, double time) {
 	derivs->pi[i][j][k] = br * m->pi.dr(i,j,k,br) + 
 	  bt * m->pi.dtheta(i,j,k,bt) + 
 	  bp * m->pi.dphi(i,j,k,bp) +
-	  s->lapse(i,j,k) * s->K(i,j,k) * m->pi(i,j,k) + s->lapse(i,j,k) * potential->dVdsf(m->sf[i][j][k]);
+	  s->lapse(i,j,k) * s->K(i,j,k) * m->pi(i,j,k);
 #ifdef FLAT
 	const double e4p = 1.0;
 	tensor gup(1.0, 0.0, 0.0, 1.0/(rl*rl), 0.0, 1.0/(rst*rst));
@@ -151,6 +155,9 @@ void ScalarField::dot_pi(scalar_state *m, state *s, curvature *c, double time) {
 	}
 	// finally add Kreiss-Oliger...
 	derivs->pi[i][j][k] += eta_KO * m->pi.KO(i,j,k);
+	
+	// add potential
+	derivs->pi[i][j][k] += s->lapse(i,j,k) * potential->dVdsf(m->sf[i][j][k]);
       }
     }
   }
@@ -163,7 +170,7 @@ void ScalarField::dot_pi(scalar_state *m, state *s, curvature *c, double time) {
 // NOTE: will compute unrescaled sources, as expected in field equations
 //================================================
 //
-void ScalarField::ADM_Sources(state * s, curvature * c)
+void ScalarFieldWithPotential::ADM_Sources(state * s, curvature * c)
 {
   for (int i = N_g; i < N_r - N_g; i++) {   
     //    const double rl = grid->r(i);
@@ -209,7 +216,7 @@ void ScalarField::ADM_Sources(state * s, curvature * c)
   	//
   	// ... and trace of stress: 
   	//
-  	adm_sources->trace_S[i][j][k] = 1.5 * pi2 - 0.5 * psi2 - 3.0 * potential->V(inter->sf[i][j][k]);
+  	adm_sources->trace_S[i][j][k] = 1.5 * pi2 - 0.5 * psi2 - 3. * potential->V(inter->sf[i][j][k]);
       } 
     }
   }
@@ -220,8 +227,7 @@ void ScalarField::ADM_Sources(state * s, curvature * c)
   drhoddr = adm_sources->rho_ADM.ddr(N_g,N_g,N_g);
 };
 
-
-void ScalarField::rho_components(state * s, curvature * c)
+void ScalarFieldWithPotential::rho_components(state * s, curvature * c)
 {
   for (int i = N_g; i < N_r - N_g; i++) {   
     //    const double rl = grid->r(i);
@@ -255,7 +261,7 @@ void ScalarField::rho_components(state * s, curvature * c)
   }
 };
 
-void ScalarField::Hamiltonian_components(state *s, curvature *curve) {
+void ScalarFieldWithPotential::Hamiltonian_components(state *s, curvature *curve) {
   //
   // make sure X is updated
   // 
