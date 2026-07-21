@@ -164,9 +164,9 @@ void Solve_K() {
 			}
 		}
 	}
-	cout << " INFLATIONGW: K_error at r = " << K.r(10) << " and theta = " << K.theta(n_theta / 2) 
-	<< " is " << K(10, n_theta/2, 0) + 3.296513422807648 << endl;
-	dump_error_monitor(K(10, n_theta/2, 0) + 3.296513422807648);
+	//cout << " INFLATIONGW: K_error at r = " << K.r(10) << " and theta = " << K.theta(n_theta / 2) 
+	//<< " is " << K(10, n_theta/2, 0) + 3.296513422807648 << endl;
+	//dump_error_monitor(K(10, n_theta/2, 0) + 3.296513422807648);
 	K.fill_ghosts();
 }
 

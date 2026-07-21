@@ -170,6 +170,7 @@ class Manager {
     } else if (matter_type == 5) {
       matter = new ScalarField(grid, dump, indata, cowling, cosmology,
 			       monitor, eta_KO, checkpoint);
+             slicing->set_matter(matter);
     } else if (matter_type == 6) {
       matter = new RadHydro(grid, dump, indata, eos, cowling, cosmology,
 			    monitor, checkpoint);

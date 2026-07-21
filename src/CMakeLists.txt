@@ -81,7 +81,8 @@ add_executable(SphericalGR ${CMAKE_CURRENT_SOURCE_DIR}/GR.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/Tests.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/HorizonFinder.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/dumper.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C)
+  ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C /
+  ${CMAKE_CURRENT_SOURCE_DIR}/LocalCosmoBonaMasso.C)
 
 
 target_include_directories(SphericalGR PRIVATE

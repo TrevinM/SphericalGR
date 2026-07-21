@@ -345,6 +345,30 @@ Integrate.C.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/SphericalGR.dir/build.make CMakeFiles/SphericalGR.dir/Integrate.C.s
 .PHONY : Integrate.C.s
 
+LocalCosmoBonaMasso.o: LocalCosmoBonaMasso.C.o
+.PHONY : LocalCosmoBonaMasso.o
+
+# target to build an object file
+LocalCosmoBonaMasso.C.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/SphericalGR.dir/build.make CMakeFiles/SphericalGR.dir/LocalCosmoBonaMasso.C.o
+.PHONY : LocalCosmoBonaMasso.C.o
+
+LocalCosmoBonaMasso.i: LocalCosmoBonaMasso.C.i
+.PHONY : LocalCosmoBonaMasso.i
+
+# target to preprocess a source file
+LocalCosmoBonaMasso.C.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/SphericalGR.dir/build.make CMakeFiles/SphericalGR.dir/LocalCosmoBonaMasso.C.i
+.PHONY : LocalCosmoBonaMasso.C.i
+
+LocalCosmoBonaMasso.s: LocalCosmoBonaMasso.C.s
+.PHONY : LocalCosmoBonaMasso.s
+
+# target to generate assembly for a file
+LocalCosmoBonaMasso.C.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/SphericalGR.dir/build.make CMakeFiles/SphericalGR.dir/LocalCosmoBonaMasso.C.s
+.PHONY : LocalCosmoBonaMasso.C.s
+
 Maxwell.o: Maxwell.C.o
 .PHONY : Maxwell.o
 
@@ -525,6 +549,9 @@ help:
 	@echo "... Integrate.o"
 	@echo "... Integrate.i"
 	@echo "... Integrate.s"
+	@echo "... LocalCosmoBonaMasso.o"
+	@echo "... LocalCosmoBonaMasso.i"
+	@echo "... LocalCosmoBonaMasso.s"
 	@echo "... Maxwell.o"
 	@echo "... Maxwell.i"
 	@echo "... Maxwell.s"

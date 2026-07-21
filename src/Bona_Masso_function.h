@@ -90,6 +90,20 @@ public:
   string Name() { return bonamasso_name.str(); };
 };
 
+//================================================
+// Cosmo - Brady
+//================================================
+class Cosmo : public BonaMasso_f {
+public:
+  Cosmo() : BonaMasso_f() {
+    cout << " BONAMASSO: setting up f(alpha) for Cosmo slicing..." << endl;
+    bonamasso_name << "Cosmo" ;
+  }
+  ~Cosmo() {};
+  double operator()(double alpha) { return exp(-alpha) / alpha; };
+  string Name() { return bonamasso_name.str(); };
+};
+
 
 
     

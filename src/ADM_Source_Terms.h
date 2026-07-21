@@ -112,7 +112,7 @@ public:
     ifstream infile;
     infile.open(dump_list_file);
     if (!infile) {
-      cerr << " ADM_SOURCE_TERMS: can't oppen " << dump_list_file << " for input." << endl;
+      cerr << " ADM_SOURCE_TERMS: can't open " << dump_list_file << " for input." << endl;
       return 0;
     }
     cout << " ADM_SOURCE_TERMS: reading dump list from file " << dump_list_file << endl;

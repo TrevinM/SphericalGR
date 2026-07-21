@@ -250,6 +250,8 @@ int Read_Input(int argc, char * argv[],
       cout << "   Running with Ken's log slicing " << endl;
     else if (slicing_type == 8)
       cout << "   Running with generalized advective 1+log slicing " << endl;
+    else if (slicing_type == 9)
+      cout << "   Running with LocalCosmoBonaMasso slicing " << endl;
     else
       error = 4;
     if (gauge_type == 1)

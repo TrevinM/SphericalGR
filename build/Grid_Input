@@ -1,6 +1,6 @@
 Size of (interior) grid
-      N_r = 512
-      N_theta = 24
+      N_r = 1024
+      N_theta = 2
       N_phi = 2
 Outer boundary r_max
       initial = 15.4

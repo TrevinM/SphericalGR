@@ -68,7 +68,8 @@ Slicing type = 1
   4 : harmonic slicing
   5 : maximal slicing
   6 : second-order maximal slicing 
-  8 : Bona-Masso)
+  8 : Bona-Masso
+  9 : LocalCosmoBonaMasso)
 Gauge type = 1
  (1 : constant shift
   2 : (non-advective) Gamma-driver

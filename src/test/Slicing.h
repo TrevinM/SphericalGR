@@ -32,11 +32,11 @@ public:
   Slicing(Grid *grid_i, Cosmology *cosmology_i, double eta_KO_i) :
     grid(grid_i), cosmology(cosmology_i), eta_KO(eta_KO_i)
   {
+    PI = acos(-1.0);
     N_g = grid->N_ghosts();
     N_r = grid->N_r_tot();
     N_t = grid->N_theta_tot();
     N_p = grid->N_phi_tot();
-    PI = acos(-1.0);
   };
   virtual ~Slicing() {};
   //================================================
@@ -45,7 +45,7 @@ public:
   //================================================
   virtual void dot_lapse(state * c, state * derivs, double t = 0.0) = 0;
   virtual string Name() = 0; 
-    virtual void set_matter(Matter* a_matter)
+  virtual void set_matter(Matter* a_matter)
   {};
 };
 //
@@ -206,6 +206,10 @@ public:
       bonamasso_f = new GaugeShockAvoid(bona_masso_parameter);
     } else if (bona_masso_type == 4) {
       bonamasso_f = new GaugeShockAvoid_lin(bona_masso_parameter);
+    } else if (bona_masso_type == 5) {
+      bonamasso_f = new Cosmo(bona_masso_parameter);
+    } else if (bona_masso_type == 6) {
+      bonamasso_f = new CosmoShockAvoid(bona_masso_parameter);
     } else {
       cerr << " SLICING: Unknown Bona-Masso type " << bona_masso_type << endl;
       cerr << " SLICING: Will use standard 1+log... " << endl;
@@ -242,7 +246,10 @@ public:
 
 //
 //================================================
-// Brady Slicing
+// Generalized Advective 1+log slicing:
+// allow f(alpha) to be different from 2/alpha
+// with local cosmological gauge condition 
+// (see Doherty, Gracia-Linares, Laguna 2025)
 //================================================
 //
 class LocalCosmoBonaMasso : public Slicing {
@@ -254,7 +261,7 @@ public:
 	    double eta_KO_i) : 
     Slicing(grid_i, cosmology_i, eta_KO_i) {
     cout << " SLICING: setting up (generalized) Bona-Masso slicing..." << endl;
-    int bona_masso_type = 5;
+    int bona_masso_type = 1;
     double bona_masso_parameter = 2.0;
     ifstream infile;
     infile.open("Bona_Masso_Input");
@@ -276,7 +283,9 @@ public:
     } else if (bona_masso_type == 4) {
       bonamasso_f = new GaugeShockAvoid_lin(bona_masso_parameter);
     } else if (bona_masso_type == 5) {
-      bonamasso_f = new Cosmo();
+      bonamasso_f = new Cosmo(bona_masso_parameter);
+    } else if (bona_masso_type == 6) {
+      bonamasso_f = new CosmoShockAvoid(bona_masso_parameter);
     } else {
       cerr << " SLICING: Unknown Bona-Masso type " << bona_masso_type << endl;
       cerr << " SLICING: Will use standard 1+log... " << endl;
