@@ -192,6 +192,8 @@ public:
 	#endif
 			double res = Solve_Constraints();
 			cout << " INFLATIONGW: Solved constraints momentum residual = " << Momentum_Residual() << endl;
+			cout << " and K residual = " << Hamiltonian_K_Residual() << endl;
+			cout << " and psi residual = " << Hamiltonian_Psi_Residual() << endl;
 			Compute_Aij();
 			dump(&psi);
 			if (res < tol) {

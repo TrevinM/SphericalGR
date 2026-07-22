@@ -51,20 +51,28 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		double psi_asym_error_mid = Integrate(psi0_mid) - 1.0;
 		if (psi_asym_error_mid * psi_asym_error_low < 0.0) {
 			psi0_high = psi0_mid;
+			psi_asym_error_high = psi_asym_error_mid;
 		}
 		else {
 			psi0_low = psi0_mid;
+			psi_asym_error_low = psi_asym_error_mid;
 		}
 		psi_asym_error = psi_asym_error_mid;
 		cout << " INFLATIONGW: Narrowed psi0 now " << psi0_mid << endl;
 		cout << " INFLATIONGW: psi_asym_error =  " << psi_asym_error << endl;
+		//cout << " INFLATIONGWL Hamiltonian psi residual = " << Hamiltonian_Psi_Residual() << endl;
 	}
 	if (abs(psi_asym_error) > tol_tri) {
-		cerr << " INFLATIONGW: ERROR: Root finding failed to converge with bound difference " << psi0_high - psi0_low <<endl;
+		cerr << " INFLATIONGW: ERROR: Root finding failed to converge with bound difference " << psi0_high - psi0_low << endl;
 	}
 	else {
 		cout << " INFLATIONGW: Found psi0 = " << psi0_mid << endl;
 	}
+	Update_Psi();
+}
+
+
+void Update_Psi() {
 	for (int i = N_g; i < n_r; i++) {
 		const double rl = K.r(i);
 		for (int j = N_g; j < n_theta - N_g; j++) {
@@ -83,14 +91,13 @@ double Integrate(double psi0) {
 	double delta_r = (grid->delta_r(N_g - 1)) / 2.0;
 	pair<double, double> k1 = Ham_RHS_0(vars, 0.0);
 	pair<double, double> vars2 = {vars.first + k1.first * delta_r * 0.5, vars.second + k1.second * delta_r * 0.5};
-	pair<double, double> k2 = Ham_RHS_0(vars2, delta_r * 0.5);
+	pair<double, double> k2 = Ham_RHS(vars2, delta_r * 0.5);
 	pair<double, double> vars3 = {vars.first + k2.first * delta_r * 0.5, vars.second + k2.second * delta_r * 0.5};
-	pair<double, double> k3 = Ham_RHS_0(vars3, delta_r * 0.5);
+	pair<double, double> k3 = Ham_RHS(vars3, delta_r * 0.5);
 	pair<double, double> vars4 = {vars.first + k3.first * delta_r, vars.second + k3.second * delta_r};
-	pair<double, double> k4 = Ham_RHS_0(vars4, delta_r);
+	pair<double, double> k4 = Ham_RHS(vars4, delta_r);
 	vars.first = vars.first + delta_r * (k1.first + 2. * k2.first + 2. * k3.first + k4.first) / 6.;
 	vars.second = vars.second + delta_r * (k1.second + 2. * k2.second + 2. * k3.second + k4.second) / 6.;	
-
 
   	for (int i = N_g; i < n_r; i++) {
 		const double rl = grid->r(i);
