@@ -77,16 +77,17 @@ void Compute_Aij() {
 
 //================================================
   // rescaled spherical polar components of \hat A_{ij} for m=0 version of model (A)
-  // (compare (3.7) in Shibata & Nakamura)
+  // (compare (3.7) in Shibata & Nakamura) ONLY FAMILY B HAS SIGMA IMPLEMENTED
   //================================================
   inline double An_rr(double r, double theta) {
     const double r2 = r*r;
+    const double sigma2 = sigma * sigma;
       if (nakamura_type == 0) {
 	const double costheta = cos(theta);
 	return GW_amp * exp(-r2/2.0) * (1. - 3.0 * costheta * costheta);
       } else if (nakamura_type == 1) {
 	const double costheta = cos(theta);
-	return GW_amp * exp(-r2/2.0) * (5. - r2) *
+	return GW_amp * exp(-r2/sigma2) * (5. -  2. * r2 / sigma2) *
 	  (1. - 3.0 * costheta * costheta);
       }
       else {
@@ -96,10 +97,11 @@ void Compute_Aij() {
 
   inline double An_rt(double r, double theta) {
     const double r2 = r*r;
+    const double sigma2 = sigma * sigma;
       if (nakamura_type == 0) {
 	return GW_amp * exp(-r2/2.0) * (3.0 - r2) * sin(theta) * cos(theta);
       } else if (nakamura_type == 1) {
-	return GW_amp * exp(-r2/2.0) * (15.0 - 10.*r2 + r2*r2) *
+	return GW_amp * exp(-r2/sigma2) * (15.0 - 20.*r2/sigma2 + 4.*r2*r2/(sigma2*sigma2)) *
 	  sin(theta) * cos(theta);
       }
       else {
@@ -119,11 +121,15 @@ void Compute_Aij() {
 	return - GW_amp * exp(-r2/2.0) *
 	  (2 - 6.*costheta*costheta + (6 - 8*r2 + r4)*sintheta*sintheta) / 4.0;
       } else if (nakamura_type == 1) {
-      const double cos2theta = cos(2.*theta);
+        const double costheta = cos(theta);
+      const double cos2theta = costheta*costheta;
       const double r6 = r4*r2;
-      return - GW_amp * exp(-r2/2.0) *
-	(20. - 60.*r2 + 17.*r4 - r6 -
-	 (60. - 68.*r2 + 17.*r4 - r6) * cos2theta) / 8.0;
+      const double sigma2 = sigma * sigma;
+      const double sigma4 = sigma2 * sigma2;
+      const double sigma6 = sigma4 * sigma2;
+      return (GW_amp / 8.0) * exp(-r2/sigma2) *
+	(-80. + 256.*r2/sigma2 -136.*r4/sigma4 + 16.*r6/sigma6 +
+	 2.*(60. - 136.*r2/sigma2 + 68.*r4/sigma4 - 8.*r6/sigma6) * cos2theta);
       }
       else {
         return 0.0;
@@ -142,11 +148,15 @@ void Compute_Aij() {
 	  (- 2 + 6.*costheta*costheta +
 	   (6 - 8*r2 + r4)*sintheta*sintheta) / 4.0;
       } else if (nakamura_type == 1) {
-      const double cos2theta = cos(2.*theta);
-      const double r6 = r4*r2;
-	return GW_amp * exp(-r2/2.0) *
-	  ( 40. - 64.*r2 + 17.*r4 - r6 +
-	   r2*(56 - 17.*r2 + r4) * cos2theta ) / 8.0;      
+        const double costheta = cos(theta);
+        const double sigma2 = sigma * sigma;
+        const double sigma4 = sigma2 * sigma2;
+        const double sigma6 = sigma4 * sigma2;
+        const double cos2theta = costheta * costheta;
+        const double r6 = r4*r2;
+	return (GW_amp / 8.) * exp(-r2/sigma2) *
+	  ( 40. - 240.*r2/sigma2 + 136.*r4/sigma4 - 16.*r6/sigma6 +
+	   (4.*r2/sigma2)*(56 - 34.*r2/sigma2 + 4.*r4/sigma4) * cos2theta );      
       }
       else
       {

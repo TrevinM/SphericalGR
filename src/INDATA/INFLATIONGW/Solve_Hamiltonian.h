@@ -88,7 +88,7 @@ void Update_Psi() {
 
 double Integrate(double psi0) {
 	pair<double, double> vars = {psi0, 0.0};
-	double delta_r = (grid->delta_r(N_g - 1)) / 2.0;
+	double delta_r = ((grid->delta_r(N_g - 1)) / 2.0);
 	pair<double, double> k1 = Ham_RHS_0(vars, 0.0);
 	pair<double, double> vars2 = {vars.first + k1.first * delta_r * 0.5, vars.second + k1.second * delta_r * 0.5};
 	pair<double, double> k2 = Ham_RHS(vars2, delta_r * 0.5);
