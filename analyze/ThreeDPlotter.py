@@ -113,7 +113,7 @@ class ThreeDPlotter:
                 ax.plot(self.x_val, self.an_plot[z][y_iter], label=f'an {label}', c=self.c)
                     
             if auxiliary:
-                ax.plot(self.x_val, self.aux_plot[z][y_iter], label=f'aux {label}', marker='x', c=self.c)
+                ax.scatter(self.x_val, self.aux_plot[z][y_iter], label=f'aux {label}', marker='x', c=self.c)
 
         ax.set(xlabel=f'{self.x_var}', ylabel=f'{self.var_name}')
         plt.title(f"{self.z_var} = {round(self.z_val[z], 2)}")

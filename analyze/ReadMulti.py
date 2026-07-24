@@ -1,5 +1,6 @@
 import ReaderSlice
 import ReaderRay
+import math
 import matplotlib.pyplot as plt
 
 import AnalyticalDualMax
@@ -10,11 +11,12 @@ def PATH(test):
 
 #The test directories to read from
 TESTS = [
-    'SR_128_16',
-    'SR_256_32',
+    # 'SR_64_8',
+    # 'SR_128_16',
+    # 'SR_256_32',
     'SR_512_64',
+    'SR_768_96',
     'SR_1024_128'
-    # 'SR_RES_64_8'
 ]
 
 #The dump function name to be read.
@@ -40,6 +42,7 @@ ANALYTICAL = [
     AnalyticalDualMax.multipole(1, 0, 0),
     AnalyticalDualMax.multipole(1, 0, 0),
     AnalyticalDualMax.multipole(1, 0, 0),
+    AnalyticalDualMax.multipole(1, 0, 0),
     AnalyticalDualMax.multipole(1, 0, 0)
 ]
 
@@ -47,17 +50,24 @@ ANALYTICAL = [
 #Only works if there is an analytical function
 #Not required if PLOT_AUXILIARY is set to False
 AUXILIARY = [
-    lambda num, an: num - an,
-    lambda num, an: 16 * (num - an),
-    lambda num, an: 16 * 16 * (num - an),
-    lambda num, an: 16 * 16* 16 * (num - an)
+    lambda num, an: (num - an),
+    lambda num, an: 5.0625 * (num - an),
+    lambda num, an: 16 * (num - an)
 ]
+
+# AUXILIARY = [
+#     lambda num, an: num - an,
+#     lambda num, an: (num - an),
+#     lambda num, an: (num - an),
+#     lambda num, an: (num - an),
+#     lambda num, an: (num - an)
+# ]
 
 #The horizontal axis of the plot to be created
 #HORIZONTAL: 'r', 'theta', or 't'
 #HORIZONTAL_GRID: range of gridpoint(s) or None to get all available
 HORIZONTAL = 'r'
-HORIZONTAL_GRID = range(8, 128)
+HORIZONTAL_GRID = range(0,128)
 
 #Plot multiple different lines in the same plot
 #SERIES: 'r', 'theta', or 't'
@@ -69,7 +79,7 @@ SERIES_GRID = [1]
 #MOVIE: 'r', 'theta', or 't'
 #MOVIE_GRID: list containing animation gridpoint(s) or None to get all available
 MOVIE = 't'
-MOVIE_GRID = [0]
+MOVIE_GRID = [10]
 MOVIE_PLOT = [0]
 
 #initialize list
@@ -104,13 +114,21 @@ for i, reader in enumerate(readers):
 
     reader.read()
 
-    reader.abs_integrate_plot(reader.aux_plot, 'x')
+    # reader.abs_integrate_plot(reader.aux_plot, 'x')
 
 
     if MOVIE_PLOT == None:
         movie_length[i] = len(reader.z_grid)
     else:
         movie_length[i] = len(MOVIE_PLOT)
+
+
+# maximum = max([readers[i].max() for i in range(len(readers))]) #type: ignore
+# for reader in readers: 
+#     factor = maximum / reader.max()
+#     reader.scale(factor)
+#     print(f'Factor: {factor}')
+
 
 if all(length == movie_length[0] for length in movie_length):
     print("All movie steps length match! Plotting . . .")

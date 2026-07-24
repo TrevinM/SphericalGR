@@ -1,12 +1,13 @@
 import glob
 from Reader import Reader
+import math
 
 class SliceReader(Reader):
 
-    def __init__(self, path, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid):
+    def __init__(self, path, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid, color=None):
         self._files = glob.glob(path+'/'+var_name+'_slice_*')
 
-        super(SliceReader, self).__init__(var_name, x_var, x_grid, y_var, y_grid, z_var, z_grid)
+        super(SliceReader, self).__init__(var_name, x_var, x_grid, y_var, y_grid, z_var, z_grid, color)
 
 
     def _grid_resolution(self):
@@ -51,4 +52,6 @@ class SliceReader(Reader):
                 break
             
         row = r_step * (self.resolution[1] + 1) + th_step
-        return [float(x) for x in lines[row].split()]
+        th = (2 * th_step + 1)/(2 * self.resolution[1]) * math.pi
+        vals = [float(x) for x in lines[row].split()]
+        return [vals[0], th, vals[2]]

@@ -61,7 +61,7 @@ class RayReader(Reader):
             
         vals = [float(x) for x in lines[r_step + self._n_g].split()]
         r = vals[0]
-        th = [0, pi/2][th_step]
+        th = [0, pi/2.][th_step]
         var = vals[th_step + 1]
         return [r, th, var]
     

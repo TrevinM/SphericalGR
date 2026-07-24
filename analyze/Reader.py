@@ -16,6 +16,7 @@ class Reader(ThreeDPlotter, ABC):
         self._x_in = x_grid
         self._y_in = y_grid
         self._z_in = z_grid
+        self._max = None
 
         #Public
         self.resolution = self._grid_resolution()
@@ -63,7 +64,7 @@ class Reader(ThreeDPlotter, ABC):
             self.x_grid = list(self.x_grid)
             scale = self.resolution[0]/min_resolution[0]
             for x_iter in range(len(self.x_grid)):
-                self.x_grid[x_iter] = round(scale * self.x_grid[x_iter] + scale/2 - 1)
+                self.x_grid[x_iter] = math.floor(scale * self.x_grid[x_iter] + scale/2)
         else:
             print("Not scaling x")
 
@@ -74,7 +75,7 @@ class Reader(ThreeDPlotter, ABC):
             self.y_grid = list(self.y_grid)
             scale = self.resolution[1]/min_resolution[1]
             for x_iter in range(len(self.x_grid)):
-                self.x_grid[x_iter] = round(scale * self.x_grid[x_iter] + scale/2 - 1) #type: ignore
+                self.x_grid[x_iter] = math.floor(scale * self.x_grid[x_iter] + scale/2) #type: ignore
         else:
             print("Not scaling y")
 
@@ -85,24 +86,38 @@ class Reader(ThreeDPlotter, ABC):
             self.z_grid = list(self.z_grid)
             scale = self.resolution[2]/min_resolution[2]
             for x_iter in range(len(self.x_grid)):
-                self.x_grid[x_iter] = round(scale * self.x_grid[x_iter] + scale/2 - 1) #type: ignore
+                self.x_grid[x_iter] = math.floor(scale * self.x_grid[x_iter] + scale/2) #type: ignore
         else:
             print("Not scaling z")
 
 
     def fill_x(self):
         """Fills any missing internal points of the grid"""
-        self.x_grid = range(min(self.x_grid), max(self.x_grid))
+        self.x_grid = range(min(self.x_grid), max(self.x_grid)+1)
 
 
     def fill_y(self):
         """Fills any missing internal points of the grid"""
-        self.y_grid = range(min(self.y_grid), max(self.y_grid))
+        self.y_grid = range(min(self.y_grid), max(self.y_grid)+1)
 
 
     def fill_z(self):
         """Fills any missing internal points of the grid"""
-        self.y_grid = range(min(self.y_grid), max(self.y_grid))
+        self.y_grid = range(min(self.y_grid), max(self.y_grid)+1)
+
+
+    def max(self):
+        "Returns the maximum value of the function"
+        return self._max
+    
+
+    def scale(self, factor):
+        for z_iter in range(len(self.z_grid)):
+            for y_iter in range(len(self.y_grid)):
+                for x_iter in range(len(self.x_grid)):
+                    self.num_plot[z_iter][y_iter][x_iter] *= factor
+                    self.an_plot[z_iter][y_iter][x_iter] *= factor
+                    self.aux_plot[z_iter][y_iter][x_iter] = self._aux(self.num_plot[z_iter][y_iter][x_iter], self.an_plot[z_iter][y_iter][x_iter]) #type: ignore
 
 
     def read(self):
@@ -229,3 +244,6 @@ class Reader(ThreeDPlotter, ABC):
                             else:
                                 self.z_val.append(vals[self.z_index])  
                                 print(f"z_val appended {self.z_val[-1]}")
+
+                    if self._max == None or self._max < num_val:
+                        self._max = num_val
