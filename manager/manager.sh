@@ -12,7 +12,7 @@ export OMP_NUM_THREADS=16
 export dir=/mnt/research/tbaumgar/Students/tmacomber/SphericalGR
 
 #Name of critical collapse suite to be run
-suite=QxDO
+suite=DxQ
 suite_path=$dir/test/$suite
 
 #Default upper and lower bounds
@@ -237,10 +237,8 @@ do
             mkdir $it_path/$eta
             wait
             cp $dir/manager/moosehead.sh $it_path/$eta/$suite\_$i\_$eta.sh
-            cp $dir/test/example_DualMax/* $it_path/$eta/
-            wait
 
-            #Edit Inputs
+            #Copy and edit input files
             export ETA=$eta
             bash $dir/manager/$suite.sh
 
