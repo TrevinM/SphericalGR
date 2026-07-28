@@ -104,8 +104,6 @@ public:
   string Name() { return bonamasso_name.str(); };
 };
 
-
-
     
 
 

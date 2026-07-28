@@ -5,6 +5,7 @@
 //================================================
 //
 #include "../scalarpotential.h"
+#include <vector>
 
 class InflationGW : public InData {
 private:
@@ -36,7 +37,7 @@ private:
 	bool all_clear;
 	QuadraticPotential* potential;
 	ostringstream indata_name;
-	VecDoub psi_r;
+	std::vector<double> psi_r;
 public:
 	//================================================
 	// Constructor
@@ -140,11 +141,11 @@ public:
 		// AE_p.setup(grid, 1, "AE_p", gf_counter++, -1, -1, +1); 
 		// AE_dot_p.setup(grid, 1, "AE_p", gf_counter++, -1, -1, +1); 
 		//
-		int i;
-		psi_r.resize(n_r);
-		for (i = 0; i < n_r; i++) {
-			psi_r[i] = 0.0;
-		}
+		//int i;
+		//psi_r.resize(n_r);
+		//for (i = 0; i < n_r; i++) {
+		//	psi_r[i] = 0.0;
+		//}
 		//================================================
 		// compute source functions and initialize psi etc...
 		//================================================

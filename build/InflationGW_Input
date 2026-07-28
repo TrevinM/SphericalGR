@@ -7,7 +7,7 @@ Parameters for the initial inflaton field
 	
 Gravitational wave parameters
        Nakamura A^ij family (See BGH 2026, 0: A, 1: B) = 0
-       Wave amplitude = 1.0
+       Wave amplitude = 0.0
 
 Parameters for elliptic solver
        max_it = 1000

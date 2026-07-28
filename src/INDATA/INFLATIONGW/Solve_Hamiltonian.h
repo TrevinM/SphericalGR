@@ -3,10 +3,11 @@
 // Solve Hamiltonian constraint
 //====================================================
 void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
-		       bool verbose = true) {	
+		       bool verbose = true) {
+	const double delta_r = (grid->delta_r(N_g - 1)) / 100.0;
 	double psi0 = 1.0;
 	double psi0_last = psi0;
-	double psi_asym_error_init = Integrate(psi0) - 1.0;
+	double psi_asym_error_init = Integrate(psi0, delta_r) - 1.0;
 	cout << " INFLATIONGW: Inital psi_asym_error = " << psi_asym_error_init << endl;
  	double psi_asym_error = psi_asym_error_init;
 	int iter = 0;
@@ -16,7 +17,7 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 		iter++;
 		psi0_last = psi0;
 		psi0 *= 1.01; //Change from hardcoded
-		psi_asym_error = Integrate(psi0) - 1.0;
+		psi_asym_error = Integrate(psi0, delta_r) - 1.0;
 		cout << "INFLATIONGW: psi0 = " << psi0 << " gives asym_error = " << psi_asym_error << endl;
 	}
 	if (iter >= max_it) {
@@ -31,7 +32,7 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 			iter++;
 			psi0_last = psi0;
 			psi0 *= 1.01; //Change from hardcoded
-			psi_asym_error = Integrate(psi0) - 1.0;
+			psi_asym_error = Integrate(psi0, delta_r) - 1.0;
 			cout << "INFLATIONGW: psi0 = " << psi0 << " gives asym_error = " << psi_asym_error << endl;
 		}
 		if (iter >= max_it) {
@@ -41,14 +42,14 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 
 	double psi0_high = psi0;
 	double psi0_low = psi0_last;
-	double psi_asym_error_low = Integrate(psi0_low) - 1.0;
-	double psi_asym_error_high = Integrate(psi0_high) - 1.0;
+	double psi_asym_error_low = Integrate(psi0_low, delta_r) - 1.0;
+	double psi_asym_error_high = Integrate(psi0_high, delta_r) - 1.0;
 	cout << " INFLATIONGW: Narrowed psi0 to between " << psi0_low << " and " << psi0_high << endl;
 	double psi0_mid = (psi0_high + psi0_low) / 2.0;
 	while (abs(psi_asym_error) > tol_tri && psi0_high - psi0_low > 1.e-2*tol_tri)
 	{
 		psi0_mid = (psi0_high + psi0_low) / 2.0;
-		double psi_asym_error_mid = Integrate(psi0_mid) - 1.0;
+		double psi_asym_error_mid = Integrate(psi0_mid, delta_r) - 1.0;
 		if (psi_asym_error_mid * psi_asym_error_low < 0.0) {
 			psi0_high = psi0_mid;
 			psi_asym_error_high = psi_asym_error_mid;
@@ -68,17 +69,17 @@ void Solve_Psi(double tol_tri = 1.e-10, double tol_res = 1.e-8,
 	else {
 		cout << " INFLATIONGW: Found psi0 = " << psi0_mid << endl;
 	}
-	Update_Psi();
+	Update_Psi(delta_r);
 }
 
 
-void Update_Psi() {
+void Update_Psi(double deltar) {
 	for (int i = N_g; i < n_r; i++) {
 		const double rl = K.r(i);
+		const double psi_interp = Interp_Psi_r(psi_r, deltar, rl);
 		for (int j = N_g; j < n_theta - N_g; j++) {
-			const double thetal = K.theta(j);
 			for (int k = N_g; k < n_phi - N_g; k++) {
-				psi[i][j][k] = psi_r[i];
+				psi[i][j][k] = psi_interp;
 			}
 		}
 	}
@@ -86,9 +87,14 @@ void Update_Psi() {
 }
 
 
-double Integrate(double psi0) {
+double Integrate(double psi0, double deltar) {
+	cout << "Integrating psi..." << endl;
+	psi_r.clear();
+	//cout << "Adding psi0..." << endl;
+	psi_r.push_back(psi0);
 	pair<double, double> vars = {psi0, 0.0};
-	double delta_r = ((grid->delta_r(N_g - 1)) / 2.0);
+	double delta_r = deltar; 
+	double r_current = delta_r;
 	pair<double, double> k1 = Ham_RHS_0(vars, 0.0);
 	pair<double, double> vars2 = {vars.first + k1.first * delta_r * 0.5, vars.second + k1.second * delta_r * 0.5};
 	pair<double, double> k2 = Ham_RHS(vars2, delta_r * 0.5);
@@ -98,23 +104,24 @@ double Integrate(double psi0) {
 	pair<double, double> k4 = Ham_RHS(vars4, delta_r);
 	vars.first = vars.first + delta_r * (k1.first + 2. * k2.first + 2. * k3.first + k4.first) / 6.;
 	vars.second = vars.second + delta_r * (k1.second + 2. * k2.second + 2. * k3.second + k4.second) / 6.;	
-
-  	for (int i = N_g; i < n_r; i++) {
-		const double rl = grid->r(i);
-		delta_r = grid->delta_r(i);
+	//cout << "Adding first rk4 to psi_r..." << endl;
+	psi_r.push_back(vars.first);
+	//cout << "r_current = " << r_current << " and r_max = " << K.r(n_r - 1) << " at start of loop" << endl;
+  	while (r_current < K.r(n_r - 1)) {
 		if (vars.first < 0.0) {
 			//cerr << " INFLATIONGW: ERROR: found some negative psi... Bad..." << endl;
 		} 
-		psi_r[i] = vars.first;
-		pair<double, double> k1 = Ham_RHS(vars, rl);
+		pair<double, double> k1 = Ham_RHS(vars, r_current);
 		pair<double, double> vars2 = {vars.first + k1.first * delta_r * 0.5, vars.second + k1.second * delta_r * 0.5};
-		pair<double, double> k2 = Ham_RHS(vars2, rl + delta_r * 0.5);
+		pair<double, double> k2 = Ham_RHS(vars2, r_current + delta_r * 0.5);
 		pair<double, double> vars3 = {vars.first + k2.first * delta_r * 0.5, vars.second + k2.second * delta_r * 0.5};
-		pair<double, double> k3 = Ham_RHS(vars3, rl + delta_r * 0.5);
+		pair<double, double> k3 = Ham_RHS(vars3, r_current + delta_r * 0.5);
 		pair<double, double> vars4 = {vars.first + k3.first * delta_r, vars.second + k3.second * delta_r};
-		pair<double, double> k4 = Ham_RHS(vars4, rl + delta_r);
+		pair<double, double> k4 = Ham_RHS(vars4, r_current + delta_r);
 		vars.first = vars.first + delta_r * (k1.first + 2. * k2.first + 2. * k3.first + k4.first) / 6.;
 		vars.second = vars.second + delta_r * (k1.second + 2. * k2.second + 2. * k3.second + k4.second) / 6.;
+		psi_r.push_back(vars.first);
+		r_current += delta_r;
 	}
 	return vars.first;
 
@@ -138,6 +145,29 @@ pair<double, double> Ham_RHS_0(pair<double, double> vars, double r) {
 	return pair<double, double> {0.0, -2.0 * PI * psi5 * epsilon * V / 3.0};			
 }
 
+
+double Interp_Psi_r(const vector<double>& psi_r, double deltar, double r_target) {
+	const int n = (int) psi_r.size();
+	int i0 = (int) floor(r_target / deltar) - 1;   // start of 4-pt stencil
+	if (i0 < 0) i0 = 0;
+	if (i0 > n - 4) i0 = n - 4;   // clamp: also handles extrapolation past r_max gracefully
+
+	double r_pts[4], p_pts[4];
+	for (int m = 0; m < 4; m++) {
+		r_pts[m] = (i0 + m) * deltar;
+		p_pts[m] = psi_r[i0 + m];
+	}
+
+	double val = 0.0;
+	for (int m = 0; m < 4; m++) {
+		double L = 1.0;
+		for (int nn = 0; nn < 4; nn++) {
+			if (nn != m) L *= (r_target - r_pts[nn]) / (r_pts[m] - r_pts[nn]);
+		}
+		val += p_pts[m] * L;
+	}
+	return val;
+}
 
 
 double Hamiltonian_Psi_Residual() {
