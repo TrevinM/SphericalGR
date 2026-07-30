@@ -1,7 +1,7 @@
 Input parameters for horizon finder
 Find horizons after timesteps or times (don't search for Horizons: findtimes < 0)
-      findsteps = 0
-      findtimes = 1.0
+      findsteps = 20
+      findtimes = 0.
 Parameter eta in expansion equation
       eta = -1.0
 Parameters for elliptic solver
@@ -12,6 +12,8 @@ Parameters for expansion loop
       max_iter_exp = 100
 Initial mass guess
       mass_guess = 1.0
+Find cosmological horizons instead = 1
+(0 : False, 1 : True)
 
 NOTE: to use times as criterion, set findsteps = 0.  If findsteps > 0 will
 use number of steps as criterion for searching for horizons.

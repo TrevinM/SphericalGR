@@ -97,7 +97,7 @@ public:
     for (int i = N_g; i < N_r - N_g; i++)    
       for (int j = N_g; j < N_t - N_g; j++)
 	for (int k = N_g; k < N_p - N_g ; k++) {    
-	  derivs->lapse[i][j][k] = - 2.0 * c->lapse(i,j,k) *
+	  derivs->lapse[i][j][k] = - 2.0 * c->lapse(i,j,k) * 
 	    ( c->K(i,j,k) - K_0 ) + eta_KO * c->lapse.KO(i,j,k);
  	}  
   };
@@ -206,6 +206,8 @@ public:
       bonamasso_f = new GaugeShockAvoid(bona_masso_parameter);
     } else if (bona_masso_type == 4) {
       bonamasso_f = new GaugeShockAvoid_lin(bona_masso_parameter);
+    }  else if (bona_masso_type == 5) {
+        bonamasso_f = new Cosmo(bona_masso_parameter);
     } else {
       cerr << " SLICING: Unknown Bona-Masso type " << bona_masso_type << endl;
       cerr << " SLICING: Will use standard 1+log... " << endl;
@@ -276,7 +278,7 @@ public:
     } else if (bona_masso_type == 4) {
       bonamasso_f = new GaugeShockAvoid_lin(bona_masso_parameter);
     } else if (bona_masso_type == 5) {
-      bonamasso_f = new Cosmo();
+      bonamasso_f = new Cosmo(bona_masso_parameter);
     } else {
       cerr << " SLICING: Unknown Bona-Masso type " << bona_masso_type << endl;
       cerr << " SLICING: Will use standard 1+log... " << endl;

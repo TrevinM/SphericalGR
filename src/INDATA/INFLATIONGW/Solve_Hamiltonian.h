@@ -150,7 +150,7 @@ double Interp_Psi_r(const vector<double>& psi_r, double deltar, double r_target)
 	const int n = (int) psi_r.size();
 	int i0 = (int) floor(r_target / deltar) - 1;   // start of 4-pt stencil
 	if (i0 < 0) i0 = 0;
-	if (i0 > n - 4) i0 = n - 4;   // clamp: also handles extrapolation past r_max gracefully
+	if (i0 > n - 4) i0 = n - 4;   // clamp: also handles extrapolation past r_max
 
 	double r_pts[4], p_pts[4];
 	for (int m = 0; m < 4; m++) {

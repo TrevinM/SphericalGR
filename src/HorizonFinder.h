@@ -95,6 +95,7 @@ private:
   double a_friedmann;      // current value of cosmological expansion coefficient
   bool use_time_step_criterion;  // use step counter to decide whether to 
                                  // search for horizon; otherwise use time
+  bool cosmo_horizonfind;
   //  char file_stem[64];
   ofstream monitorfile;
   ofstream surfacefile;
@@ -249,6 +250,11 @@ public:
     cout << "   max_iter_exp = " << max_iter_exp << endl;
     cout << "   mass_guess   = " << mass_guess << endl;
     cout << "   using file names starting with '" << file_stem << "'" << endl;
+    if (cosmo_horizonfind == 1) {
+      cout << " HORIZONFINDER: searching for cosmological horizons " << endl;
+    } else {
+      cout << " HORIZONFINDER: searching for black hole horizons " << endl;
+    }
     use_time_step_criterion = (find_steps > 0);
     next_time = 0.0;
     next_step = 0;

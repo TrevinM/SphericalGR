@@ -32,6 +32,7 @@ int HorizonFinder::ReadInput() {
   infile.get(buf,500,'='); infile.get(c); infile >> tol_exp;
   infile.get(buf,500,'='); infile.get(c); infile >> max_iter_exp;
   infile.get(buf,500,'='); infile.get(c); infile >> mass_guess;
+  infile.get(buf,500,'='); infile.get(c); infile >> cosmo_horizonfind;
   //  infile.get(buf,500,'='); infile.get(c); infile.get(c); 
   //  infile.get(file_stem,64);
   if(infile.eof()) {
@@ -247,9 +248,16 @@ double HorizonFinder::Expansion(){
       //
       // compute 2D Laplace operator on h:
       //
+      if (cosmo_horizonfind == 1) {
+      expansion[j][k] = lambda(j,k) * ( m[1][1] * h.ddtheta(j,k) + 
+					  2.0 * m[1][2] * h.dthetadphi(j,k) + 
+					  m[2][2] * h.ddphi(j,k) );
+      } else {
       expansion[j][k] = - lambda(j,k) * ( m[1][1] * h.ddtheta(j,k) + 
 					  2.0 * m[1][2] * h.dthetadphi(j,k) + 
 					  m[2][2] * h.ddphi(j,k) );
+      }
+
       //      if (test) cout << " Laplace of h = " << expansion(j,k) << endl;
       //
       // store gradient of phi in vector
@@ -277,7 +285,12 @@ double HorizonFinder::Expansion(){
 	for (int b = 0; b < 3; b++) {
 	  expansion[j][k] += psi2 * A[a][b] * s[a] * s[b]; 
 	  for (int c = 0; c < 3; c++) {
-	    expansion[j][k] -= m[a][b] * s_low[c] * Gamma[c][a][b];
+      if (cosmo_horizonfind == 1) {
+        expansion[j][k] += m[a][b] * s_low[c] * Gamma[c][a][b];
+      }
+      else {
+        expansion[j][k] -= m[a][b] * s_low[c] * Gamma[c][a][b];
+      }  
 	  }
 	}
       }
@@ -354,9 +367,16 @@ void HorizonFinder::Expansion(gf2d & h_S, gf2d & exp_S, gf2d & nr, gf2d & nt, gf
       //
       // compute 2D Laplace operator on h:
       //
+      if (cosmo_horizonfind == 1){
+      exp_S[j][k] = lambda(j,k) * ( m[1][1] * h_S.ddtheta(j,k) + 
+				      2.0 * m[1][2] * h_S.dthetadphi(j,k) + 
+				      m[2][2] * h_S.ddphi(j,k) );   
+      }
+      else {
       exp_S[j][k] = - lambda(j,k) * ( m[1][1] * h_S.ddtheta(j,k) + 
 				      2.0 * m[1][2] * h_S.dthetadphi(j,k) + 
 				      m[2][2] * h_S.ddphi(j,k) );
+      }
       //      if (test) cout << " Laplace of h = " << exp_S(j,k) << endl;
       //
       // store gradient of phi in vector
@@ -383,7 +403,12 @@ void HorizonFinder::Expansion(gf2d & h_S, gf2d & exp_S, gf2d & nr, gf2d & nt, gf
 	for (int b = 0; b < 3; b++) {
 	  exp_S[j][k] += psi2 * A[a][b] * s[a] * s[b];
 	  for (int c = 0; c < 3; c++) {
-	    exp_S[j][k] -= m[a][b] * s_low[c] * Gamma[c][a][b];
+      if (cosmo_horizonfind == 1) {
+        exp_S[j][k] += m[a][b] * s_low[c] * Gamma[c][a][b];
+      }
+      else {
+        exp_S[j][k] -= m[a][b] * s_low[c] * Gamma[c][a][b];
+      }
 	  }
 	}
       }

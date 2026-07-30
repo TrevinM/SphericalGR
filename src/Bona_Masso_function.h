@@ -94,20 +94,17 @@ public:
 // Cosmo - Brady
 //================================================
 class Cosmo : public BonaMasso_f {
+private:
+  double k;
 public:
-  Cosmo() : BonaMasso_f() {
+  Cosmo(double par) : BonaMasso_f(), k(par) {
     cout << " BONAMASSO: setting up f(alpha) for Cosmo slicing..." << endl;
+    cout << " BONAMASSO: using barameter k = " << k << endl;
     bonamasso_name << "Cosmo" ;
   }
   ~Cosmo() {};
-  double operator()(double alpha) { return exp(-alpha) / alpha; };
+  double operator()(double alpha) { return k * exp(-alpha) / alpha; };
   string Name() { return bonamasso_name.str(); };
 };
-
-    
-
-
-
-
 
 #endif /* BONAMASSO_H */

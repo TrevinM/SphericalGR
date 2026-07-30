@@ -1,0 +1,1446 @@
+==================================================
+=======       Running SphericalGR         ========
+==================================================
+Reading input from file /mnt/research/tbaumgar/Students/pharris/github/build/Input
+   Maximum time : 1000
+   Coefficient for Kreiss-Oliger : 0.1
+   Using LAGRANGIAN formulation 
+   Evolving all fields dynamically 
+   Evolving with BSSN 
+   Evolving with fourth-order Runge-Kutta 
+   Applying Sommerfeld conditions via derivative 
+   Dumping output every 20 timesteps 
+   Monitor writes into file InflationGw
+   Monitor will note every 10 timesteps 
+   Will start with initial data (NOT from check point)
+   Will write check point files every 100000 timesteps
+   Asymptotically Minkowski 
+   Running with Inflation GW initial data 
+   Will read initial data input from file InflationGW_Input
+   Running with scalar field 
+   Running with LocalCosmoBonaMasso slicing 
+   Running with zero shift 
+  Creating tar-file of source files in directory /mnt/research/tbaumgar/Work/Disks/src
+tar: /mnt/research/tbaumgar/Work/Disks/src: Cannot open: No such file or directory
+tar: Error is not recoverable: exiting now
+===================================================
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+!! Running code assuming AXISYMMETRY !! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+!! Running code assuming EQSYMMETRY  !! 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+ GR: allocating grid...
+ GRID: Using N_ghost = 4 for eighth-oder spatial differencing.
+ GRID: setting N_phi = 1 in Axisymmetry 
+ GRID:  N_r      = 256
+ GRID:  N_theta  = 12
+ GRID:  N_phi     = 1
+ GRID:  r_max_init = 15.4, r_max_fin = 15.4
+ GRID:  using Courant factor of 0.4
+ GRID:  using 4 ghost zones 
+ GRID: no regridding. 
+ GRID: Using radial grid parameters s_param = 0 t_param = 0 and t_amp = 0
+ GRID: Using angular grid parameter theta_param = 0
+ CHECKPOINT: creating checkpoint class...
+ GR: allocating cosmology...
+ GR: allocating EOS...
+ GR: allocating indata...
+ INFLATIONGW: Reading initial data parameters from file InflationGW_Input
+ INFLATIONGW: Will set up Inflation GW initial data with
+      inflaton parameters phi_0 = 0, sigma = 0.77, epsilon = 0, branch = 1
+      and Nakamura type = 1 with amplitude 10
+ INFLATIONGW: Will run elliptic solver with max_it = 1000 and tol = 1e-08
+ INFLATIONGW: Solving with step factor = 0.85 and momentum step factor = 0.85
+Creating quadratic potential with mass m = 0.159287
+ SLICING: setting up (generalized) Bona-Masso slicing...
+ BONAMASSO: setting up f(alpha) for gauge-shock-avoiding slices...
+ BONAMASSO: using parameter kappa = 1
+ GAUGE: setting up constant shift...
+ GR: allocating dumper...
+ GR: allocating monitor...
+ Opened monitor file output/InflationGw_256_12.mon for output 
+ Opened monitor file output/InflationGw_256_12.const_mon for output 
+ Opened monitor file output/InflationGw_256_12.inv_mon for output 
+ GR: allocating manager...
+ MANAGER: Constructing manager... 
+ MANAGER: t = 0
+ GRID: Setting up radial grid with N_r = 256, r_max = 15.4, and A = 0
+ GRID: dr across origin:     0.0601563
+ GRID: dr at outer boundary: 0.0601563
+ GRID: Setting up angular grid with N_theta = 12, N_phi = 1 and B = 0
+ MANAGER: setting up states... 
+ STATE: reading dump list from file Dump_List
+ ... found function name lapse
+ ... found function name shift_r
+ ... found function name phi
+ ... found function name h_rr
+ ... found function name a_rr
+ ... found function name a_rt
+ ... found function name a_rp
+ ... found function name a_tt
+ ... found function name a_tp
+ ... found function name a_pp
+ ... found function name K
+ ... found function name h_pp
+ CHECKPOINT: Adding last to checkpoint list 
+ CURVATURE: reading dump list from file Dump_List
+ AUXILIARY: reading dump list from file Dump_List
+ HORIZONFINDER: Constructing HorizonFinder... 
+ HORIZONFINDER: using parameters: 
+   find_steps    = 0
+   find_times    = 1
+   eta          = -1
+   tol_ell      = 1e-09
+   max_iter_ell = 10000
+   tol_exp      = 0.0001
+   max_iter_exp = 100
+   mass_guess   = 1
+   using file names starting with 'InflationGw'
+ Constructing EllSolver2D for 12x12 matrix...
+ MANAGER: setting up diagnostics... 
+ DIAGNOSTICS: reading dump list from file Dump_List
+ ... found function name Ham
+ ... found function name Mom_r
+ ... found function name Mom_t
+ ... found function name Mom_p
+ ... found function name R_prop
+ ... found function name I_Re
+ ... found function name J_Re
+ ... found function name E_rr
+ ... found function name s_axial
+ MANAGER: using dt = 0.00157489
+ MANAGER: using Kreiss-Oliger coefficient 0.1
+ GAUGE: Using Kreiss-Oliger coefficient 0.1 in Gauge.h 
+ SCALARFIELD: setting up scalar field... 
+ SCALARFIELD: setting up states... 
+ SCALAR_STATE: List of all functions in scalar_state scalar_last: 
+      scalarfield
+      pi
+ SCALAR_STATE: reading dump list from file Dump_List
+ ... found function name scalarfield
+ CHECKPOINT: Adding scalar_last to checkpoint list 
+ ADM_SOURCE_TERMS: reading dump list from file Dump_List
+ ... found function name rho_ADM
+ ... found function name S_r
+ ... found function name S_t
+ ... found function name S_p
+ SCALAR_AUX: reading dump list from file Dump_List
+ ... found function name gradient_parts
+ ... found function name pi_parts
+ ... found function name potential_parts
+ ... found function name K_parts
+ ... found function name A2_parts
+ ... found function name R_parts
+Creating quadratic potential with mass m = 0.159287
+ GR: initializing manager...
+ INITIALIZE: t = 0
+ INFLATIONGW: Initializing Inflation GW initial data... 
+ VECLAPLACIAN: Constructing VecLaplacian for 9216x9216 matrix...
+ INFLATIONGW: Computing scalar field and sources
+ INFLATIONGW: Solving for psi
+Integrating psi...
+ INFLATIONGW: Inital psi_asym_error = 0
+ INFLATIONGW: Finding weak branch bounds for psi0
+ INFLATIONGW: Finding strong branch
+Integrating psi...
+Integrating psi...
+ INFLATIONGW: Narrowed psi0 to between 1 and 1
+ INFLATIONGW: Found psi0 = 1
+ INFLATIONGW: Finding initial A_ij
+ INFLATIONGW: psi part of hamiltonian has residual: 3.25267e-12
+ INFLATIONGW: Momentum residual = 0
+ INFLATIONGW: Hamiltonian K residual = 4596.84
+ INFLATIONGW: initial constraint residual = 4596.84
+ INFLATIONGW: current tolerance = 4.59684
+ INFLATIONGW - Momentum residual converged to 1.80753 in 4 steps
+ INFLATIONGW: Momentum residual = 1.80753
+ INFLATIONGW: Hamiltonian K residual = 2086.31
+ INFLATIONGW: after 1 steps constraint residual = 2086.31
+ INFLATIONGW: current tolerance = 2.08631
+ INFLATIONGW - Momentum residual converged to 1.28258 in 4 steps
+ INFLATIONGW: Momentum residual = 1.28258
+ INFLATIONGW: Hamiltonian K residual = 962.477
+ INFLATIONGW: after 2 steps constraint residual = 962.477
+ INFLATIONGW: current tolerance = 0.962477
+ INFLATIONGW - Momentum residual converged to 0.335092 in 4 steps
+ INFLATIONGW: Momentum residual = 0.335092
+ INFLATIONGW: Hamiltonian K residual = 454.151
+ INFLATIONGW: after 3 steps constraint residual = 454.151
+ INFLATIONGW: current tolerance = 0.454151
+ INFLATIONGW - Momentum residual converged to 0.269411 in 4 steps
+ INFLATIONGW: Momentum residual = 0.269411
+ INFLATIONGW: Hamiltonian K residual = 245.834
+ INFLATIONGW: after 4 steps constraint residual = 245.834
+ INFLATIONGW: current tolerance = 0.245834
+ INFLATIONGW - Momentum residual converged to 0.121853 in 4 steps
+ INFLATIONGW: Momentum residual = 0.121853
+ INFLATIONGW: Hamiltonian K residual = 137.471
+ INFLATIONGW: after 5 steps constraint residual = 137.471
+ INFLATIONGW: current tolerance = 0.137471
+ INFLATIONGW - Momentum residual converged to 0.085857 in 4 steps
+ INFLATIONGW: Momentum residual = 0.085857
+ INFLATIONGW: Hamiltonian K residual = 76.216
+ INFLATIONGW: after 6 steps constraint residual = 76.216
+ INFLATIONGW: current tolerance = 0.076216
+ INFLATIONGW - Momentum residual converged to 0.0469248 in 4 steps
+ INFLATIONGW: Momentum residual = 0.0469248
+ INFLATIONGW: Hamiltonian K residual = 47.1414
+ INFLATIONGW: after 7 steps constraint residual = 47.1414
+ INFLATIONGW: current tolerance = 0.0471414
+ INFLATIONGW - Momentum residual converged to 0.03238 in 4 steps
+ INFLATIONGW: Momentum residual = 0.03238
+ INFLATIONGW: Hamiltonian K residual = 27.495
+ INFLATIONGW: after 8 steps constraint residual = 27.4951
+ INFLATIONGW: current tolerance = 0.0274951
+ INFLATIONGW - Momentum residual converged to 0.022745 in 4 steps
+ INFLATIONGW: Momentum residual = 0.022745
+ INFLATIONGW: Hamiltonian K residual = 17.8749
+ INFLATIONGW: after 9 steps constraint residual = 17.8749
+ INFLATIONGW: current tolerance = 0.0178749
+ INFLATIONGW - Momentum residual converged to 0.0150547 in 4 steps
+ INFLATIONGW: Momentum residual = 0.0150547
+ INFLATIONGW: Hamiltonian K residual = 11.0648
+ INFLATIONGW: after 10 steps constraint residual = 11.0648
+ INFLATIONGW: current tolerance = 0.0110648
+ INFLATIONGW - Momentum residual converged to 0.0107763 in 4 steps
+ INFLATIONGW: Momentum residual = 0.0107763
+ INFLATIONGW: Hamiltonian K residual = 7.365
+ INFLATIONGW: after 11 steps constraint residual = 7.36501
+ INFLATIONGW: current tolerance = 0.00736501
+ INFLATIONGW - Momentum residual converged to 0.007067 in 4 steps
+ INFLATIONGW: Momentum residual = 0.007067
+ INFLATIONGW: Hamiltonian K residual = 4.832
+ INFLATIONGW: after 12 steps constraint residual = 4.83201
+ INFLATIONGW: current tolerance = 0.00483201
+ INFLATIONGW - Momentum residual converged to 0.00119341 in 5 steps
+ INFLATIONGW: Momentum residual = 0.00119341
+ INFLATIONGW: Hamiltonian K residual = 3.28114
+ INFLATIONGW: after 13 steps constraint residual = 3.28114
+ INFLATIONGW: current tolerance = 0.00328114
+ INFLATIONGW - Momentum residual converged to 0.000824036 in 5 steps
+ INFLATIONGW: Momentum residual = 0.000824036
+ INFLATIONGW: Hamiltonian K residual = 2.25359
+ INFLATIONGW: after 14 steps constraint residual = 2.25359
+ INFLATIONGW: current tolerance = 0.00225359
+ INFLATIONGW - Momentum residual converged to 0.000615644 in 5 steps
+ INFLATIONGW: Momentum residual = 0.000615644
+ INFLATIONGW: Hamiltonian K residual = 1.56089
+ INFLATIONGW: after 15 steps constraint residual = 1.56089
+ INFLATIONGW: current tolerance = 0.00156089
+ INFLATIONGW - Momentum residual converged to 0.000446048 in 5 steps
+ INFLATIONGW: Momentum residual = 0.000446048
+ INFLATIONGW: Hamiltonian K residual = 1.10488
+ INFLATIONGW: after 16 steps constraint residual = 1.10488
+ INFLATIONGW: current tolerance = 0.00110488
+ INFLATIONGW - Momentum residual converged to 0.000331106 in 5 steps
+ INFLATIONGW: Momentum residual = 0.000331106
+ INFLATIONGW: Hamiltonian K residual = 0.779958
+ INFLATIONGW: after 17 steps constraint residual = 0.779958
+ INFLATIONGW: current tolerance = 0.000779958
+ INFLATIONGW - Momentum residual converged to 0.000242198 in 5 steps
+ INFLATIONGW: Momentum residual = 0.000242198
+ INFLATIONGW: Hamiltonian K residual = 0.562366
+ INFLATIONGW: after 18 steps constraint residual = 0.562367
+ INFLATIONGW: current tolerance = 0.000562367
+ INFLATIONGW - Momentum residual converged to 0.000177944 in 5 steps
+ INFLATIONGW: Momentum residual = 0.000177944
+ INFLATIONGW: Hamiltonian K residual = 0.403802
+ INFLATIONGW: after 19 steps constraint residual = 0.403802
+ INFLATIONGW: current tolerance = 0.000403802
+ INFLATIONGW - Momentum residual converged to 0.000130717 in 5 steps
+ INFLATIONGW: Momentum residual = 0.000130717
+ INFLATIONGW: Hamiltonian K residual = 0.294818
+ INFLATIONGW: after 20 steps constraint residual = 0.294818
+ INFLATIONGW: current tolerance = 0.000294818
+ INFLATIONGW - Momentum residual converged to 9.60743e-05 in 5 steps
+ INFLATIONGW: Momentum residual = 9.60743e-05
+ INFLATIONGW: Hamiltonian K residual = 0.214915
+ INFLATIONGW: after 21 steps constraint residual = 0.214915
+ INFLATIONGW: current tolerance = 0.000214915
+ INFLATIONGW - Momentum residual converged to 7.09839e-05 in 5 steps
+ INFLATIONGW: Momentum residual = 7.09839e-05
+ INFLATIONGW: Hamiltonian K residual = 0.158568
+ INFLATIONGW: after 22 steps constraint residual = 0.158568
+ INFLATIONGW: current tolerance = 0.000158568
+ INFLATIONGW - Momentum residual converged to 5.25945e-05 in 5 steps
+ INFLATIONGW: Momentum residual = 5.25945e-05
+ INFLATIONGW: Hamiltonian K residual = 0.117192
+ INFLATIONGW: after 23 steps constraint residual = 0.117192
+ INFLATIONGW: current tolerance = 0.000117192
+ INFLATIONGW - Momentum residual converged to 3.91798e-05 in 5 steps
+ INFLATIONGW: Momentum residual = 3.91798e-05
+ INFLATIONGW: Hamiltonian K residual = 0.0873789
+ INFLATIONGW: after 24 steps constraint residual = 0.0873789
+ INFLATIONGW: current tolerance = 8.73789e-05
+ INFLATIONGW - Momentum residual converged to 2.93682e-05 in 5 steps
+ INFLATIONGW: Momentum residual = 2.93682e-05
+ INFLATIONGW: Hamiltonian K residual = 0.0654258
+ INFLATIONGW: after 25 steps constraint residual = 0.0654258
+ INFLATIONGW: current tolerance = 6.54258e-05
+ INFLATIONGW - Momentum residual converged to 2.21067e-05 in 5 steps
+ INFLATIONGW: Momentum residual = 2.21067e-05
+ INFLATIONGW: Hamiltonian K residual = 0.0493383
+ INFLATIONGW: after 26 steps constraint residual = 0.0493383
+ INFLATIONGW: current tolerance = 4.93383e-05
+ INFLATIONGW - Momentum residual converged to 1.67767e-05 in 5 steps
+ INFLATIONGW: Momentum residual = 1.67767e-05
+ INFLATIONGW: Hamiltonian K residual = 0.0374246
+ INFLATIONGW: after 27 steps constraint residual = 0.0374247
+ INFLATIONGW: current tolerance = 3.74247e-05
+ INFLATIONGW - Momentum residual converged to 1.27771e-05 in 5 steps
+ INFLATIONGW: Momentum residual = 1.27771e-05
+ INFLATIONGW: Hamiltonian K residual = 0.0285749
+ INFLATIONGW: after 28 steps constraint residual = 0.0285749
+ INFLATIONGW: current tolerance = 2.85749e-05
+ INFLATIONGW - Momentum residual converged to 9.81188e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 9.81188e-06
+ INFLATIONGW: Hamiltonian K residual = 0.0219655
+ INFLATIONGW: after 29 steps constraint residual = 0.0219655
+ INFLATIONGW: current tolerance = 2.19655e-05
+ INFLATIONGW - Momentum residual converged to 7.56186e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 7.56186e-06
+ INFLATIONGW: Hamiltonian K residual = 0.0169972
+ INFLATIONGW: after 30 steps constraint residual = 0.0169972
+ INFLATIONGW: current tolerance = 1.69972e-05
+ INFLATIONGW - Momentum residual converged to 5.87066e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 5.87066e-06
+ INFLATIONGW: Hamiltonian K residual = 0.0132471
+ INFLATIONGW: after 31 steps constraint residual = 0.0132471
+ INFLATIONGW: current tolerance = 1.32471e-05
+ INFLATIONGW - Momentum residual converged to 4.57562e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 4.57562e-06
+ INFLATIONGW: Hamiltonian K residual = 0.0103952
+ INFLATIONGW: after 32 steps constraint residual = 0.0103952
+ INFLATIONGW: current tolerance = 1.03952e-05
+ INFLATIONGW - Momentum residual converged to 3.5882e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 3.5882e-06
+ INFLATIONGW: Hamiltonian K residual = 0.00821645
+ INFLATIONGW: after 33 steps constraint residual = 0.00821645
+ INFLATIONGW: current tolerance = 8.21645e-06
+ INFLATIONGW - Momentum residual converged to 2.82577e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 2.82577e-06
+ INFLATIONGW: Hamiltonian K residual = 0.00653917
+ INFLATIONGW: after 34 steps constraint residual = 0.00653917
+ INFLATIONGW: current tolerance = 6.53917e-06
+ INFLATIONGW - Momentum residual converged to 2.23694e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 2.23694e-06
+ INFLATIONGW: Hamiltonian K residual = 0.00524084
+ INFLATIONGW: after 35 steps constraint residual = 0.00524084
+ INFLATIONGW: current tolerance = 5.24084e-06
+ INFLATIONGW - Momentum residual converged to 1.77859e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 1.77859e-06
+ INFLATIONGW: Hamiltonian K residual = 0.00422838
+ INFLATIONGW: after 36 steps constraint residual = 0.00422838
+ INFLATIONGW: current tolerance = 4.22838e-06
+ INFLATIONGW - Momentum residual converged to 1.42075e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 1.42075e-06
+ INFLATIONGW: Hamiltonian K residual = 0.00343395
+ INFLATIONGW: after 37 steps constraint residual = 0.00343395
+ INFLATIONGW: current tolerance = 3.43395e-06
+ INFLATIONGW - Momentum residual converged to 1.13999e-06 in 5 steps
+ INFLATIONGW: Momentum residual = 1.13999e-06
+ INFLATIONGW: Hamiltonian K residual = 0.0028062
+ INFLATIONGW: after 38 steps constraint residual = 0.0028062
+ INFLATIONGW: current tolerance = 2.8062e-06
+ INFLATIONGW - Momentum residual converged to 9.18813e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 9.18813e-07
+ INFLATIONGW: Hamiltonian K residual = 0.00230696
+ INFLATIONGW: after 39 steps constraint residual = 0.00230696
+ INFLATIONGW: current tolerance = 2.30696e-06
+ INFLATIONGW - Momentum residual converged to 7.43967e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 7.43967e-07
+ INFLATIONGW: Hamiltonian K residual = 0.00190734
+ INFLATIONGW: after 40 steps constraint residual = 0.00190734
+ INFLATIONGW: current tolerance = 1.90734e-06
+ INFLATIONGW - Momentum residual converged to 6.05167e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 6.05167e-07
+ INFLATIONGW: Hamiltonian K residual = 0.00158549
+ INFLATIONGW: after 41 steps constraint residual = 0.00158549
+ INFLATIONGW: current tolerance = 1.58549e-06
+ INFLATIONGW - Momentum residual converged to 4.94666e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 4.94666e-07
+ INFLATIONGW: Hamiltonian K residual = 0.00132474
+ INFLATIONGW: after 42 steps constraint residual = 0.00132474
+ INFLATIONGW: current tolerance = 1.32474e-06
+ INFLATIONGW - Momentum residual converged to 4.06371e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 4.06371e-07
+ INFLATIONGW: Hamiltonian K residual = 0.00111234
+ INFLATIONGW: after 43 steps constraint residual = 0.00111234
+ INFLATIONGW: current tolerance = 1.11234e-06
+ INFLATIONGW - Momentum residual converged to 3.3563e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 3.3563e-07
+ INFLATIONGW: Hamiltonian K residual = 0.000938425
+ INFLATIONGW: after 44 steps constraint residual = 0.000938426
+ INFLATIONGW: current tolerance = 9.38426e-07
+ INFLATIONGW - Momentum residual converged to 2.78752e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 2.78752e-07
+ INFLATIONGW: Hamiltonian K residual = 0.000795341
+ INFLATIONGW: after 45 steps constraint residual = 0.000795341
+ INFLATIONGW: current tolerance = 7.95341e-07
+ INFLATIONGW - Momentum residual converged to 2.3291e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 2.3291e-07
+ INFLATIONGW: Hamiltonian K residual = 0.000677103
+ INFLATIONGW: after 46 steps constraint residual = 0.000677103
+ INFLATIONGW: current tolerance = 6.77103e-07
+ INFLATIONGW - Momentum residual converged to 1.9586e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 1.9586e-07
+ INFLATIONGW: Hamiltonian K residual = 0.000578996
+ INFLATIONGW: after 47 steps constraint residual = 0.000578996
+ INFLATIONGW: current tolerance = 5.78996e-07
+ INFLATIONGW - Momentum residual converged to 1.65816e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 1.65816e-07
+ INFLATIONGW: Hamiltonian K residual = 0.000497284
+ INFLATIONGW: after 48 steps constraint residual = 0.000497284
+ INFLATIONGW: current tolerance = 4.97284e-07
+ INFLATIONGW - Momentum residual converged to 1.41401e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 1.41401e-07
+ INFLATIONGW: Hamiltonian K residual = 0.000428986
+ INFLATIONGW: after 49 steps constraint residual = 0.000428986
+ INFLATIONGW: current tolerance = 4.28986e-07
+ INFLATIONGW - Momentum residual converged to 1.21496e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 1.21496e-07
+ INFLATIONGW: Hamiltonian K residual = 0.000371708
+ INFLATIONGW: after 50 steps constraint residual = 0.000371708
+ INFLATIONGW: current tolerance = 3.71708e-07
+ INFLATIONGW - Momentum residual converged to 1.052e-07 in 5 steps
+ INFLATIONGW: Momentum residual = 1.052e-07
+ INFLATIONGW: Hamiltonian K residual = 0.000323519
+ INFLATIONGW: after 51 steps constraint residual = 0.000323519
+ INFLATIONGW: current tolerance = 3.23519e-07
+ INFLATIONGW - Momentum residual converged to 9.1799e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 9.1799e-08
+ INFLATIONGW: Hamiltonian K residual = 0.00028285
+ INFLATIONGW: after 52 steps constraint residual = 0.00028285
+ INFLATIONGW: current tolerance = 2.8285e-07
+ INFLATIONGW - Momentum residual converged to 8.07682e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 8.07682e-08
+ INFLATIONGW: Hamiltonian K residual = 0.000248419
+ INFLATIONGW: after 53 steps constraint residual = 0.000248419
+ INFLATIONGW: current tolerance = 2.48419e-07
+ INFLATIONGW - Momentum residual converged to 7.16128e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 7.16128e-08
+ INFLATIONGW: Hamiltonian K residual = 0.000219179
+ INFLATIONGW: after 54 steps constraint residual = 0.00021918
+ INFLATIONGW: current tolerance = 2.1918e-07
+ INFLATIONGW - Momentum residual converged to 6.39789e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 6.39789e-08
+ INFLATIONGW: Hamiltonian K residual = 0.000194267
+ INFLATIONGW: after 55 steps constraint residual = 0.000194267
+ INFLATIONGW: current tolerance = 1.94267e-07
+ INFLATIONGW - Momentum residual converged to 5.75893e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 5.75893e-08
+ INFLATIONGW: Hamiltonian K residual = 0.000172971
+ INFLATIONGW: after 56 steps constraint residual = 0.000172971
+ INFLATIONGW: current tolerance = 1.72971e-07
+ INFLATIONGW - Momentum residual converged to 5.21844e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 5.21844e-08
+ INFLATIONGW: Hamiltonian K residual = 0.0001547
+ INFLATIONGW: after 57 steps constraint residual = 0.0001547
+ INFLATIONGW: current tolerance = 1.547e-07
+ INFLATIONGW - Momentum residual converged to 4.75902e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 4.75902e-08
+ INFLATIONGW: Hamiltonian K residual = 0.000138967
+ INFLATIONGW: after 58 steps constraint residual = 0.000138967
+ INFLATIONGW: current tolerance = 1.38967e-07
+ INFLATIONGW - Momentum residual converged to 4.36431e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 4.36431e-08
+ INFLATIONGW: Hamiltonian K residual = 0.000125366
+ INFLATIONGW: after 59 steps constraint residual = 0.000125366
+ INFLATIONGW: current tolerance = 1.25366e-07
+ INFLATIONGW - Momentum residual converged to 4.02517e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 4.02517e-08
+ INFLATIONGW: Hamiltonian K residual = 0.000113558
+ INFLATIONGW: after 60 steps constraint residual = 0.000113558
+ INFLATIONGW: current tolerance = 1.13558e-07
+ INFLATIONGW - Momentum residual converged to 3.72842e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 3.72842e-08
+ INFLATIONGW: Hamiltonian K residual = 0.000103263
+ INFLATIONGW: after 61 steps constraint residual = 0.000103263
+ INFLATIONGW: current tolerance = 1.03263e-07
+ INFLATIONGW - Momentum residual converged to 3.46849e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 3.46849e-08
+ INFLATIONGW: Hamiltonian K residual = 9.42467e-05
+ INFLATIONGW: after 62 steps constraint residual = 9.42467e-05
+ INFLATIONGW: current tolerance = 9.42467e-08
+ INFLATIONGW - Momentum residual converged to 3.23746e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 3.23746e-08
+ INFLATIONGW: Hamiltonian K residual = 8.63138e-05
+ INFLATIONGW: after 63 steps constraint residual = 8.63138e-05
+ INFLATIONGW: current tolerance = 8.63138e-08
+ INFLATIONGW - Momentum residual converged to 3.03256e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 3.03256e-08
+ INFLATIONGW: Hamiltonian K residual = 7.93015e-05
+ INFLATIONGW: after 64 steps constraint residual = 7.93015e-05
+ INFLATIONGW: current tolerance = 7.93015e-08
+ INFLATIONGW - Momentum residual converged to 2.84761e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 2.84761e-08
+ INFLATIONGW: Hamiltonian K residual = 7.30741e-05
+ INFLATIONGW: after 65 steps constraint residual = 7.30741e-05
+ INFLATIONGW: current tolerance = 7.30741e-08
+ INFLATIONGW - Momentum residual converged to 2.68104e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 2.68104e-08
+ INFLATIONGW: Hamiltonian K residual = 6.75182e-05
+ INFLATIONGW: after 66 steps constraint residual = 6.75182e-05
+ INFLATIONGW: current tolerance = 6.75182e-08
+ INFLATIONGW - Momentum residual converged to 2.52832e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 2.52832e-08
+ INFLATIONGW: Hamiltonian K residual = 6.25389e-05
+ INFLATIONGW: after 67 steps constraint residual = 6.25389e-05
+ INFLATIONGW: current tolerance = 6.25389e-08
+ INFLATIONGW - Momentum residual converged to 2.38893e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 2.38893e-08
+ INFLATIONGW: Hamiltonian K residual = 5.80569e-05
+ INFLATIONGW: after 68 steps constraint residual = 5.80569e-05
+ INFLATIONGW: current tolerance = 5.80569e-08
+ INFLATIONGW - Momentum residual converged to 2.2615e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 2.2615e-08
+ INFLATIONGW: Hamiltonian K residual = 5.40055e-05
+ INFLATIONGW: after 69 steps constraint residual = 5.40055e-05
+ INFLATIONGW: current tolerance = 5.40055e-08
+ INFLATIONGW - Momentum residual converged to 2.14349e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 2.14349e-08
+ INFLATIONGW: Hamiltonian K residual = 5.03288e-05
+ INFLATIONGW: after 70 steps constraint residual = 5.03288e-05
+ INFLATIONGW: current tolerance = 5.03288e-08
+ INFLATIONGW - Momentum residual converged to 2.03461e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 2.03461e-08
+ INFLATIONGW: Hamiltonian K residual = 4.69795e-05
+ INFLATIONGW: after 71 steps constraint residual = 4.69795e-05
+ INFLATIONGW: current tolerance = 4.69795e-08
+ INFLATIONGW - Momentum residual converged to 1.93131e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.93131e-08
+ INFLATIONGW: Hamiltonian K residual = 4.39179e-05
+ INFLATIONGW: after 72 steps constraint residual = 4.39179e-05
+ INFLATIONGW: current tolerance = 4.39179e-08
+ INFLATIONGW - Momentum residual converged to 1.83551e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.83551e-08
+ INFLATIONGW: Hamiltonian K residual = 4.111e-05
+ INFLATIONGW: after 73 steps constraint residual = 4.111e-05
+ INFLATIONGW: current tolerance = 4.111e-08
+ INFLATIONGW - Momentum residual converged to 1.74455e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.74455e-08
+ INFLATIONGW: Hamiltonian K residual = 3.85271e-05
+ INFLATIONGW: after 74 steps constraint residual = 3.85271e-05
+ INFLATIONGW: current tolerance = 3.85271e-08
+ INFLATIONGW - Momentum residual converged to 1.66006e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.66006e-08
+ INFLATIONGW: Hamiltonian K residual = 3.61446e-05
+ INFLATIONGW: after 75 steps constraint residual = 3.61446e-05
+ INFLATIONGW: current tolerance = 3.61446e-08
+ INFLATIONGW - Momentum residual converged to 1.58091e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.58091e-08
+ INFLATIONGW: Hamiltonian K residual = 3.39414e-05
+ INFLATIONGW: after 76 steps constraint residual = 3.39414e-05
+ INFLATIONGW: current tolerance = 3.39414e-08
+ INFLATIONGW - Momentum residual converged to 1.50463e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.50463e-08
+ INFLATIONGW: Hamiltonian K residual = 3.18992e-05
+ INFLATIONGW: after 77 steps constraint residual = 3.18993e-05
+ INFLATIONGW: current tolerance = 3.18993e-08
+ INFLATIONGW - Momentum residual converged to 1.43254e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.43254e-08
+ INFLATIONGW: Hamiltonian K residual = 3.00025e-05
+ INFLATIONGW: after 78 steps constraint residual = 3.00025e-05
+ INFLATIONGW: current tolerance = 3.00025e-08
+ INFLATIONGW - Momentum residual converged to 1.36732e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.36732e-08
+ INFLATIONGW: Hamiltonian K residual = 2.82373e-05
+ INFLATIONGW: after 79 steps constraint residual = 2.82373e-05
+ INFLATIONGW: current tolerance = 2.82373e-08
+ INFLATIONGW - Momentum residual converged to 1.30151e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.30151e-08
+ INFLATIONGW: Hamiltonian K residual = 2.65919e-05
+ INFLATIONGW: after 80 steps constraint residual = 2.65919e-05
+ INFLATIONGW: current tolerance = 2.65919e-08
+ INFLATIONGW - Momentum residual converged to 1.23868e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.23868e-08
+ INFLATIONGW: Hamiltonian K residual = 2.50557e-05
+ INFLATIONGW: after 81 steps constraint residual = 2.50557e-05
+ INFLATIONGW: current tolerance = 2.50557e-08
+ INFLATIONGW - Momentum residual converged to 1.17965e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.17965e-08
+ INFLATIONGW: Hamiltonian K residual = 2.36194e-05
+ INFLATIONGW: after 82 steps constraint residual = 2.36194e-05
+ INFLATIONGW: current tolerance = 2.36194e-08
+ INFLATIONGW - Momentum residual converged to 1.12491e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.12491e-08
+ INFLATIONGW: Hamiltonian K residual = 2.22749e-05
+ INFLATIONGW: after 83 steps constraint residual = 2.22749e-05
+ INFLATIONGW: current tolerance = 2.22749e-08
+ INFLATIONGW - Momentum residual converged to 1.07241e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.07241e-08
+ INFLATIONGW: Hamiltonian K residual = 2.10149e-05
+ INFLATIONGW: after 84 steps constraint residual = 2.10149e-05
+ INFLATIONGW: current tolerance = 2.10149e-08
+ INFLATIONGW - Momentum residual converged to 1.02213e-08 in 5 steps
+ INFLATIONGW: Momentum residual = 1.02213e-08
+ INFLATIONGW: Hamiltonian K residual = 1.98329e-05
+ INFLATIONGW: after 85 steps constraint residual = 1.98329e-05
+ INFLATIONGW: current tolerance = 1.98329e-08
+ INFLATIONGW - Momentum residual converged to 9.73613e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 9.73613e-09
+ INFLATIONGW: Hamiltonian K residual = 1.87231e-05
+ INFLATIONGW: after 86 steps constraint residual = 1.87231e-05
+ INFLATIONGW: current tolerance = 1.87231e-08
+ INFLATIONGW - Momentum residual converged to 9.27867e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 9.27867e-09
+ INFLATIONGW: Hamiltonian K residual = 1.76802e-05
+ INFLATIONGW: after 87 steps constraint residual = 1.76802e-05
+ INFLATIONGW: current tolerance = 1.76802e-08
+ INFLATIONGW - Momentum residual converged to 8.83288e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 8.83288e-09
+ INFLATIONGW: Hamiltonian K residual = 1.66994e-05
+ INFLATIONGW: after 88 steps constraint residual = 1.66994e-05
+ INFLATIONGW: current tolerance = 1.66994e-08
+ INFLATIONGW - Momentum residual converged to 8.4122e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 8.4122e-09
+ INFLATIONGW: Hamiltonian K residual = 1.57765e-05
+ INFLATIONGW: after 89 steps constraint residual = 1.57765e-05
+ INFLATIONGW: current tolerance = 1.57765e-08
+ INFLATIONGW - Momentum residual converged to 8.02037e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 8.02037e-09
+ INFLATIONGW: Hamiltonian K residual = 1.49076e-05
+ INFLATIONGW: after 90 steps constraint residual = 1.49076e-05
+ INFLATIONGW: current tolerance = 1.49076e-08
+ INFLATIONGW - Momentum residual converged to 7.63233e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 7.63233e-09
+ INFLATIONGW: Hamiltonian K residual = 1.4089e-05
+ INFLATIONGW: after 91 steps constraint residual = 1.4089e-05
+ INFLATIONGW: current tolerance = 1.4089e-08
+ INFLATIONGW - Momentum residual converged to 7.26196e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 7.26196e-09
+ INFLATIONGW: Hamiltonian K residual = 1.33175e-05
+ INFLATIONGW: after 92 steps constraint residual = 1.33175e-05
+ INFLATIONGW: current tolerance = 1.33175e-08
+ INFLATIONGW - Momentum residual converged to 6.91293e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 6.91293e-09
+ INFLATIONGW: Hamiltonian K residual = 1.25901e-05
+ INFLATIONGW: after 93 steps constraint residual = 1.25902e-05
+ INFLATIONGW: current tolerance = 1.25902e-08
+ INFLATIONGW - Momentum residual converged to 6.58302e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 6.58302e-09
+ INFLATIONGW: Hamiltonian K residual = 1.19041e-05
+ INFLATIONGW: after 94 steps constraint residual = 1.19041e-05
+ INFLATIONGW: current tolerance = 1.19041e-08
+ INFLATIONGW - Momentum residual converged to 6.26108e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 6.26108e-09
+ INFLATIONGW: Hamiltonian K residual = 1.12567e-05
+ INFLATIONGW: after 95 steps constraint residual = 1.12567e-05
+ INFLATIONGW: current tolerance = 1.12567e-08
+ INFLATIONGW - Momentum residual converged to 5.97655e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 5.97655e-09
+ INFLATIONGW: Hamiltonian K residual = 1.06458e-05
+ INFLATIONGW: after 96 steps constraint residual = 1.06458e-05
+ INFLATIONGW: current tolerance = 1.06458e-08
+ INFLATIONGW - Momentum residual converged to 5.6713e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 5.6713e-09
+ INFLATIONGW: Hamiltonian K residual = 1.0069e-05
+ INFLATIONGW: after 97 steps constraint residual = 1.0069e-05
+ INFLATIONGW: current tolerance = 1.0069e-08
+ INFLATIONGW - Momentum residual converged to 5.38704e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 5.38704e-09
+ INFLATIONGW: Hamiltonian K residual = 9.52439e-06
+ INFLATIONGW: after 98 steps constraint residual = 9.52439e-06
+ INFLATIONGW: current tolerance = 9.52439e-09
+ INFLATIONGW - Momentum residual converged to 5.14221e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 5.14221e-09
+ INFLATIONGW: Hamiltonian K residual = 9.01002e-06
+ INFLATIONGW: after 99 steps constraint residual = 9.01002e-06
+ INFLATIONGW: current tolerance = 9.01002e-09
+ INFLATIONGW - Momentum residual converged to 4.89228e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 4.89228e-09
+ INFLATIONGW: Hamiltonian K residual = 8.52411e-06
+ INFLATIONGW: after 100 steps constraint residual = 8.52411e-06
+ INFLATIONGW: current tolerance = 8.52411e-09
+ INFLATIONGW - Momentum residual converged to 4.64157e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 4.64157e-09
+ INFLATIONGW: Hamiltonian K residual = 8.06503e-06
+ INFLATIONGW: after 101 steps constraint residual = 8.06503e-06
+ INFLATIONGW: current tolerance = 8.06503e-09
+ INFLATIONGW - Momentum residual converged to 4.4201e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 4.4201e-09
+ INFLATIONGW: Hamiltonian K residual = 7.63121e-06
+ INFLATIONGW: after 102 steps constraint residual = 7.63121e-06
+ INFLATIONGW: current tolerance = 7.63121e-09
+ INFLATIONGW - Momentum residual converged to 4.19918e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 4.19918e-09
+ INFLATIONGW: Hamiltonian K residual = 7.22122e-06
+ INFLATIONGW: after 103 steps constraint residual = 7.22122e-06
+ INFLATIONGW: current tolerance = 7.22122e-09
+ INFLATIONGW - Momentum residual converged to 3.99387e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 3.99387e-09
+ INFLATIONGW: Hamiltonian K residual = 6.8337e-06
+ INFLATIONGW: after 104 steps constraint residual = 6.8337e-06
+ INFLATIONGW: current tolerance = 6.8337e-09
+ INFLATIONGW - Momentum residual converged to 3.80439e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 3.80439e-09
+ INFLATIONGW: Hamiltonian K residual = 6.46737e-06
+ INFLATIONGW: after 105 steps constraint residual = 6.46737e-06
+ INFLATIONGW: current tolerance = 6.46737e-09
+ INFLATIONGW - Momentum residual converged to 3.61522e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 3.61522e-09
+ INFLATIONGW: Hamiltonian K residual = 6.12105e-06
+ INFLATIONGW: after 106 steps constraint residual = 6.12105e-06
+ INFLATIONGW: current tolerance = 6.12105e-09
+ INFLATIONGW - Momentum residual converged to 3.42452e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 3.42452e-09
+ INFLATIONGW: Hamiltonian K residual = 5.7936e-06
+ INFLATIONGW: after 107 steps constraint residual = 5.7936e-06
+ INFLATIONGW: current tolerance = 5.7936e-09
+ INFLATIONGW - Momentum residual converged to 3.26135e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 3.26135e-09
+ INFLATIONGW: Hamiltonian K residual = 5.48397e-06
+ INFLATIONGW: after 108 steps constraint residual = 5.48397e-06
+ INFLATIONGW: current tolerance = 5.48397e-09
+ INFLATIONGW - Momentum residual converged to 3.1088e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 3.1088e-09
+ INFLATIONGW: Hamiltonian K residual = 5.19117e-06
+ INFLATIONGW: after 109 steps constraint residual = 5.19117e-06
+ INFLATIONGW: current tolerance = 5.19117e-09
+ INFLATIONGW - Momentum residual converged to 2.95467e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 2.95467e-09
+ INFLATIONGW: Hamiltonian K residual = 4.91426e-06
+ INFLATIONGW: after 110 steps constraint residual = 4.91426e-06
+ INFLATIONGW: current tolerance = 4.91426e-09
+ INFLATIONGW - Momentum residual converged to 2.81301e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 2.81301e-09
+ INFLATIONGW: Hamiltonian K residual = 4.65237e-06
+ INFLATIONGW: after 111 steps constraint residual = 4.65237e-06
+ INFLATIONGW: current tolerance = 4.65237e-09
+ INFLATIONGW - Momentum residual converged to 2.65867e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 2.65867e-09
+ INFLATIONGW: Hamiltonian K residual = 4.40465e-06
+ INFLATIONGW: after 112 steps constraint residual = 4.40465e-06
+ INFLATIONGW: current tolerance = 4.40465e-09
+ INFLATIONGW - Momentum residual converged to 2.5348e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 2.5348e-09
+ INFLATIONGW: Hamiltonian K residual = 4.17034e-06
+ INFLATIONGW: after 113 steps constraint residual = 4.17034e-06
+ INFLATIONGW: current tolerance = 4.17034e-09
+ INFLATIONGW - Momentum residual converged to 2.39645e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 2.39645e-09
+ INFLATIONGW: Hamiltonian K residual = 3.94869e-06
+ INFLATIONGW: after 114 steps constraint residual = 3.94869e-06
+ INFLATIONGW: current tolerance = 3.94869e-09
+ INFLATIONGW - Momentum residual converged to 2.27357e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 2.27357e-09
+ INFLATIONGW: Hamiltonian K residual = 3.739e-06
+ INFLATIONGW: after 115 steps constraint residual = 3.739e-06
+ INFLATIONGW: current tolerance = 3.739e-09
+ INFLATIONGW - Momentum residual converged to 2.16459e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 2.16459e-09
+ INFLATIONGW: Hamiltonian K residual = 3.54062e-06
+ INFLATIONGW: after 116 steps constraint residual = 3.54062e-06
+ INFLATIONGW: current tolerance = 3.54062e-09
+ INFLATIONGW - Momentum residual converged to 2.06262e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 2.06262e-09
+ INFLATIONGW: Hamiltonian K residual = 3.35294e-06
+ INFLATIONGW: after 117 steps constraint residual = 3.35294e-06
+ INFLATIONGW: current tolerance = 3.35294e-09
+ INFLATIONGW - Momentum residual converged to 1.95356e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.95356e-09
+ INFLATIONGW: Hamiltonian K residual = 3.17535e-06
+ INFLATIONGW: after 118 steps constraint residual = 3.17535e-06
+ INFLATIONGW: current tolerance = 3.17535e-09
+ INFLATIONGW - Momentum residual converged to 1.85307e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.85307e-09
+ INFLATIONGW: Hamiltonian K residual = 3.00732e-06
+ INFLATIONGW: after 119 steps constraint residual = 3.00732e-06
+ INFLATIONGW: current tolerance = 3.00732e-09
+ INFLATIONGW - Momentum residual converged to 1.75397e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.75397e-09
+ INFLATIONGW: Hamiltonian K residual = 2.84831e-06
+ INFLATIONGW: after 120 steps constraint residual = 2.84832e-06
+ INFLATIONGW: current tolerance = 2.84832e-09
+ INFLATIONGW - Momentum residual converged to 1.67785e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.67785e-09
+ INFLATIONGW: Hamiltonian K residual = 2.69785e-06
+ INFLATIONGW: after 121 steps constraint residual = 2.69785e-06
+ INFLATIONGW: current tolerance = 2.69785e-09
+ INFLATIONGW - Momentum residual converged to 1.60595e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.60595e-09
+ INFLATIONGW: Hamiltonian K residual = 2.55546e-06
+ INFLATIONGW: after 122 steps constraint residual = 2.55546e-06
+ INFLATIONGW: current tolerance = 2.55546e-09
+ INFLATIONGW - Momentum residual converged to 1.50768e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.50768e-09
+ INFLATIONGW: Hamiltonian K residual = 2.4207e-06
+ INFLATIONGW: after 123 steps constraint residual = 2.4207e-06
+ INFLATIONGW: current tolerance = 2.4207e-09
+ INFLATIONGW - Momentum residual converged to 1.43674e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.43674e-09
+ INFLATIONGW: Hamiltonian K residual = 2.29315e-06
+ INFLATIONGW: after 124 steps constraint residual = 2.29315e-06
+ INFLATIONGW: current tolerance = 2.29315e-09
+ INFLATIONGW - Momentum residual converged to 1.3513e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.3513e-09
+ INFLATIONGW: Hamiltonian K residual = 2.17244e-06
+ INFLATIONGW: after 125 steps constraint residual = 2.17244e-06
+ INFLATIONGW: current tolerance = 2.17244e-09
+ INFLATIONGW - Momentum residual converged to 1.29433e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.29433e-09
+ INFLATIONGW: Hamiltonian K residual = 2.05817e-06
+ INFLATIONGW: after 126 steps constraint residual = 2.05817e-06
+ INFLATIONGW: current tolerance = 2.05817e-09
+ INFLATIONGW - Momentum residual converged to 1.23504e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.23504e-09
+ INFLATIONGW: Hamiltonian K residual = 1.95001e-06
+ INFLATIONGW: after 127 steps constraint residual = 1.95001e-06
+ INFLATIONGW: current tolerance = 1.95001e-09
+ INFLATIONGW - Momentum residual converged to 1.18172e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.18172e-09
+ INFLATIONGW: Hamiltonian K residual = 1.84762e-06
+ INFLATIONGW: after 128 steps constraint residual = 1.84762e-06
+ INFLATIONGW: current tolerance = 1.84762e-09
+ INFLATIONGW - Momentum residual converged to 1.1077e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.1077e-09
+ INFLATIONGW: Hamiltonian K residual = 1.7507e-06
+ INFLATIONGW: after 129 steps constraint residual = 1.7507e-06
+ INFLATIONGW: current tolerance = 1.7507e-09
+ INFLATIONGW - Momentum residual converged to 1.05654e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.05654e-09
+ INFLATIONGW: Hamiltonian K residual = 1.65894e-06
+ INFLATIONGW: after 130 steps constraint residual = 1.65894e-06
+ INFLATIONGW: current tolerance = 1.65894e-09
+ INFLATIONGW - Momentum residual converged to 1.00134e-09 in 5 steps
+ INFLATIONGW: Momentum residual = 1.00134e-09
+ INFLATIONGW: Hamiltonian K residual = 1.57206e-06
+ INFLATIONGW: after 131 steps constraint residual = 1.57206e-06
+ INFLATIONGW: current tolerance = 1.57206e-09
+ INFLATIONGW - Momentum residual converged to 9.47733e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 9.47733e-10
+ INFLATIONGW: Hamiltonian K residual = 1.4898e-06
+ INFLATIONGW: after 132 steps constraint residual = 1.4898e-06
+ INFLATIONGW: current tolerance = 1.4898e-09
+ INFLATIONGW - Momentum residual converged to 9.2158e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 9.2158e-10
+ INFLATIONGW: Hamiltonian K residual = 1.41192e-06
+ INFLATIONGW: after 133 steps constraint residual = 1.41192e-06
+ INFLATIONGW: current tolerance = 1.41192e-09
+ INFLATIONGW - Momentum residual converged to 8.63966e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 8.63966e-10
+ INFLATIONGW: Hamiltonian K residual = 1.33817e-06
+ INFLATIONGW: after 134 steps constraint residual = 1.33817e-06
+ INFLATIONGW: current tolerance = 1.33817e-09
+ INFLATIONGW - Momentum residual converged to 8.19938e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 8.19938e-10
+ INFLATIONGW: Hamiltonian K residual = 1.26833e-06
+ INFLATIONGW: after 135 steps constraint residual = 1.26833e-06
+ INFLATIONGW: current tolerance = 1.26833e-09
+ INFLATIONGW - Momentum residual converged to 7.81835e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 7.81835e-10
+ INFLATIONGW: Hamiltonian K residual = 1.2022e-06
+ INFLATIONGW: after 136 steps constraint residual = 1.2022e-06
+ INFLATIONGW: current tolerance = 1.2022e-09
+ INFLATIONGW - Momentum residual converged to 7.5635e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 7.5635e-10
+ INFLATIONGW: Hamiltonian K residual = 1.13956e-06
+ INFLATIONGW: after 137 steps constraint residual = 1.13956e-06
+ INFLATIONGW: current tolerance = 1.13956e-09
+ INFLATIONGW - Momentum residual converged to 6.9578e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 6.9578e-10
+ INFLATIONGW: Hamiltonian K residual = 1.08025e-06
+ INFLATIONGW: after 138 steps constraint residual = 1.08025e-06
+ INFLATIONGW: current tolerance = 1.08025e-09
+ INFLATIONGW - Momentum residual converged to 6.63826e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 6.63826e-10
+ INFLATIONGW: Hamiltonian K residual = 1.02406e-06
+ INFLATIONGW: after 139 steps constraint residual = 1.02406e-06
+ INFLATIONGW: current tolerance = 1.02406e-09
+ INFLATIONGW - Momentum residual converged to 6.41458e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 6.41458e-10
+ INFLATIONGW: Hamiltonian K residual = 9.70841e-07
+ INFLATIONGW: after 140 steps constraint residual = 9.70842e-07
+ INFLATIONGW: current tolerance = 9.70842e-10
+ INFLATIONGW - Momentum residual converged to 6.06275e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 6.06275e-10
+ INFLATIONGW: Hamiltonian K residual = 9.20434e-07
+ INFLATIONGW: after 141 steps constraint residual = 9.20434e-07
+ INFLATIONGW: current tolerance = 9.20434e-10
+ INFLATIONGW - Momentum residual converged to 5.75834e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 5.75834e-10
+ INFLATIONGW: Hamiltonian K residual = 8.72682e-07
+ INFLATIONGW: after 142 steps constraint residual = 8.72682e-07
+ INFLATIONGW: current tolerance = 8.72682e-10
+ INFLATIONGW - Momentum residual converged to 5.51417e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 5.51417e-10
+ INFLATIONGW: Hamiltonian K residual = 8.27446e-07
+ INFLATIONGW: after 143 steps constraint residual = 8.27446e-07
+ INFLATIONGW: current tolerance = 8.27446e-10
+ INFLATIONGW - Momentum residual converged to 5.3617e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 5.3617e-10
+ INFLATIONGW: Hamiltonian K residual = 7.84589e-07
+ INFLATIONGW: after 144 steps constraint residual = 7.84589e-07
+ INFLATIONGW: current tolerance = 7.84589e-10
+ INFLATIONGW - Momentum residual converged to 5.22915e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 5.22915e-10
+ INFLATIONGW: Hamiltonian K residual = 7.43984e-07
+ INFLATIONGW: after 145 steps constraint residual = 7.43985e-07
+ INFLATIONGW: current tolerance = 7.43985e-10
+ INFLATIONGW - Momentum residual converged to 4.64829e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 4.64829e-10
+ INFLATIONGW: Hamiltonian K residual = 7.05514e-07
+ INFLATIONGW: after 146 steps constraint residual = 7.05514e-07
+ INFLATIONGW: current tolerance = 7.05514e-10
+ INFLATIONGW - Momentum residual converged to 4.54569e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 4.54569e-10
+ INFLATIONGW: Hamiltonian K residual = 6.69062e-07
+ INFLATIONGW: after 147 steps constraint residual = 6.69062e-07
+ INFLATIONGW: current tolerance = 6.69062e-10
+ INFLATIONGW - Momentum residual converged to 4.33912e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 4.33912e-10
+ INFLATIONGW: Hamiltonian K residual = 6.34519e-07
+ INFLATIONGW: after 148 steps constraint residual = 6.34519e-07
+ INFLATIONGW: current tolerance = 6.34519e-10
+ INFLATIONGW - Momentum residual converged to 4.02051e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 4.02051e-10
+ INFLATIONGW: Hamiltonian K residual = 6.01785e-07
+ INFLATIONGW: after 149 steps constraint residual = 6.01785e-07
+ INFLATIONGW: current tolerance = 6.01785e-10
+ INFLATIONGW - Momentum residual converged to 3.77886e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 3.77886e-10
+ INFLATIONGW: Hamiltonian K residual = 5.70767e-07
+ INFLATIONGW: after 150 steps constraint residual = 5.70767e-07
+ INFLATIONGW: current tolerance = 5.70767e-10
+ INFLATIONGW - Momentum residual converged to 3.65271e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 3.65271e-10
+ INFLATIONGW: Hamiltonian K residual = 5.4137e-07
+ INFLATIONGW: after 151 steps constraint residual = 5.4137e-07
+ INFLATIONGW: current tolerance = 5.4137e-10
+ INFLATIONGW - Momentum residual converged to 3.55206e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 3.55206e-10
+ INFLATIONGW: Hamiltonian K residual = 5.13506e-07
+ INFLATIONGW: after 152 steps constraint residual = 5.13507e-07
+ INFLATIONGW: current tolerance = 5.13507e-10
+ INFLATIONGW - Momentum residual converged to 3.35008e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 3.35008e-10
+ INFLATIONGW: Hamiltonian K residual = 4.87101e-07
+ INFLATIONGW: after 153 steps constraint residual = 4.87101e-07
+ INFLATIONGW: current tolerance = 4.87101e-10
+ INFLATIONGW - Momentum residual converged to 3.22133e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 3.22133e-10
+ INFLATIONGW: Hamiltonian K residual = 4.62068e-07
+ INFLATIONGW: after 154 steps constraint residual = 4.62069e-07
+ INFLATIONGW: current tolerance = 4.62069e-10
+ INFLATIONGW - Momentum residual converged to 3.01897e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 3.01897e-10
+ INFLATIONGW: Hamiltonian K residual = 4.38341e-07
+ INFLATIONGW: after 155 steps constraint residual = 4.38341e-07
+ INFLATIONGW: current tolerance = 4.38341e-10
+ INFLATIONGW - Momentum residual converged to 3.04583e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 3.04583e-10
+ INFLATIONGW: Hamiltonian K residual = 4.1585e-07
+ INFLATIONGW: after 156 steps constraint residual = 4.1585e-07
+ INFLATIONGW: current tolerance = 4.1585e-10
+ INFLATIONGW - Momentum residual converged to 2.70598e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.70598e-10
+ INFLATIONGW: Hamiltonian K residual = 3.94527e-07
+ INFLATIONGW: after 157 steps constraint residual = 3.94527e-07
+ INFLATIONGW: current tolerance = 3.94527e-10
+ INFLATIONGW - Momentum residual converged to 2.63808e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.63808e-10
+ INFLATIONGW: Hamiltonian K residual = 3.74312e-07
+ INFLATIONGW: after 158 steps constraint residual = 3.74312e-07
+ INFLATIONGW: current tolerance = 3.74312e-10
+ INFLATIONGW - Momentum residual converged to 2.59937e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.59937e-10
+ INFLATIONGW: Hamiltonian K residual = 3.55148e-07
+ INFLATIONGW: after 159 steps constraint residual = 3.55148e-07
+ INFLATIONGW: current tolerance = 3.55148e-10
+ INFLATIONGW - Momentum residual converged to 2.55248e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.55248e-10
+ INFLATIONGW: Hamiltonian K residual = 3.36976e-07
+ INFLATIONGW: after 160 steps constraint residual = 3.36976e-07
+ INFLATIONGW: current tolerance = 3.36976e-10
+ INFLATIONGW - Momentum residual converged to 2.38213e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.38213e-10
+ INFLATIONGW: Hamiltonian K residual = 3.19746e-07
+ INFLATIONGW: after 161 steps constraint residual = 3.19746e-07
+ INFLATIONGW: current tolerance = 3.19746e-10
+ INFLATIONGW - Momentum residual converged to 2.14236e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.14236e-10
+ INFLATIONGW: Hamiltonian K residual = 3.03408e-07
+ INFLATIONGW: after 162 steps constraint residual = 3.03408e-07
+ INFLATIONGW: current tolerance = 3.03408e-10
+ INFLATIONGW - Momentum residual converged to 2.2648e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.2648e-10
+ INFLATIONGW: Hamiltonian K residual = 2.87916e-07
+ INFLATIONGW: after 163 steps constraint residual = 2.87916e-07
+ INFLATIONGW: current tolerance = 2.87916e-10
+ INFLATIONGW - Momentum residual converged to 2.12507e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.12507e-10
+ INFLATIONGW: Hamiltonian K residual = 2.73226e-07
+ INFLATIONGW: after 164 steps constraint residual = 2.73226e-07
+ INFLATIONGW: current tolerance = 2.73226e-10
+ INFLATIONGW - Momentum residual converged to 2.04241e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 2.04241e-10
+ INFLATIONGW: Hamiltonian K residual = 2.59292e-07
+ INFLATIONGW: after 165 steps constraint residual = 2.59292e-07
+ INFLATIONGW: current tolerance = 2.59292e-10
+ INFLATIONGW - Momentum residual converged to 1.78491e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.78491e-10
+ INFLATIONGW: Hamiltonian K residual = 2.46079e-07
+ INFLATIONGW: after 166 steps constraint residual = 2.46079e-07
+ INFLATIONGW: current tolerance = 2.46079e-10
+ INFLATIONGW - Momentum residual converged to 1.76221e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.76221e-10
+ INFLATIONGW: Hamiltonian K residual = 2.33546e-07
+ INFLATIONGW: after 167 steps constraint residual = 2.33546e-07
+ INFLATIONGW: current tolerance = 2.33546e-10
+ INFLATIONGW - Momentum residual converged to 1.88044e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.88044e-10
+ INFLATIONGW: Hamiltonian K residual = 2.2166e-07
+ INFLATIONGW: after 168 steps constraint residual = 2.2166e-07
+ INFLATIONGW: current tolerance = 2.2166e-10
+ INFLATIONGW - Momentum residual converged to 1.66962e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.66962e-10
+ INFLATIONGW: Hamiltonian K residual = 2.10384e-07
+ INFLATIONGW: after 169 steps constraint residual = 2.10384e-07
+ INFLATIONGW: current tolerance = 2.10384e-10
+ INFLATIONGW - Momentum residual converged to 1.63874e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.63874e-10
+ INFLATIONGW: Hamiltonian K residual = 1.99692e-07
+ INFLATIONGW: after 170 steps constraint residual = 1.99692e-07
+ INFLATIONGW: current tolerance = 1.99692e-10
+ INFLATIONGW - Momentum residual converged to 1.50731e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.50731e-10
+ INFLATIONGW: Hamiltonian K residual = 1.89548e-07
+ INFLATIONGW: after 171 steps constraint residual = 1.89548e-07
+ INFLATIONGW: current tolerance = 1.89548e-10
+ INFLATIONGW - Momentum residual converged to 1.58157e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.58157e-10
+ INFLATIONGW: Hamiltonian K residual = 1.79923e-07
+ INFLATIONGW: after 172 steps constraint residual = 1.79923e-07
+ INFLATIONGW: current tolerance = 1.79923e-10
+ INFLATIONGW - Momentum residual converged to 1.42052e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.42052e-10
+ INFLATIONGW: Hamiltonian K residual = 1.70793e-07
+ INFLATIONGW: after 173 steps constraint residual = 1.70793e-07
+ INFLATIONGW: current tolerance = 1.70793e-10
+ INFLATIONGW - Momentum residual converged to 1.47697e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.47697e-10
+ INFLATIONGW: Hamiltonian K residual = 1.62133e-07
+ INFLATIONGW: after 174 steps constraint residual = 1.62133e-07
+ INFLATIONGW: current tolerance = 1.62133e-10
+ INFLATIONGW - Momentum residual converged to 1.5357e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.5357e-10
+ INFLATIONGW: Hamiltonian K residual = 1.53914e-07
+ INFLATIONGW: after 175 steps constraint residual = 1.53914e-07
+ INFLATIONGW: current tolerance = 1.53914e-10
+ INFLATIONGW - Momentum residual converged to 1.40039e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.40039e-10
+ INFLATIONGW: Hamiltonian K residual = 1.46116e-07
+ INFLATIONGW: after 176 steps constraint residual = 1.46116e-07
+ INFLATIONGW: current tolerance = 1.46116e-10
+ INFLATIONGW - Momentum residual converged to 1.38751e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.38751e-10
+ INFLATIONGW: Hamiltonian K residual = 1.38719e-07
+ INFLATIONGW: after 177 steps constraint residual = 1.38719e-07
+ INFLATIONGW: current tolerance = 1.38719e-10
+ INFLATIONGW - Momentum residual converged to 1.18123e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.18123e-10
+ INFLATIONGW: Hamiltonian K residual = 1.317e-07
+ INFLATIONGW: after 178 steps constraint residual = 1.317e-07
+ INFLATIONGW: current tolerance = 1.317e-10
+ INFLATIONGW - Momentum residual converged to 1.18212e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.18212e-10
+ INFLATIONGW: Hamiltonian K residual = 1.25039e-07
+ INFLATIONGW: after 179 steps constraint residual = 1.25039e-07
+ INFLATIONGW: current tolerance = 1.25039e-10
+ INFLATIONGW - Momentum residual converged to 8.4855e-11 in 6 steps
+ INFLATIONGW: Momentum residual = 8.4855e-11
+ INFLATIONGW: Hamiltonian K residual = 1.18721e-07
+ INFLATIONGW: after 180 steps constraint residual = 1.18721e-07
+ INFLATIONGW: current tolerance = 1.18721e-10
+ INFLATIONGW - Momentum residual converged to 1.18139e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.18139e-10
+ INFLATIONGW: Hamiltonian K residual = 1.12721e-07
+ INFLATIONGW: after 181 steps constraint residual = 1.12721e-07
+ INFLATIONGW: current tolerance = 1.12721e-10
+ INFLATIONGW - Momentum residual converged to 1.12414e-10 in 5 steps
+ INFLATIONGW: Momentum residual = 1.12414e-10
+ INFLATIONGW: Hamiltonian K residual = 1.07029e-07
+ INFLATIONGW: after 182 steps constraint residual = 1.07029e-07
+ INFLATIONGW: current tolerance = 1.07029e-10
+ INFLATIONGW - Momentum residual converged to 8.59774e-11 in 6 steps
+ INFLATIONGW: Momentum residual = 8.59774e-11
+ INFLATIONGW: Hamiltonian K residual = 1.01629e-07
+ INFLATIONGW: after 183 steps constraint residual = 1.01629e-07
+ INFLATIONGW: current tolerance = 1.01629e-10
+ INFLATIONGW - Momentum residual converged to 9.07818e-11 in 6 steps
+ INFLATIONGW: Momentum residual = 9.07818e-11
+ INFLATIONGW: Hamiltonian K residual = 9.65032e-08
+ INFLATIONGW: after 184 steps constraint residual = 9.65032e-08
+ INFLATIONGW: current tolerance = 9.65032e-11
+ INFLATIONGW - Momentum residual converged to 9.26538e-11 in 6 steps
+ INFLATIONGW: Momentum residual = 9.26538e-11
+ INFLATIONGW: Hamiltonian K residual = 9.16354e-08
+ INFLATIONGW: after 185 steps constraint residual = 9.16354e-08
+ INFLATIONGW: current tolerance = 9.16354e-11
+ INFLATIONGW - Momentum residual converged to 8.49396e-11 in 11 steps
+ INFLATIONGW: Momentum residual = 8.49396e-11
+ INFLATIONGW: Hamiltonian K residual = 8.70176e-08
+ INFLATIONGW: after 186 steps constraint residual = 8.70176e-08
+ INFLATIONGW: current tolerance = 8.70176e-11
+ INFLATIONGW - Momentum residual converged to 8.00911e-11 in 8 steps
+ INFLATIONGW: Momentum residual = 8.00911e-11
+ INFLATIONGW: Hamiltonian K residual = 8.26334e-08
+ INFLATIONGW: after 187 steps constraint residual = 8.26335e-08
+ INFLATIONGW: current tolerance = 8.26335e-11
+ INFLATIONGW - Momentum residual converged to 7.95295e-11 in 15 steps
+ INFLATIONGW: Momentum residual = 7.95295e-11
+ INFLATIONGW: Hamiltonian K residual = 7.84733e-08
+ INFLATIONGW: after 188 steps constraint residual = 7.84733e-08
+ INFLATIONGW: current tolerance = 7.84733e-11
+ INFLATIONGW - Momentum residual converged to 7.50268e-11 in 6 steps
+ INFLATIONGW: Momentum residual = 7.50268e-11
+ INFLATIONGW: Hamiltonian K residual = 7.45227e-08
+ INFLATIONGW: after 189 steps constraint residual = 7.45228e-08
+ INFLATIONGW: current tolerance = 7.45228e-11
+ INFLATIONGW - Momentum residual converged to 7.14468e-11 in 34 steps
+ INFLATIONGW: Momentum residual = 7.14468e-11
+ INFLATIONGW: Hamiltonian K residual = 7.07745e-08
+ INFLATIONGW: after 190 steps constraint residual = 7.07745e-08
+ INFLATIONGW: current tolerance = 7.07745e-11
+ INFLATIONGW - Momentum residual converged to 6.84951e-11 in 12 steps
+ INFLATIONGW: Momentum residual = 6.84951e-11
+ INFLATIONGW: Hamiltonian K residual = 6.72157e-08
+ INFLATIONGW: after 191 steps constraint residual = 6.72158e-08
+ INFLATIONGW: current tolerance = 6.72158e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.64602e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.64602e-11
+ INFLATIONGW: Hamiltonian K residual = 6.38381e-08
+ INFLATIONGW: after 192 steps constraint residual = 6.38381e-08
+ INFLATIONGW: current tolerance = 6.38381e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.33584e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.33584e-10
+ INFLATIONGW: Hamiltonian K residual = 6.0628e-08
+ INFLATIONGW: after 193 steps constraint residual = 6.06281e-08
+ INFLATIONGW: current tolerance = 6.06281e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.85954e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.85954e-11
+ INFLATIONGW: Hamiltonian K residual = 5.75849e-08
+ INFLATIONGW: after 194 steps constraint residual = 5.75849e-08
+ INFLATIONGW: current tolerance = 5.75849e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.11018e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.11018e-10
+ INFLATIONGW: Hamiltonian K residual = 5.46932e-08
+ INFLATIONGW: after 195 steps constraint residual = 5.46933e-08
+ INFLATIONGW: current tolerance = 5.46933e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 9.86672e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 9.86672e-11
+ INFLATIONGW: Hamiltonian K residual = 5.19493e-08
+ INFLATIONGW: after 196 steps constraint residual = 5.19494e-08
+ INFLATIONGW: current tolerance = 5.19494e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 9.19291e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 9.19291e-11
+ INFLATIONGW: Hamiltonian K residual = 4.93414e-08
+ INFLATIONGW: after 197 steps constraint residual = 4.93415e-08
+ INFLATIONGW: current tolerance = 4.93415e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.07699e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.07699e-10
+ INFLATIONGW: Hamiltonian K residual = 4.68676e-08
+ INFLATIONGW: after 198 steps constraint residual = 4.68678e-08
+ INFLATIONGW: current tolerance = 4.68678e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.09924e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.09924e-10
+ INFLATIONGW: Hamiltonian K residual = 4.45176e-08
+ INFLATIONGW: after 199 steps constraint residual = 4.45177e-08
+ INFLATIONGW: current tolerance = 4.45177e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 9.05598e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 9.05598e-11
+ INFLATIONGW: Hamiltonian K residual = 4.22881e-08
+ INFLATIONGW: after 200 steps constraint residual = 4.22882e-08
+ INFLATIONGW: current tolerance = 4.22882e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 9.5203e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 9.5203e-11
+ INFLATIONGW: Hamiltonian K residual = 4.01703e-08
+ INFLATIONGW: after 201 steps constraint residual = 4.01704e-08
+ INFLATIONGW: current tolerance = 4.01704e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.04949e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.04949e-10
+ INFLATIONGW: Hamiltonian K residual = 3.81584e-08
+ INFLATIONGW: after 202 steps constraint residual = 3.81585e-08
+ INFLATIONGW: current tolerance = 3.81585e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.33581e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.33581e-10
+ INFLATIONGW: Hamiltonian K residual = 3.62475e-08
+ INFLATIONGW: after 203 steps constraint residual = 3.62478e-08
+ INFLATIONGW: current tolerance = 3.62478e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 9.83829e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 9.83829e-11
+ INFLATIONGW: Hamiltonian K residual = 3.44325e-08
+ INFLATIONGW: after 204 steps constraint residual = 3.44327e-08
+ INFLATIONGW: current tolerance = 3.44327e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 9.775e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 9.775e-11
+ INFLATIONGW: Hamiltonian K residual = 3.2711e-08
+ INFLATIONGW: after 205 steps constraint residual = 3.27111e-08
+ INFLATIONGW: current tolerance = 3.27111e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.23042e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.23042e-10
+ INFLATIONGW: Hamiltonian K residual = 3.10761e-08
+ INFLATIONGW: after 206 steps constraint residual = 3.10763e-08
+ INFLATIONGW: current tolerance = 3.10763e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.3077e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.3077e-11
+ INFLATIONGW: Hamiltonian K residual = 2.9522e-08
+ INFLATIONGW: after 207 steps constraint residual = 2.95221e-08
+ INFLATIONGW: current tolerance = 2.95221e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 7.68608e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 7.68608e-11
+ INFLATIONGW: Hamiltonian K residual = 2.80465e-08
+ INFLATIONGW: after 208 steps constraint residual = 2.80466e-08
+ INFLATIONGW: current tolerance = 2.80466e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.43466e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.43466e-11
+ INFLATIONGW: Hamiltonian K residual = 2.66459e-08
+ INFLATIONGW: after 209 steps constraint residual = 2.6646e-08
+ INFLATIONGW: current tolerance = 2.6646e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.10881e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.10881e-10
+ INFLATIONGW: Hamiltonian K residual = 2.53156e-08
+ INFLATIONGW: after 210 steps constraint residual = 2.53158e-08
+ INFLATIONGW: current tolerance = 2.53158e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.60657e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.60657e-11
+ INFLATIONGW: Hamiltonian K residual = 2.40512e-08
+ INFLATIONGW: after 211 steps constraint residual = 2.40513e-08
+ INFLATIONGW: current tolerance = 2.40513e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.30716e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.30716e-11
+ INFLATIONGW: Hamiltonian K residual = 2.28506e-08
+ INFLATIONGW: after 212 steps constraint residual = 2.28508e-08
+ INFLATIONGW: current tolerance = 2.28508e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.19874e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.19874e-10
+ INFLATIONGW: Hamiltonian K residual = 2.17106e-08
+ INFLATIONGW: after 213 steps constraint residual = 2.1711e-08
+ INFLATIONGW: current tolerance = 2.1711e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.06753e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.06753e-10
+ INFLATIONGW: Hamiltonian K residual = 2.0626e-08
+ INFLATIONGW: after 214 steps constraint residual = 2.06263e-08
+ INFLATIONGW: current tolerance = 2.06263e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.34397e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.34397e-10
+ INFLATIONGW: Hamiltonian K residual = 1.95979e-08
+ INFLATIONGW: after 215 steps constraint residual = 1.95984e-08
+ INFLATIONGW: current tolerance = 1.95984e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.04853e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.04853e-10
+ INFLATIONGW: Hamiltonian K residual = 1.86207e-08
+ INFLATIONGW: after 216 steps constraint residual = 1.8621e-08
+ INFLATIONGW: current tolerance = 1.8621e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.72776e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.72776e-11
+ INFLATIONGW: Hamiltonian K residual = 1.76926e-08
+ INFLATIONGW: after 217 steps constraint residual = 1.76928e-08
+ INFLATIONGW: current tolerance = 1.76928e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.01349e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.01349e-10
+ INFLATIONGW: Hamiltonian K residual = 1.68116e-08
+ INFLATIONGW: after 218 steps constraint residual = 1.68119e-08
+ INFLATIONGW: current tolerance = 1.68119e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.13101e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.13101e-11
+ INFLATIONGW: Hamiltonian K residual = 1.59731e-08
+ INFLATIONGW: after 219 steps constraint residual = 1.59733e-08
+ INFLATIONGW: current tolerance = 1.59733e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.39054e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.39054e-11
+ INFLATIONGW: Hamiltonian K residual = 1.5179e-08
+ INFLATIONGW: after 220 steps constraint residual = 1.51792e-08
+ INFLATIONGW: current tolerance = 1.51792e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.07033e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.07033e-10
+ INFLATIONGW: Hamiltonian K residual = 1.44206e-08
+ INFLATIONGW: after 221 steps constraint residual = 1.4421e-08
+ INFLATIONGW: current tolerance = 1.4421e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.42573e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.42573e-11
+ INFLATIONGW: Hamiltonian K residual = 1.3704e-08
+ INFLATIONGW: after 222 steps constraint residual = 1.37043e-08
+ INFLATIONGW: current tolerance = 1.37043e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.45698e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.45698e-11
+ INFLATIONGW: Hamiltonian K residual = 1.30225e-08
+ INFLATIONGW: after 223 steps constraint residual = 1.30228e-08
+ INFLATIONGW: current tolerance = 1.30228e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.91901e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.91901e-11
+ INFLATIONGW: Hamiltonian K residual = 1.23745e-08
+ INFLATIONGW: after 224 steps constraint residual = 1.23748e-08
+ INFLATIONGW: current tolerance = 1.23748e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.51659e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.51659e-11
+ INFLATIONGW: Hamiltonian K residual = 1.17585e-08
+ INFLATIONGW: after 225 steps constraint residual = 1.17588e-08
+ INFLATIONGW: current tolerance = 1.17588e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.08514e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.08514e-10
+ INFLATIONGW: Hamiltonian K residual = 1.11737e-08
+ INFLATIONGW: after 226 steps constraint residual = 1.11743e-08
+ INFLATIONGW: current tolerance = 1.11743e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 8.49247e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 8.49247e-11
+ INFLATIONGW: Hamiltonian K residual = 1.06177e-08
+ INFLATIONGW: after 227 steps constraint residual = 1.06181e-08
+ INFLATIONGW: current tolerance = 1.06181e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 1.00812e-10 after 50 steps 
+ INFLATIONGW: Momentum residual = 1.00812e-10
+ INFLATIONGW: Hamiltonian K residual = 1.00909e-08
+ INFLATIONGW: after 228 steps constraint residual = 1.00914e-08
+ INFLATIONGW: current tolerance = 1.00914e-11
+ INFLATIONGW - Momentum constraint did not converge! 
+              Residual 9.6656e-11 after 50 steps 
+ INFLATIONGW: Momentum residual = 9.6656e-11
+ INFLATIONGW: Hamiltonian K residual = 9.58771e-09
+ INFLATIONGW: after 229 steps constraint residual = 9.58819e-09
+ INFLATIONGW: Momentum residual = 9.6656e-11
+ INFLATIONGW: Hamiltonian K residual = 9.58771e-09
+ INFLATIONGW: Solved constraints momentum residual = 9.6656e-11
+ and K residual = 9.58771e-09
+ and psi residual = 3.25267e-12
+ INFLATIONGW: done with initialization! 
+ INITIALIZE: lapse 0
+ INITIALIZE: shift 0
+ INITIALIZE: curvature 0
+ MANAGER: Found M = 0, J = 0 and P_z = 30.1113 at radius 14.4074
+ STATE: Dumping functions in state last at time t = 0
+ CURVATURE: Dumping curvature functions curve at time t = 0
+ AUXILIARY: Dumping auxiliary functions in auxiliaries at time t = 0
+ SCALARFIELD: Dumping matter functions at time t = 0
+ SCALAR_STATE: Dumping functions in scalar_state scalar_last at time t = 0
+ ADM_SOURCE_TERMS: Dumping source terms scalar_souces at time t = 0
+ SCALAR_AUX: Dumping functions in scalar_aux scalar_aux at time t = 0
+ DIAGNOSTICS: Dumping diagnostic functions constraints at time t = 0
+ GR: integrating manager...
+ DIAGNOSTICS: Dumping diagnostic functions constraints at time t = 0.00157489
+ STATE: Dumping functions in state last at time t = 0.00157489
+ DIAGNOSTICS: looking for horizon at time t = 0.00157489
+ HORIZONFINDER: Initial guess M = 1.06588e-09, P = 0
+ HORIZONFINDER: Initial guess M = 1.38564e-09, P = 0
+ HORIZONFINDER: Initial guess M = 1.80133e-09, P = 0
+ HORIZONFINDER: Initial guess M = 2.34173e-09, P = 0
+ HORIZONFINDER: Initial guess M = 3.04425e-09, P = 0
+ HORIZONFINDER: Initial guess M = 3.95753e-09, P = 0
+ HORIZONFINDER: Initial guess M = 5.14479e-09, P = 0
+ HORIZONFINDER: Initial guess M = 6.68822e-09, P = 0
+ HORIZONFINDER: Initial guess M = 8.69469e-09, P = 0
+ HORIZONFINDER: Initial guess M = 1.13031e-08, P = 0
+ HORIZONFINDER: Initial guess M = 1.4694e-08, P = 0
+ HORIZONFINDER: Initial guess M = 1.91022e-08, P = 0
+ HORIZONFINDER: Initial guess M = 2.48329e-08, P = 0
+ HORIZONFINDER: Initial guess M = 3.22828e-08, P = 0
+ HORIZONFINDER: Initial guess M = 4.19676e-08, P = 0
+ HORIZONFINDER: Initial guess M = 5.45579e-08, P = 0
+ HORIZONFINDER: Initial guess M = 7.09252e-08, P = 0
+ HORIZONFINDER: Initial guess M = 9.22028e-08, P = 0
+ HORIZONFINDER: Initial guess M = 1.19864e-07, P = 0
+ HORIZONFINDER: Initial guess M = 1.55823e-07, P = 0
+ HORIZONFINDER: Initial guess M = 2.0257e-07, P = 0
+ HORIZONFINDER: Initial guess M = 2.6334e-07, P = 0
+ HORIZONFINDER: Initial guess M = 3.42343e-07, P = 0
+ HORIZONFINDER: Initial guess M = 4.45045e-07, P = 0
+ HORIZONFINDER: Initial guess M = 5.78559e-07, P = 0
+ HORIZONFINDER: Initial guess M = 7.52127e-07, P = 0
+ HORIZONFINDER: Initial guess M = 9.77765e-07, P = 0
+ HORIZONFINDER: Initial guess M = 1.27109e-06, P = 0
+ HORIZONFINDER: Initial guess M = 1.65242e-06, P = 0
+ HORIZONFINDER: Initial guess M = 2.14815e-06, P = 0
+ HORIZONFINDER: Initial guess M = 2.79259e-06, P = 0
+ HORIZONFINDER: Initial guess M = 3.63037e-06, P = 0
+ HORIZONFINDER: Initial guess M = 4.71948e-06, P = 0
+ HORIZONFINDER: Initial guess M = 6.13533e-06, P = 0
+ HORIZONFINDER: Initial guess M = 7.97593e-06, P = 0
+ HORIZONFINDER: Initial guess M = 1.03687e-05, P = 0
+ HORIZONFINDER: Initial guess M = 1.34793e-05, P = 0
+ HORIZONFINDER: Initial guess M = 1.75231e-05, P = 0
+ HORIZONFINDER: Initial guess M = 2.278e-05, P = 0
+ HORIZONFINDER: Initial guess M = 2.96141e-05, P = 0
+ HORIZONFINDER: Initial guess M = 3.84983e-05, P = 0
+ HORIZONFINDER: Initial guess M = 5.00478e-05, P = 0
+ HORIZONFINDER: Initial guess M = 6.50621e-05, P = 0
+ HORIZONFINDER: Initial guess M = 8.45807e-05, P = 0
+ GRID: exceeded maximum number of regrids. 
+ STATE: function phi in state last is not finite!
+ STATE: function h_rr in state last is not finite!
+ STATE: function h_rt in state last is not finite!
+ STATE: function h_rp in state last is not finite!
+ STATE: function h_tt in state last is not finite!
+ STATE: function h_tp in state last is not finite!
+ STATE: function h_pp in state last is not finite!
+ STATE: function K in state last is not finite!
+ STATE: function a_rr in state last is not finite!
+ STATE: function a_rt in state last is not finite!
+ STATE: function a_rp in state last is not finite!
+ STATE: function a_tt in state last is not finite!
+ STATE: function a_tp in state last is not finite!
+ STATE: function a_pp in state last is not finite!
+ STATE: function lam_r in state last is not finite!
+ STATE: function lam_t in state last is not finite!
+ STATE: function lam_p in state last is not finite!
+ STATE: Dumping functions in state last at time t = 0.0110242
+ CURVATURE: Dumping curvature functions curve at time t = 0.0110242
+ AUXILIARY: Dumping auxiliary functions in auxiliaries at time t = 0.0110242
+ DIAGNOSTICS: Dumping diagnostic functions constraints at time t = 0.0110242
+ SCALARFIELD: Dumping matter functions at time t = 0.0110242
+ SCALAR_STATE: Dumping functions in scalar_state scalar_last at time t = 0.0110242
+ ADM_SOURCE_TERMS: Dumping source terms scalar_souces at time t = 0.0110242
+ GRID: Regridded 0 times. 
+ STATE: ... closing state last... 
+ STATE: ... closing state derivs... 
+ STATE: ... closing state inter... 
+ STATE: ... closing state updates... 
+ CURVATURE: ... closing curvature ... 
+ AUXILIARY: ... closing auxiliary functions auxiliaries... 
+ DIAGNOSTICS: ... closing diagnostics ... 
+ SCALAR_STATE: ... closing scalar_state scalar_last... 
+ SCALAR_STATE: ... closing scalar_state scalar_derivs... 
+ SCALAR_STATE: ... closing scalar_state scalar_inter... 
+ SCALAR_STATE: ... closing scalar_state scalar_updates... 
+ ADM_SOURCE_TERMS: ... closing adm_source_terms ... 
+ SCALAR_AUX: ... closing scalar_aux scalar_aux... 
+ SCALARFIELD: destructing derived class ScalarField 
+ MATTER: destructing base class Matter 
+ Destructing EllSolver2D... 
+ MANAGER: Destructing manager - bye! 
