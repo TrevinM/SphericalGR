@@ -377,19 +377,19 @@ private:
     for (int i = 0; i < n_r; i++) {
       const double rl = rho.r(i);
       for (int j = 0; j < n_theta; j++) {
-	const double stl = rho.sintheta(j);
-	for (int k = 0; k < n_phi; k++) {
-	  const double psil = psi(i,j,k);
-	  const double r_prop = rl;
-	  const double rpr0 = r_prop + r0;
-	  const double rmr0 = r_prop - r0;
-	  // const double r_prop = psil * psil * rl;
-	  // Note: upper rescaled component
-	  const double psi_n = pow(psil,n_psi_e);
-	  e_p[i][j][k] = - 4.0 * A * r_prop * psi_n * stl * 
-	    ( exp(- rpr0*rpr0 ) + exp( - rmr0*rmr0 ) ) ;
-	  a_p[i][j][k] = 0.0;
-	}
+        const double stl = rho.sintheta(j);
+        for (int k = 0; k < n_phi; k++) {
+          const double psil = psi(i,j,k);
+          const double r_prop = rl;
+          const double rpr0 = r_prop + r0;
+          const double rmr0 = r_prop - r0;
+          // const double r_prop = psil * psil * rl;
+          // Note: upper rescaled component
+          const double psi_n = pow(psil,n_psi_e);
+          e_p[i][j][k] = - 4.0 * A * r_prop * psi_n * stl * 
+            ( exp(- rpr0*rpr0 ) + exp( - rmr0*rmr0 ) ) ;
+          a_p[i][j][k] = 0.0;
+        }
       }
     }
   };
@@ -402,27 +402,27 @@ private:
       const double rl = rho.r(i);
       const double r2 = rl*rl;
       for (int j = N_g; j < n_theta - N_g; j++) { 
-	const double stl = rho.sintheta(j);
-	const double st2 = stl*stl;
-	const double ctl = rho.costheta(j);
-	for (int k = N_g; k < n_phi - N_g; k++) {
-	  const double psil = psi(i,j,k);
-	  const double psi4 = psil*psil*psil*psil;
-	  const double E_phi = e_p(i,j,k);  // upper component
-	  const double E2 = psi4 * E_phi * E_phi;
-	  const double D_r_A_p = rl * stl * a_p.dr(i,j,k);
-	  const double D_t_A_p = rl * stl * a_p.dtheta(i,j,k);
-	  const double D_p_A_r = - stl * a_p(i,j,k);
-	  const double D_p_A_t = - rl * ctl * a_p(i,j,k);
-	  const double DA_rp = D_r_A_p - D_p_A_r;
-	  const double DA_tp = D_t_A_p - D_p_A_t;
-	  // const double DA_pr = - DA_rp;
-	  // const double DA_pt = - DA_tp;
-	  const double F2 = 2.0 * ( DA_rp*DA_rp / (r2 * st2) +
-				    DA_tp*DA_tp / (r2 * r2 * st2) )
-	    / ( psi4*psi4 ) - 2.0 * E2;
-	  rho[i][j][k] = oo4p * ( E2 + F2 / 4.0 );
-	}
+        const double stl = rho.sintheta(j);
+        const double st2 = stl*stl;
+        const double ctl = rho.costheta(j);
+        for (int k = N_g; k < n_phi - N_g; k++) {
+          const double psil = psi(i,j,k);
+          const double psi4 = psil*psil*psil*psil;
+          const double E_phi = e_p(i,j,k);  // upper component
+          const double E2 = psi4 * E_phi * E_phi;
+          const double D_r_A_p = rl * stl * a_p.dr(i,j,k);
+          const double D_t_A_p = rl * stl * a_p.dtheta(i,j,k);
+          const double D_p_A_r = - stl * a_p(i,j,k);
+          const double D_p_A_t = - rl * ctl * a_p(i,j,k);
+          const double DA_rp = D_r_A_p - D_p_A_r;
+          const double DA_tp = D_t_A_p - D_p_A_t;
+          // const double DA_pr = - DA_rp;
+          // const double DA_pt = - DA_tp;
+          const double F2 = 2.0 * ( DA_rp*DA_rp / (r2 * st2) +
+                  DA_tp*DA_tp / (r2 * r2 * st2) )
+            / ( psi4*psi4 ) - 2.0 * E2;
+          rho[i][j][k] = oo4p * ( E2 + F2 / 4.0 );
+        }
       }
     }
   };
@@ -430,31 +430,31 @@ private:
   void Compute_u() {
     for (int i = 0; i < n_r; i++) 
       for (int j = 0; j < n_theta; j++) 
-	for (int k = 0; k < n_phi; k++) {
-	  // const double rl = rho.r(i);
-	  const double psil = psi(i,j,k);
-	  const double psi4 = psil*psil*psil*psil;
-	  double factor = 0.0;
-	  factor = 5 + 4 + 2*n_psi_e;
-	  u[i][j][k] = 2.0*PI*psi4*rho(i,j,k) * factor;
-	}
+        for (int k = 0; k < n_phi; k++) {
+          // const double rl = rho.r(i);
+          const double psil = psi(i,j,k);
+          const double psi4 = psil*psil*psil*psil;
+          double factor = 0.0;
+          factor = 5 + 4 + 2*n_psi_e;
+          u[i][j][k] = 2.0*PI*psi4*rho(i,j,k) * factor;
+        }
   };
   void update_psi() {
     for (int i = 0; i < n_r; i++) 
       for (int j = 0; j < n_theta; j++) 
-	for (int k = 0; k < n_phi; k++) {
-	  psi[i][j][k] += delta_psi(i,j,k);
-	}
+        for (int k = 0; k < n_phi; k++) {
+          psi[i][j][k] += delta_psi(i,j,k);
+        }
   };
   double Hamiltonian_Residual() {
     for (int i = N_g; i < n_r-N_g; i++) 
       for (int j = N_g; j < n_theta-N_g; j++) 
-	for (int k = N_g; k < n_phi-N_g; k++) {
-	  const double psil = psi(i,j,k);
-	  const double psi5 = psil*psil*psil*psil*psil;
-	  res[i][j][k] = psi.Laplace(i,j,k) 
-	    + 2.0*PI*psi5*rho(i,j,k);
-	}
+        for (int k = N_g; k < n_phi-N_g; k++) {
+          const double psil = psi(i,j,k);
+          const double psi5 = psil*psil*psil*psil*psil;
+          res[i][j][k] = psi.Laplace(i,j,k) 
+            + 2.0*PI*psi5*rho(i,j,k);
+	      }
     return res.L2_norm();
   };
 };

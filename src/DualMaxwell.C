@@ -46,6 +46,17 @@ void DualMaxwell::Compute_RHS(state *s, curvature *c, double time) {
   for (int i = 0; i < derivs->N_fcts; i++) {
     derivs->fct_list[i]->derivs_outerboundary(inter->fct_list[i]);
   }
+
+//   dump->slice(0.0,0.0,12473, derivs->a_r.Address());
+//   dump->slice(0.0,0.0,12473, derivs->a_t.Address());
+//   dump->slice(0.0,0.0,12473, derivs->a_p.Address());
+//   dump->slice(0.0,0.0,12473, derivs->as_r.Address());
+//   dump->slice(0.0,0.0,12473, derivs->as_t.Address());
+//   dump->slice(0.0,0.0,12473, derivs->as_p.Address());
+  
+//   cout << "Just Dumped. Goodbye !!" << endl;
+//   exit(0);
+
 };
 //
 //===============================================
@@ -124,6 +135,13 @@ void DualMaxwell::dot_a_as(dualmaxwell_state *m, state *s, double time) {
       }
     }
   }
+  derivs->a_r.fill_ghosts();
+  derivs->a_t.fill_ghosts();
+  derivs->a_p.fill_ghosts();
+  derivs->as_r.fill_ghosts();
+  derivs->as_t.fill_ghosts();
+  derivs->as_p.fill_ghosts();
+
 };
 
 
@@ -318,7 +336,10 @@ void DualMaxwell::ADM_Sources(state * s, curvature * c)
   adm_sources->rho_ADM.fill_ghosts();
   rho_center = adm_sources->rho_ADM(0.0,N_g,N_g);
   if (rho_center > rho_c_max) rho_c_max = rho_center;
+  rho_max = adm_sources->rho_ADM.max(rho_i, rho_j, rho_k);
+  if (rho_max > rho_max_MAX) rho_max_MAX = rho_max;
   drhoddr = adm_sources->rho_ADM.ddr(N_g,N_g,N_g);
+  s->lapse.min(lapse_i, lapse_j, lapse_k);
   //
   // compute diagnostic function Omega
   //

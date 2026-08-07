@@ -54,7 +54,7 @@ void dumper::dump(double phys_time, double prop_time, int timestep, gf3d *fct,
   outfile << "# ======================================== " << endl;
 #endif /* AXISYMMETRY */
   outfile << "# Data for " << indata->Name() << " initial data at coord. time " 
-  	  << phys_time << " and proper central time " << prop_time << endl;
+  	  << setprecision(16) << setw(24) << phys_time << " and proper central time " << prop_time << endl;
   outfile << "# Evolved with (" << N_r << "," << N_theta << "," << N_phi
   	  << ") gridpoints (including " << N_g << " ghosts)" << endl; 
   outfile << "# Evolution with " << slicing->Name() << " and " 
@@ -145,7 +145,8 @@ void dumper::slice(double phys_time, double prop_time, int timestep, gf3d * fct,
 	  << setw(20) << fct->Name() << endl;
   outfile << "#===============================================================" << endl;
   outfile.setf(ios::right);
-  for (int i = N_g; i < N_r; i++) {
+  for (int i = N_g; i < N_r - N_g; i++) {
+  //LATER: put 0 back to N_g and N_theta - N_g
     for (int j = N_g; j < N_theta - N_g; j++) { 
       double rl = fct->r(i);
       double thetal = fct->theta(j);

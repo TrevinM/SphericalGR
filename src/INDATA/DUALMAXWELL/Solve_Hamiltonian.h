@@ -75,7 +75,7 @@ void update_psi() {
   for (int i = 0; i < n_r; i++) 
     for (int j = 0; j < n_theta; j++) 
       for (int k = 0; k < n_phi; k++) {
-	psi[i][j][k] += delta_psi(i,j,k);
+	psi[i][j][k] += 0.6 * delta_psi(i,j,k);
       }
 };
 double Hamiltonian_Residual() {

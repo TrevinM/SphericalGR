@@ -12,7 +12,8 @@
 //================================================
 class DualMaxwell : public Matter {
 public:
-  double rho_center, rho_c_max, drhoddr;    // diagnostics 
+  double rho_center, rho_c_max, rho_max, rho_max_MAX, drhoddr;    // diagnostics 
+  int lapse_i, lapse_j, lapse_k, rho_i, rho_j, rho_k;
   dualmaxwell_state * last, * derivs, * inter, * updates;
   dualmaxwell_aux * aux;
   Monitor * monitor;
@@ -40,6 +41,7 @@ public:
     updates = new dualmaxwell_state(grid, dump, "dualmaxwell_updates");
     // create dump list for state last:
     last->assemble_dump_list("Dump_List");
+    derivs->assemble_dump_list("Dump_List");
     // let checkpointer know about last
     checkpoint->CollectDynVariables(last);
     //
@@ -55,6 +57,7 @@ public:
      //
     // finally create a monitor file...
     //
+
     ostringstream monfilename;
     monfilename << "output/" << monitor->Filestem() << "_" << N_r - 2*N_g << "_" 
      		<< N_t - 2*N_g << ".dualmaxwell_mon" << ends;
@@ -70,10 +73,17 @@ public:
 		<< setw(18) << "pr time (r=0)" 
 		<< setw(18) << "rho_ADM_c" 
 		<< setw(18) << "rho_ADM_c_max" 
+		<< setw(18) << "rho_ADM_max" 
+		<< setw(18) << "rho_ADM_max_MAX"
+		<< setw(18) << "r(rho_ADM_max)" 
+		<< setw(18) << "th(rho_ADM_max)" 
+		<< setw(18) << "r(lapse_min)" 
+		<< setw(18) << "th(lapse_min)" 
 		<< endl;
     monitorfile << "#=======================================================================================================================================================================" << endl;
    //
     rho_center = rho_c_max = drhoddr = 0.0;
+    rho_max = rho_max_MAX = 0.0;
   };
   ~DualMaxwell() {
     delete last;
@@ -156,6 +166,12 @@ public:
 		  << setw(18) << tau_c
 		  << setprecision(10) << setw(18) << rho_center
 		  << setprecision(10) << setw(18) << rho_c_max
+		  << setprecision(10) << setw(18) << rho_max
+		  << setprecision(10) << setw(18) << rho_max_MAX
+		  << setprecision(10) << setw(18) << grid->r(rho_i)
+		  << setprecision(10) << setw(18) << grid->theta(rho_j)
+		  << setprecision(10) << setw(18) << grid->r(lapse_i)
+		  << setprecision(10) << setw(18) << grid->theta(lapse_j)
 		  << endl;
     }
   };

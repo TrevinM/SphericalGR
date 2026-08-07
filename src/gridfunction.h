@@ -338,15 +338,18 @@ public:
   //================================================
   void derivs_outerboundary(gf3d * fct) {
     //    cout << " using fct " << fct->Name() << " for " << this->Name() << " with wave_speed " << wave_speed <<  endl;
-    for (int j = 0; j < nt; j++)
-      for (int k = 0; k < np; k++) 
-	for (int i = nr - 1; i >= nr - N_g; i--)
-	  v[i][j][k] = - wave_speed * ( fct->dr_OS(i,j,k,-1) + 
-					fall_off * ( (*fct)[i][j][k] - background ) / (*r_p)[i] );
-    // v[nr-2][j][k] = - wave_speed * ( fct->dr(nr-2,j,k,-1) +
-    // 				 fall_off * ( (*fct)[nr-2][j][k] - background ) / (*r_p)[nr-2] ); 
-    // v[nr-3][j][k] = - wave_speed * ( fct->dr(nr-3,j,k,-1) +
-    // 				 fall_off * ( (*fct)[nr-3][j][k] - background ) / (*r_p)[nr-3] ); 
+    for (int j = 0; j < nt; j++) {
+      for (int k = 0; k < np; k++) {
+        for (int i = nr - 1; i >= nr - N_g; i--) {
+          v[i][j][k] = - wave_speed * ( fct->dr_OS(i,j,k,-1) + 
+                fall_off * ( (*fct)[i][j][k] - background ) / (*r_p)[i] );
+          // v[nr-2][j][k] = - wave_speed * ( fct->dr(nr-2,j,k,-1) +
+    			// 	 fall_off * ( (*fct)[nr-2][j][k] - background ) / (*r_p)[nr-2] ); 
+          // v[nr-3][j][k] = - wave_speed * ( fct->dr(nr-3,j,k,-1) +
+    			// 	 fall_off * ( (*fct)[nr-3][j][k] - background ) / (*r_p)[nr-3] ); 
+        }
+      }
+    }
   }
   //================================================
   // Fill outer boundary points
@@ -997,27 +1000,57 @@ public:
     double min = v[N_g][N_g][N_g];
     for (int i = N_g; i < nr-N_g; i++)    
       for (int j = N_g; j < nt-N_g; j++)
-	for (int k = N_g; k < np-N_g; k++) {    
-	  if (v[i][j][k] < min) min = v[i][j][k];
-	}
+        for (int k = N_g; k < np-N_g; k++) {    
+          if (v[i][j][k] < min) min = v[i][j][k];
+        }
+    return min;
+  };
+  double min(int & i_min, int & j_min, int & k_min) {
+    double min = v[N_g][N_g][N_g];
+    i_min = j_min = k_min = N_g;
+    for (int i = N_g; i < nr-N_g; i++)    
+      for (int j = N_g; j < nt-N_g; j++)
+        for (int k = N_g; k < np-N_g; k++) {    
+          if (v[i][j][k] < min) {
+            min = v[i][j][k];
+            i_min = i;
+            j_min = j;
+            k_min = k;
+          }
+	      }
     return min;
   };
   double max() {
     double max = v[N_g][N_g][N_g];
     for (int i = N_g; i < nr-N_g; i++)    
       for (int j = N_g; j < nt-N_g; j++)
-	for (int k = N_g; k < np-N_g; k++) {    
-	  if (v[i][j][k] > max) max = v[i][j][k];
-	}
+        for (int k = N_g; k < np-N_g; k++) {    
+          if (v[i][j][k] > max) max = v[i][j][k];
+        }
+    return max;
+  };
+  double max(int & i_max, int & j_max, int & k_max) {
+    double max = v[N_g][N_g][N_g];
+    i_max = j_max = k_max = N_g;
+    for (int i = N_g; i < nr-N_g; i++)    
+      for (int j = N_g; j < nt-N_g; j++)
+        for (int k = N_g; k < np-N_g; k++) { 
+          if (v[i][j][k] > max) {
+            max = v[i][j][k];
+            i_max = i;
+            j_max = j;
+            k_max = k;
+          }
+        }
     return max;
   };
   double max(double r_min) {   // finds maximum for all r > r_min
     double max = v[nr-N_g][N_g][N_g];
     for (int i = N_g; i < nr-N_g; i++)    
       for (int j = N_g; j < nt-N_g; j++)
-	for (int k = N_g; k < np-N_g; k++) {    
-	  if (v[i][j][k] > max && r(i) > r_min) max = v[i][j][k];
-	}
+        for (int k = N_g; k < np-N_g; k++) {    
+          if (v[i][j][k] > max && r(i) > r_min) max = v[i][j][k];
+        }
     return max;
   };
   //

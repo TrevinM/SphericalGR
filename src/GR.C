@@ -350,6 +350,10 @@ int main(int argc, char* argv[])
 	//================================================================
 	// Initialize
 	//================================================================
+	if (t_max > grid->r_max())
+		t_max = grid->r_max();
+	
+	manager.Set_t_max(t_max);
 	bool success = manager.Initialize();
 	//  manager.Test_Indices();
 	//  einstein.Test_Gridfunction();

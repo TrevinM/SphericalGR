@@ -174,6 +174,7 @@ inline T & NRvector<T>::operator[](const int i)	//subscripting
 {
 #ifdef _CHECKBOUNDS_
 if (i<0 || i>=nn) {
+	cout << "Oh no!! Tried to use " << i << endl;
 	toss("NRvector subscript out of bounds");
 }
 #endif

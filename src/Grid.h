@@ -18,12 +18,15 @@ private:
   int N_theta, N_phi, N_r;
   Doub r_max_init, r_max_fin;
   int regrids, regrid_counter;
+  int regrid_type, grid_type;
   Doub tau_star;    // for self-similar regridding
   Doub last_selfsim_ratio;
   bool selfsimregrid;
   Doub courant; 
   Doub cutoff;
   Doub s_param, t_param, t_amp, theta_param;
+  double r_focus, x_focus;
+  bool tracking;
   Doub r_max_current, r_max_old, r_max_new;
   int N_ghost;
   Doub r_max_factor;
@@ -69,13 +72,18 @@ public:
     infile.get(buf,500,'='); infile.get(c); infile >> r_max_init;
     infile.get(buf,500,'='); infile.get(c); infile >> r_max_fin;
     infile.get(buf,500,'='); infile.get(c); infile >> courant;    
+    infile.get(buf,500,'='); infile.get(c); infile >> regrid_type;    
     infile.get(buf,500,'='); infile.get(c); infile >> regrids;
     infile.get(buf,500,'='); infile.get(c); infile >> cutoff;
     infile.get(buf,500,'='); infile.get(c); infile >> tau_star;
+    infile.get(buf,500,'='); infile.get(c); infile >> grid_type;
     infile.get(buf,500,'='); infile.get(c); infile >> s_param;
+    infile.get(buf,500,'='); infile.get(c); infile >> theta_param;
     infile.get(buf,500,'='); infile.get(c); infile >> t_param;
     infile.get(buf,500,'='); infile.get(c); infile >> t_amp;
-    infile.get(buf,500,'='); infile.get(c); infile >> theta_param;
+    infile.get(buf,500,'='); infile.get(c); infile >> tracking;
+    infile.get(buf,500,'='); infile.get(c); infile >> r_focus;
+    infile.get(buf,500,'='); infile.get(c); infile >> x_focus;
      //
     if(infile.eof()) {
       cerr << " GRID: Error reading input file Grid_Input " << endl;
@@ -100,21 +108,26 @@ public:
     if (regrids == 0) {
       cout << " GRID: no regridding. " << endl;
     } else {
-      if (tau_star <= 0.0) {
-	selfsimregrid = false;
-	cout << " GRID: using accuracy regridding, maximally " << regrids 
-	     << " regriddings with cutoff = " << cutoff << endl;
-      } else {
-	selfsimregrid = true;
-	cout << " GRID: using self-similar regridding with tau_star = "
-	     << tau_star << " and cutoff = " << cutoff << endl;
+      if (regrid_type == 0) {
+        selfsimregrid = false;
+        cout << " GRID: using accuracy regridding, maximally " << regrids 
+	          << " regriddings with cutoff = " << cutoff << endl;
+      } else if (regrid_type == 1) {
+        selfsimregrid = true;
+        cout << " GRID: using self-similar regridding with tau_star = "
+            << tau_star << " and cutoff = " << cutoff << endl;
       }
     }
-    cout << " GRID: Using radial grid parameters s_param = " << s_param 
-	 << " t_param = " << t_param << " and t_amp = "
-	 << t_amp << endl;
-    cout << " GRID: Using angular grid parameter theta_param = " << theta_param 
-	 << endl;
+    cout << " GRID: Using grid parameters s_param = " << s_param 
+	 << " theta_param = " << theta_param << endl;
+   if (grid_type == 0) {
+    cout << " GRID: Using tanh grid parameters t_param = " << t_param 
+        << " t_amp = " << t_amp << endl;
+   } else if (grid_type == 1) {
+    cout << " GRID: Using offset grid parameters r_focus = " << r_focus
+        << " x_focus = " << x_focus << endl;
+   }
+
     // 
     r_v = VecDoub(N_r + 2*N_ghost);
     x_v = VecDoub(N_r + 2*N_ghost);
@@ -132,11 +145,12 @@ public:
     //
     // change r_max in equal factor
     //
-    if (selfsimregrid) {
+    if (regrid_type == 0) {
+      r_max_factor = pow(r_max_fin/r_max_init,1.0/regrids);
+    }
+    else if (regrid_type == 1) { 
       r_max_factor = 1. / cutoff;
       last_selfsim_ratio = r_max_current / tau_star;
-    } else { 
-      r_max_factor = pow(r_max_fin/r_max_init,1.0/regrids);
     } 
     //
     // needed in i_ind (for "hunt" routine):
@@ -157,6 +171,7 @@ public:
   int N_phi_tot() { return N_phi + 2 * N_ghost; }
   int N_ghosts() { return N_ghost; }
   Doub r_max() { return r_max_current; }
+  Doub r_max_final() {return r_max_fin; }
   Doub r_parameter() { return s_param; }
   Doub theta_parameter() { return theta_param; }
   Doub courant_factor() { return courant; }
@@ -187,7 +202,7 @@ public:
   Doub RegridCriterion(Doub tau_c) {
     return r_max_current / (tau_star - tau_c) / last_selfsim_ratio;
   }
-  bool SelfSimRegrid() { return selfsimregrid; }
+  int Regrid_Type() { return regrid_type; }
   
   //=================================================
   // Set up grid
@@ -216,7 +231,7 @@ public:
     } else
       return false;
   }
-  int Regrid(VecDoub & r_new) {
+  int Regrid(VecDoub & r_new, double criterion) {
     //
     // function returns vector with new radial gridpoints, but
     // doesn't do anything else yet -- need to complete regridding by
@@ -228,7 +243,12 @@ public:
     // r_fcct, but then want to restore old r_max so that it can be used
     // in i_ind during regridding (where old grid is needed)...
     r_max_old = r_max_current;
-    r_max_new = r_max_current * r_max_factor;
+    if (regrid_type == 2) {
+      r_max_new = r_max_current - criterion;
+    }
+    else {
+      r_max_new = r_max_current * r_max_factor;
+    }
     // ... therefore temporarily set r_max_current to r_max_new...
     r_max_current = r_max_new;
     cout << " GRID: regridding with r_max = " << r_max_current << endl;
@@ -358,7 +378,7 @@ public:
   //                             + sinh(s_param x) / sinh(s_param) )
   //
   //================================================
-  Doub r_fct(Doub x, Doub & x_prime, Doub & x_dprime) {
+  Doub r_fct_tanh(Doub x, Doub & x_prime, Doub & x_dprime) {
     Doub r = 0.0;
     if (s_param > 0.) {
       const Doub A = t_amp;
@@ -387,7 +407,66 @@ public:
       x_dprime = 0.0;
     }
     return r;
+  }
+  //================================================
+  // Compute r as function of x -- specify function here!
+  // Note:
+  //    dx / d r = 1 / r'
+  //    d^2 x/ d r^2 = - r'' / ( r' )^3
+  //
+  // Here: r = r_max (sinh(sx-sa)+sinh(sa))/(sinh(s-sa)+sinh(sa))
+  //
+  //  s_param -> flatness
+  //  t_param -> r location of flatness 
+  //  t_amp   -> x location of flatness (used if t_param=0)
+  //
+  //================================================
+  Doub r_fct_offset(Doub x, Doub & x_prime, Doub & x_dprime) {
+    double r = 0.0;
+
+    if (s_param > 0.) {
+      int sign = 1;
+      if (x < 0.) {
+        x = -x;
+        sign = -1;
+      }
+      if (r_focus > 0.) {
+        const double arg = (r_max_current/r_focus - 1.) * (1./sinh(s_param)) + (1./tanh(s_param));
+        const double arccosh = log((arg + 1.) / (arg - 1.)) / 2.;
+        x_focus = (1./s_param)*arccosh;
+      }
+
+      const double sinhSxSa = sinh(s_param * (x -  x_focus));
+      const double sinhSa = sinh(s_param * x_focus);
+      const double sinhSSa = sinh(s_param * (1. - x_focus));
+      const double coshSxSa = cosh(s_param * (x -  x_focus));
+
+      r = sign * r_max_current * (sinhSxSa + sinhSa)/(sinhSSa + sinhSa);
+
+      const double r_prime = sign * r_max_current * s_param * 
+          coshSxSa / (sinhSSa + sinhSa);
+      const double r_dprime = sign * r_max_current * s_param * s_param * 
+          sinhSxSa / (sinhSSa + sinhSa); 
+      x_prime = 1.0 / r_prime;
+      x_dprime = - r_dprime / (r_prime * r_prime * r_prime); 
+    } else {
+      r = r_max_current * x;
+      x_prime = 1.0 / r_max_current;
+      x_dprime = 0.0;
+    }
+    return r;
   }  
+
+  double r_fct(Doub x, Doub & x_prime, Doub & x_dprime) {
+    if (grid_type == 0)
+      return r_fct_tanh(x, x_prime, x_dprime);
+    else if (grid_type == 1)
+      return r_fct_offset(x, x_prime, x_dprime);
+    else {
+      cout << " GRID: Unknown grid type" << endl;
+      exit(1);
+    }
+  }
   //================================================
   // Compute theta as function of y -- specify function here!
   // Note:

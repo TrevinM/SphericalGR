@@ -28,7 +28,7 @@
 
 class Manager {
  private:
-  double t, tau_c; // coordinate time and proper time at center
+  double t, tau_c, t_max; // coordinate time and proper time at center
   int step;        // step counter
   double dt;
   Grid *grid;
@@ -239,6 +239,7 @@ class Manager {
   //===========================================
   // Initialize
   //===========================================
+  void Set_t_max(double set_t) { t_max = set_t; }
   bool Initialize();
   //===========================================
   // Compute right-hand sides of equations...

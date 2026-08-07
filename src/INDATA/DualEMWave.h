@@ -47,6 +47,7 @@ private:
 	int n_a, n_v_a, n_as, n_v_as;       // powers of r in respective seed functions
 	double r0;
 	int flat;
+	int dual_sign;
 	double PI;
 	bool all_clear;
 	ostringstream indata_name;
@@ -85,6 +86,9 @@ public:
 		infile.get(buf, 100, '='); infile.get(c); infile >> tau_star;
 		infile.get(buf, 100, '='); infile.get(c); infile >> xi;
 
+		infile.get(buf, 500, '='); infile.get(c); infile >> dual_sign;
+
+
 		cout << " DUALEMWAVE: Will set up E&M wave initial data with" << endl;
 		cout << "      amplitude parameters a1_amp = " << a1_amp
 			<< ", a2_amp = " << a2_amp
@@ -93,10 +97,9 @@ public:
 			<< ", as2_amp = " << as2_amp
 			<< ", as3_amp = " << as3_amp << endl;
 
-		cout << "      and exponents n_a = " << n_a << " n_as = " << n_as
-			<< " n_v_a = " << n_v_a << " n_v_as = " << n_v_as << endl;
 		cout << "      power of psi in seed functions: n_psi = " << n_psi << endl;
 		cout << "      and off-center parameter r_0 = " << r0 << endl;
+		cout << "      using sign convention: " << dual_sign << endl;
 		cout << " DUALEMWAVE: Will run elliptic solver with max_it = " << max_it
 			<< " and tol = " << tol << endl;
 		analytical = false;
@@ -171,6 +174,9 @@ public:
 		//================================================
 		//
 		psi.equals(1.0);
+		W_r.equals(0.0);
+		W_t.equals(0.0);
+		W_p.equals(0.0);
 		//
 #ifdef SR
 		cout << "DUALWAVE: Running without GR" << endl;

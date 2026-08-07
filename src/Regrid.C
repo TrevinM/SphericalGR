@@ -56,7 +56,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double & t_max) {
     // returns new grid points only -- need to finish up regrid with call
     // to Setup_Radial_Grid() below.
     //
-    bool regrid = grid->Regrid(r_new);
+    bool regrid = grid->Regrid(r_new, criterion);
     //
     // now make sure to regrid every dynamical variable
     //
@@ -135,9 +135,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double & t_max) {
 // the cutoff specified in Grid_Input, we regrid
 //================================================
 double Manager::RegridCriterion() {
-  if (grid->SelfSimRegrid()) {
-    return grid->RegridCriterion(tau_c);
-  } else { 
+  if (grid->Regrid_Type() == 0) {
     if (!strcmp(matter->Name(),"vacuum")) {  // vacuum...
       double diff = 0.0; 
       double max_diff = 0.0;
@@ -151,17 +149,26 @@ double Manager::RegridCriterion() {
       // 	}
       //
       for (int i = N_g; i < N_r - N_g; i++) 
-	for (int j = N_g; j < N_t - N_g; j++) 
-	  for (int k = N_g; k < N_p - N_g; k++) {
-	    diff = last->lapse(i+1,j,k) - last->lapse(i,j,k);
-	    // diff = (constraints->I_Re(i+1,j,k) - constraints->I_Re(i,j,k)) / I_Re_max;
-	    if (abs(diff) > max_diff) max_diff = abs(diff);
-	  }
+        for (int j = N_g; j < N_t - N_g; j++) 
+          for (int k = N_g; k < N_p - N_g; k++) {
+            diff = last->lapse(i+1,j,k) - last->lapse(i,j,k);
+            // diff = (constraints->I_Re(i+1,j,k) - constraints->I_Re(i,j,k)) / I_Re_max;
+            if (abs(diff) > max_diff) max_diff = abs(diff);
+	        }
       return max_diff;
     } else {
       return matter->RegridCriterion();
-    };
-  };
+    }
+  }
+  else if (grid->Regrid_Type() == 1) {
+    return grid->RegridCriterion(tau_c);
+  }
+  else if (grid->Regrid_Type() == 2) {
+    return (grid->r_max() - grid->r_max_final()) - (t_max - t);
+  }
+  else {
+    return 0;
+  }
 }
 
 

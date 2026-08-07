@@ -52,6 +52,23 @@ bool Manager::Integrate(double t_max) {
       waves->Update(dt);
     }
     //================================================
+    //  check whether it's finished
+    //================================================ 
+    bool finish_dump = false;
+    bool finish_note = false;
+    bool finished = false;
+
+    #ifdef FINISHCONIDITION
+      //Flatspace Condition
+      if (last->lapse.min() > 0.9 && t > 5.) {
+        finished = true;
+        finish_note = true;
+        finish_dump = true;
+        cout << "Minimum lapse " << last->lapse.min() << " has exceeded 0.9. Ending integration..." << endl;
+      }
+    #endif
+    
+    //================================================
     // check whether it's time to write check point
     //================================================ 
     if (step % checkpoint->CheckPointStep() == 0)
@@ -114,13 +131,14 @@ bool Manager::Integrate(double t_max) {
     //================================================
     // check whether it's time to note...
     //================================================
-    if (monitor->time_to_note(step)) {
+    if (monitor->time_to_note(step) || finish_note) {
       double ang_mom = constraints->Angular_Momentum(last,curve,aux,i);
       double lin_mom = constraints->Linear_Momentum(last,curve,aux,i);
+      bool force = finish_note;
       monitor->note(step, t, tau_c, mass, ang_mom, 
 		    lin_mom, last->phi(0.0, N_g, N_g), 
 		    last->lapse(0.0, N_g, N_g), last->lapse.min(),
-		    last->K(0.0, N_g, N_g), RegridCriterion());
+		    last->K(0.0, N_g, N_g), RegridCriterion(), force);
       //================================================
       // evaluate constraints
       //================================================ 
@@ -171,6 +189,20 @@ bool Manager::Integrate(double t_max) {
       matter->dump_fcts(t, tau_c, step, "_crash");
       return false;
     }
+
+    #ifdef FINISHCONDITION
+      if (finished) { 
+        if (finish_dump) {
+          last->dump_fcts(t, tau_c, step);
+          curve->dump_fcts(t, tau_c, step);
+          aux->dump_fcts(t, tau_c, step);
+          constraints->dump_fcts(t, tau_c, step);
+          matter->dump_fcts(t, tau_c, step);
+        }
+        break; 
+      }
+    #endif
+
   }
   return true;
 }

@@ -33,42 +33,51 @@ void Compute_Fields() {
 }
 
 
+double l1(double r, double theta) {
+	double rmr0 = r - r0;
+	double rpr0 = r + r0;
+
+	double Em = exp(-rmr0 * rmr0);
+	double Ep = exp(-rpr0 * rpr0);
+
+	return 2. * sin(theta) * (Em * rmr0 + Ep * rpr0);
+}
+
 
 double l2(double r, double theta) {
-	double Em = std::exp(-(r - r0) * (r - r0));
-	double Ep = std::exp(-(r + r0) * (r + r0));
+	double rmr0 = r - r0;
+	double rpr0 = r + r0;
 
-	double xm = r - r0;
-	double xp = r + r0;
+	double Em = exp(-rmr0 * rmr0);
+	double Ep = exp(-rpr0 * rpr0);
 
-	return (1.0 / (3.0 * r)) 
-		* (
-			Em * (xm + 2.0 * xm * xm - r)
-			+ Ep * (xp + 2.0 * xp * xp - r)
-		)
-		* std::cos(theta)
-		* std::sin(theta);
+	return 1./3. * cos(theta) * sin(theta) * (
+		Em * (-4. + (4./r) * rmr0 + 8. * rmr0 * rmr0 )
+		+ Ep * (-4. + (4./r) * rpr0 + 8. * rpr0 * rpr0 )
+	);
 }
 
 double l3(double r, double theta) {
-	double Em = std::exp(-(r - r0) * (r - r0));
-	double Ep = std::exp(-(r + r0) * (r + r0));
+	double rmr0 = r - r0;
+	double rpr0 = r + r0;
 
-	double xm = r - r0;
-	double xp = r + r0;
+	double Em = exp(-rmr0 * rmr0);
+	double Ep = exp(-rpr0 * rpr0);
 
 	// Final simplified expression
-	return (
-			Em * (6.0 * xm + 12.0 * xm * xm + 4.0 * xm * xm * xm - 6.0 * r)
-			+ Ep * (6.0 * xp + 12.0 * xp * xp + 4.0 * xp * xp * xp - 6.0 * r)
-		)
-		/ (15.0 * r * r)
-		* (5.0 * std::cos(theta) * std::cos(theta) - 1.0)
-		* std::sin(theta);
+	return (5. * cos(theta) * cos(theta) - 1.) * sin(theta) * (
+			Em * (-2./(5.*r) + (2./(5.*r*r) - 12./15.)*rmr0 + (4./(5.*r)*rmr0*rmr0 + (8./15.)*rmr0*rmr0*rmr0))
+			+ Ep * (-2./(5.*r) + (2./(5.*r*r) - 12./15.)*rpr0 + (4./(5.*r)*rpr0*rpr0 + (8./15.)*rpr0*rpr0*rpr0))
+		);
+}
+
+//This gives a potential in the AE_r component, that obeys curlAE = -dtAB for l1 (minus convention)
+double A_r_l1m_dt(double r, double theta) {
+	return -8. * exp(- r*r) * r*r * cos(theta);
 }
 
 //===============================================================
-// Compute fields: A
+// Compute fields: A (B)
 //===============================================================
 double compute_a_p(double r, double theta) {
 	int i = grid->i_ind(r);
@@ -76,17 +85,27 @@ double compute_a_p(double r, double theta) {
 	int k = N_g;
 	const double psin = pow(psi(i, j, k), n_psi);
 
-	return psin * (a1_amp * l1(r, theta) + a2_amp * l2(r, theta) + a3_amp * l3(r, theta));
+	if (dual_sign == -1) {
+		return 0;
+	}
+	else {
+		return psin * (a1_amp * l1(r, theta) + a2_amp * l2(r, theta) + a3_amp * l3(r, theta));
+	}
 }
 double compute_a_r(double r, double theta) {
-	return 0;
+	if (dual_sign == -1) {
+		return -as1_amp * A_r_l1m_dt(r, theta);
+	}
+	else {
+		return 0;
+	}
 }
 double compute_a_t(double r, double theta) {
 	return 0;
 }
 
 //===============================================================
-// Compute fields: *A
+// Compute fields: *A (E)
 //===============================================================
 double compute_as_p(double r, double theta) {
 	int i = grid->i_ind(r);
@@ -98,7 +117,12 @@ double compute_as_p(double r, double theta) {
 
 }
 double compute_as_r(double r, double theta) {
-	return 0;
+	if (dual_sign == -1) {
+		return a1_amp * A_r_l1m_dt(r, theta);
+	}
+	else {
+		return 0;
+	}
 }
 double compute_as_t(double r, double theta) {
 	return 0;
