@@ -1,0 +1,22 @@
+Amplitudes of different order solutions for both A and A*
+       a1_amp = $a1
+       a2_amp = $a2
+       a3_amp = $a3
+       as1_amp = $as1
+       as2_amp = $as2
+       as3_amp = $as3
+
+Power of psi in seed functions
+       n_psi = -6
+
+off-center parameter:
+       r0 = 0.0
+       flat = 0   ( 0 : *not* flat, 1: flat)
+
+Parameters for elliptic solver
+       max_it = 10000
+       tol = 1.e-9
+
+Two paramters for diagnostics:
+       tau_star = 1.572
+       xi = 0.5

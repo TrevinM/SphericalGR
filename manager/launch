@@ -1,0 +1,21 @@
+#!/bin/bash
+#SBATCH --mail-type=FAIL
+
+# ========================= #
+#           INPUTS          #
+# ========================= #
+
+
+#Code directory
+export dir=/mnt/research/tbaumgar/Students/tmacomber/SphericalGR
+
+#Name of critical collapse suite to be run (with sbatch) or created (with bash)
+export suite=Newqk
+
+export max_runs=3
+export verbose=1   # 1+: Slurm debug prints
+
+if [[ $SLURM_JOB_ID != "" ]]
+then
+    sbatch -J "${suite}_manager" $dir/manager/manager 
+fi 

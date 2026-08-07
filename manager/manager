@@ -1,0 +1,674 @@
+#!/bin/bash
+#SBATCH --mail-type=FAIL
+
+export OMP_NUM_THREADS=16
+
+
+# ========================= #
+#           INPUTS          #
+# ========================= #
+
+
+#Code directory
+export dir=/mnt/research/tbaumgar/Students/tmacomber/SphericalGR
+
+#Name of critical collapse suite to be run (with sbatch) or created (with bash)
+suite=ODEqH
+
+max_runs=3
+verbose=1   # 1+: Slurm debug prints
+
+#Use this when the critical paramter has changed (ie you changed your resolution)
+#and you need to figure out where your new bounds are
+reconverge=1
+
+
+# ========================== #
+#         INITIALIZE         #
+# ========================== #
+
+
+bug () { [[ verbose -ge $2 ]] && [[ verbose -gt 0 ]] && echo $1 ; }
+export -f bug
+log () { echo $1 >> $suite_path/log; }
+export -f  log
+finish () {
+    #Remove empty manager Slurms
+    cd $dir/manager
+    if [ -e "slurm-${SLURM_JOB_ID}.out" ]
+    then
+        slurm_empty=1
+        while read -r line
+        do
+            if [[ ! -z $line ]]; then slurm_empty=0 ; fi
+        done < "slurm-${SLURM_JOB_ID}.out"
+        if [[ $slurm_empty -eq 1 ]]; then rm "slurm-${SLURM_JOB_ID}.out"; fi
+
+    fi
+    exit $1
+}
+
+warning_prev=0
+
+suite_path=$dir/test/CRIT_$suite
+
+num_data_sub=0
+num_data_sup=0
+
+if [ ! -d $suite_path ]
+then
+    if [[ $SLURM_JOB_ID != "" ]]
+    then
+        echo "Create test suite with bash first..."
+        exit 1
+    else
+        #Create test suite
+        mkdir $suite_path
+        wait
+        mkdir $suite_path/example
+        wait
+
+        #Get Settings
+        read -e -p "Eta Family: " -i "eta_${suite}" family
+        read -e -p "Example: " -i "example_DualMax" example
+        read -e -p "Lower Bound: " -i "0" lower_bound
+        read -e -p "Upper Bound: " -i "10" upper_bound
+        read -e -p "Max Decimals: " -i "12" max_precision
+        read -p "Number of Cores: " num_cores
+        read -e -p "Subcritical Test: " -i "sub_lapse.sh" sub_test
+        read -e -p "Supercritical Test: " -i "sup_AH.sh" sup_test
+        read -e -p "Fast Convergence (0/1): " -i "1" fast_conv
+
+        #Copy Example
+        cp $dir/test/$example/* $suite_path/example/
+
+        #Write Settings
+        echo $lower_bound $upper_bound      >> $suite_path/constraints
+        echo Family     $family             >> $suite_path/settings
+        echo Precision  $max_precision      >> $suite_path/settings
+        echo Cores      $num_cores          >> $suite_path/settings
+        echo SubTest    $sub_test           >> $suite_path/settings
+        echo SupTest    $sup_test           >> $suite_path/settings
+        echo FastConv   $fast_conv          >> $suite_path/settings
+
+        echo "Test suite $suite created!"
+        exit 0
+    fi
+else
+    if [[ $SLURM_JOB_ID != "" ]]
+    then
+        #Read Settings
+        settings=( $(cat $suite_path/settings) )
+        family="${settings[1]}"
+        max_precision="${settings[3]}"
+        num_cores="${settings[5]}"
+        sub_test="${settings[7]}"
+        sup_test="${settings[9]}"
+        fast_conv="${settings[1]}"
+
+        bug "Suite:     $suite"    
+        bug "Family:    $family"
+        bug "Precision: $max_precision"
+        bug "Cores:     $num_cores"
+        bug "SubTest:   $sub_test"
+        bug "SupTest:   $sup_test"
+        bug "FastConv:  $fast_conv"
+
+        #Count previous data
+        if [ -e $suite_path/data_sub ]
+        then
+            while read -r line
+            do
+                let num_data_sub++
+            done < $suite_path/data_sub
+        fi
+        if [ -e $suite_path/data_sup ]
+        then
+            while read -r line
+            do
+                let num_data_sup++
+            done < $suite_path/data_sup
+        fi
+    else
+        echo "Cannot run locally. Use SBATCH..."
+        exit 1
+    fi
+fi
+
+if [[ ! -e $suite_path/SphericalGR ]]
+then
+    cp $dir/build/SphericalGR $suite_path/
+    bug "New SphericalGR"
+fi
+
+
+# =========================== #
+#           EXECUTE           #
+# =========================== #
+
+
+for (( n=0 ; n < $max_runs ; n++ ))
+do
+    #Find iteration and constraints
+    i=0
+    constraint=()
+
+    while read -r line
+    do
+        if [[ ! -z $line ]]
+        then
+            let i++
+            constraint=($line)
+        fi
+
+    done < $suite_path/constraints
+
+    lower_bound=${constraint[0]}
+    upper_bound=${constraint[1]}
+
+    for (( curr_precision=0 ; curr_precision<15 ; curr_precision++ ))
+    do
+        rounded_l="$(echo "scale=$curr_precision;$lower_bound/1" | bc)"
+        rounded_u="$(echo "scale=$curr_precision;$upper_bound/1" | bc)"
+        if [[ 1 -eq "$(echo "$rounded_l==$lower_bound" | bc)" && 1 -eq "$(echo "$rounded_u==$upper_bound" | bc)" ]]
+        then
+            #Leave precision for delta
+            let curr_precision++
+            break
+        fi
+    done
+
+    if [ $reconverge -eq 0 ]
+    then
+        # Regular Iteration
+
+        export it_path=$suite_path/iteration_$i
+        cores=$num_cores
+
+        if [ ! -d $it_path ]
+        then
+            mkdir $it_path
+        else 
+            echo "ERROR: Iteration $i already created but didn't add new constraints..."
+            exit 1
+        fi
+
+        bug "========= Iteration $i ========="
+        bug "`date`"
+
+        if [[ $n -eq 0 ]]
+        then
+            log ""
+            log "Manager ID: $SLURM_JOB_ID"
+        fi
+        log ""
+        log "========= Iteration $i ========="
+        log "`date`"
+        log ""
+
+
+        #Set iteration variables
+        delta="$(echo "scale=$curr_precision;($upper_bound-$lower_bound)/10" | bc)"
+        delta_fast="$(echo "scale=$curr_precision+1;($upper_bound-$lower_bound)/100" | bc)"
+
+
+        #Check for precision
+        if [ "$delta" == "0" ]
+        then
+            log "ERROR: Delta = 0. Resolution may have exceeded decimal precision of $curr_precision..."
+            finish 1
+        fi
+        
+        log "Bounds: $lower_bound and $upper_bound"
+        log "Previous data (sub): $num_data_sub"
+        log "Previous data (sup): $num_data_sup"
+        conv_type=0
+
+        #Estimate eta critical
+        if [[ $num_data_sub -ge 5 ]]
+        then
+            cd $suite_path
+            py_out="$(python3 $dir/manager/sub_fit.py $lower_bound $upper_bound)"
+            py_out=( $py_out )
+            eta_sub=${py_out[0]}
+            eta_c=$eta_sub
+            log "Eta (sub): $eta_sub"
+            let conv_type++ 
+        fi
+        if [[ $num_data_sup -ge 5 ]]
+        then
+            cd $suite_path
+            py_out="$(python3 $dir/manager/sup_fit.py $lower_bound $upper_bound)"
+            py_out=( $py_out )
+            eta_sup=${py_out[0]}
+            eta_c=$eta_sup
+            log "Eta (sup): $eta_sup"
+            let conv_type++
+            let conv_type++
+        fi
+        if [[ $conv_type -eq 3 ]]
+        then
+            eta_avg="$(echo "scale=$max_precision;($eta_sup+$eta_sub)/2" | bc)"
+            log "Eta (avg): $eta_avg"
+
+            if [[ 1 -eq "$(echo "($eta_sup-$eta_sub)/$delta_fast < 2*$delta_fast" | bc)" && 1 -eq "$(echo "($eta_sub-$eta_sup)/$delta_fast < 2*$delta_fast" | bc)" ]]
+            then
+                #Average convergence. eta_sup and eta_sub close together
+                eta_c=$eta_avg
+            else
+                #Dual convergence.
+                conv_type=4
+            fi
+        fi
+
+        #Calculate etas
+        etas=()
+        if [[ $conv_type -eq 0 || "$delta_fast" == "0" || $fast_conv -eq 0 ]]
+        then
+            #Simply divide constraints into 10 cells
+            log "Delta: $delta"
+            log "Using standard convergence"
+
+            for j in 1 2 3 4 5 6 7 8 9
+            do
+                etas=("${etas[@]}" $(echo "scale=$curr_precision;$lower_bound+$j*$delta" | bc))
+            done
+        elif [[ $conv_type -eq 1 || $conv_type -eq 2 || $conv_type -eq 3 ]]
+        then
+            #Use previous data to try and find critical value faster
+            overflow=1
+
+            #Add values around estimated critical
+            for j in -10 -5 -2 -1 0 1 2 5 10
+            do
+                eta="$(echo "scale=$curr_precision+1;$eta_c+$j*$delta_fast" | bc)"
+                if [[ 1 -eq "$(echo "$eta < $upper_bound" | bc)" && 1 -eq "$(echo "$eta > $lower_bound" | bc)" ]]
+                then
+                    etas=("${etas[@]}" $eta)
+                else
+                    let overflow++
+                fi
+            done
+
+            log "Delta2: $delta_fast"
+            if [[ $conv_type -eq 1 ]]
+            then
+                log "Using fast (sub) convergence with $overflow overflow"
+            elif [[ $conv_type -eq 2 ]]
+            then
+                log "Using fast (sup) convergence with $overflow overflow"
+            else
+                log "Using fast (avg) convergence with $overflow overflow"
+            fi
+
+            #Divide overflow tests evenly across constrints
+            delta="$(echo "scale=$curr_precision+1;($upper_bound-$lower_bound)/($overflow + 1)" | bc)"
+            for j in $(seq 1 $overflow)
+            do
+                eta="$(echo "scale=$curr_precision+1;$lower_bound+$j*$delta" | bc)"
+                etas=("${etas[@]}" $eta)
+            done
+        else
+            #Use previous data to try and find critical value faster
+            overflow=0
+
+            #Add values around eta sub
+            for j in -4 -1 0 1 4
+            do
+                eta="$(echo "scale=$curr_precision+1;$eta_sub+$j*$delta_fast" | bc)"
+                if [[ 1 -eq "$(echo "$eta < $upper_bound" | bc)" && 1 -eq "$(echo "$eta > $lower_bound" | bc)" ]]
+                then
+                    etas=("${etas[@]}" $eta)
+                else
+                    let overflow++
+                fi
+            done    
+
+            #Add values around eta sup
+            for j in -4 -1 0 1 4
+            do
+                eta="$(echo "scale=$curr_precision+1;$eta_sup+$j*$delta_fast" | bc)"
+                if [[ 1 -eq "$(echo "$eta < $upper_bound" | bc)" && 1 -eq "$(echo "$eta > $lower_bound" | bc)" ]]
+                then
+                    etas=("${etas[@]}" $eta)
+                else
+                    let overflow++
+                fi
+            done          
+            
+            log "Using dual convergence with $overflow overflow"
+            
+            #Divide overflow tests evenly across constrints
+            if [[ overflow -gt 0 ]]
+            then
+                delta="$(echo "scale=$curr_precision+1;($upper_bound-$lower_bound)/($overflow + 1)" | bc)"
+                for j in $(seq 1 $overflow)
+                do
+                    eta="$(echo "scale=$curr_precision+1;$lower_bound+$j*$delta" | bc)"
+                    etas=("${etas[@]}" $eta)
+                done
+            fi
+        fi
+    else
+
+        # =========================== #
+        #        RECONVERGENCE        #
+        # =========================== #
+
+        #Number the reconvergence
+        for (( r=1 ; i<10 ; r++ ))
+        do
+            if [ ! -d $suite_path/reconverge_${r} ]
+            then
+                export it_path=$suite_path/reconverge_$r
+                mkdir $it_path
+                wait
+                break
+            fi
+        done
+
+        #Move over all old iteration to old directories
+        for i in $( seq 0 15 )
+        do
+            if [[ -d ${suite_path}/iteration_$i ]]
+            then
+                if [[ ! -d ${suite_path}/old_$r ]]
+                then
+                    mkdir ${suite_path}/old_$r
+                    wait
+                fi
+                mv ${suite_path}/iteration_$i ${suite_path}/old_$r/iteration_$i
+            fi
+        done
+
+        bug "========= Reconverge $r ========="
+        bug "`date`"
+
+        if [[ $n -eq 0 ]]
+        then
+            log ""
+            log "Manager ID: $SLURM_JOB_ID"
+        fi
+        log ""
+        log "========= Reconverge $r ========="
+        log "`date`"
+        log ""
+
+        #Really only matters for naming of jobs
+        i="r${r}"
+
+        #Run Lower bounds at very precisions and +1 to the last digit
+        etas=(10)
+        delta=10
+        let curr_precision--
+        for s in $( seq 0 $curr_precision )
+        do
+            delta="$(echo "scale=$s;$delta/10" | bc)"
+            eta_l="$(echo "scale=$s;$lower_bound/1" | bc)"
+            eta_u="$(echo "scale=$s;$eta_l+$delta" | bc)"
+            [[ $s -eq 0 ]] && log "Bounds: $eta_l and $eta_u"
+            etas=("${etas[@]}" $eta_l)
+            etas=("${etas[@]}" $eta_u)
+        done
+        upper_bound=100
+        lower_bound=0
+
+        #Define cores to not exceed regular core usage (and be even)
+        let "cores=($num_cores*9)/(${#etas[@]}*2)"
+        let "cores=$cores*2"
+        conv_type=-1
+
+    fi
+
+
+    # ========================== #
+    #          RUN JOBS          #
+    # ========================== #
+
+
+    bug "Etas: ${etas[*]}"
+
+    #Create all jobs
+    job_dirs=()
+    jobs=()
+    for eta in "${etas[@]}"
+    do
+        if [ ! -d $it_path/$eta ]
+        then
+            mkdir $it_path/$eta
+            wait
+            cp $dir/manager/moosehead.sh $it_path/$eta/${suite}_${i}_${eta}.sh
+            cp $suite_path/example/* $it_path/$eta/
+            wait
+
+            #Copy and edit input files
+            export eta=$eta
+            bash $dir/manager/$family.sh
+
+            #Add job
+            job_dirs=("${job_dirs[@]}" $it_path/$eta)
+            jobs=("${jobs[@]}" ${suite}_${i}_${eta}.sh)
+        else
+            log "WARNING: The test $suite\_$i\_$eta had already been created"
+        fi
+    done
+
+    #Start all jobs
+    SECONDS=0
+
+    let "len_jobs = ${#jobs[@]} - 1"
+    for k in $( seq 0 $len_jobs )
+    do
+        cd ${job_dirs[k]}
+        sbatch -W -N 1 -n $cores ${jobs[k]} >> $suite_path/log &
+    done
+    wait
+
+    log "Finished in $(echo "scale=2;$SECONDS/3600" | bc) hours on $cores cores"
+    bug "`date`"
+
+
+    # ========================== #
+    #       CRITICAL TESTS       #
+    # ========================== #
+
+
+    upper_new=$upper_bound
+    lower_new=$lower_bound
+
+    weird_etas=()
+    uncon_etas=()
+    dual_etas=()
+    for k in $( seq 0 $len_jobs )
+    do
+        cd ${job_dirs[k]}
+        eta=${etas[k]}
+
+        sub_crit= $( bash $dir/manager/$sub_test )
+        sup_crit= $( bash $dir/manager/$sup_test )
+
+        # #Subcritical tests
+        # if [ -e output/DualMaxwell*.mon ]
+        # then
+        #     min_lapse=0
+        #     #Get last minimum lapse
+        #     while read -r line
+        #     do
+        #         split=( $line )
+        #         if [[ ${split[0]} != "#" ]]
+        #         then
+        #             new_min=${split[7]}
+        #             #Check for weird end behavior
+        #             if [[ 1 -eq "$(echo "$min_lapse - $new_min > 0.5" | bc)" ]]
+        #             then
+        #                 weird_etas=("${weird_etas[@]}" ${etas[k]})
+        #             fi
+        #             min_lapse=$new_min
+        #         fi
+        #     done < output/DualMaxwell*.mon
+        #     bug "$note"
+            
+        #     #Check Lapse
+        #     if [[ 1 -eq "$(echo "${note[7]}) > 0.85" | bc)" ]]
+        #     then
+        #         sub_crit=1
+        #     fi
+        # else
+        #     log "ERROR: Couldn't open monitor..."
+        #     finish 1
+        # fi
+
+        #Supercritical tests
+        # if [ -e output/DualMaxwell*.hor_mon ]
+        # then
+        #     #Check for non header lines
+        #     while read -r line
+        #     do
+        #         if [[ ! $line = \#* ]]
+        #         then
+        #             sup_crit=1
+        #             break
+        #         fi
+        #     done < output/DualMaxwell*.hor_mon
+        # else
+        #     log "ERROR: Couldn't open horizon monitor..."
+        #     finish 1
+        # fi
+
+        if [[ $sub_crit -eq -1 || $sup_crit -eq -1 ]]
+        then
+            #Couldn't Open a monitor
+            finish 1
+        elif [[ $sub_crit -eq 2 || $sup_crit -eq 2 ]]
+        then
+            #Weird end behavior
+            weird_etas=("${weird_etas[@]}" $eta)
+        elif [[ $sub_crit -eq 1 && $sup_crit -eq 1 ]]
+        then
+            #Both sub and sup crit
+            dual_etas=("${dual_etas[@]}" $eta)
+        elif [[ $sub_crit -eq 1 ]]
+        then
+            #Sub critical
+            bug "$eta went to flat space"
+            [[ 1 -eq "$(echo "$eta > $lower_new" | bc)" ]] && lower_new=$eta && bug "changed lower bound"
+
+            #Log Subcritical Data
+            if [ -e output/DualMaxwell*.dualmaxwell_mon ]
+            then
+                rho_c_max=0
+                while read -r line
+                do
+                    split=( $line )
+                    [[ ${split[0]} != "#" ]] && rho_c_max=${split[3]}
+                done < output/DualMaxwell*.dualmaxwell_mon
+
+                echo $eta $rho_c_max >> $suite_path/data_sub
+                let num_data_sub++
+            else
+                log "WARNING: Couldn't open dualmaxwell monitor..." 
+            fi
+
+        elif [[ $sup_crit -eq 1 ]]
+        then
+            #Sup critical
+            bug "${etas[k]} formed a black hole"
+            [[ 1 -eq "$(echo "${etas[k]} < $upper_new" | bc)" ]] && upper_new=${etas[k]} && bug "changed upper bound"
+
+            #Log Supercritical Data
+
+
+        else
+            #Neither
+            uncon_etas=("${uncon_etas[@]}" ${etas[k]})
+        fi
+    done
+    if [[ $weird_etas != "" ]]
+    then
+        log "ERROR: Etas ${weird_etas[*}]} weird end behavior..."
+    fi
+    if [[ $dual_etas != "" ]]
+    then
+        log "ERROR: Etas ${dual_etas[*]} dual end behavior..."
+    fi
+    if [[ $uncon_etas != "" ]]
+    then
+        log "ERROR: Etas ${uncon_etas[*]} unconclusive..."
+    fi
+    if [[ $weird_etas != "" || $dual_etas != "" || $uncon_etas != "" ]]
+    then
+        finish 1
+    fi
+
+
+    # =========================== #
+    #      VERIFY NEW BOUNDS      #
+    # =========================== #
+
+
+    #Check for Convergence
+    if [[ "$upper_new" = "$upper_bound" && "$lower_new" = "$lower_bound" ]]
+    then
+        log "ERROR: Did not converge..."
+        finish 1
+    fi
+
+    #Add warning if one of the boundaries didn't move
+    if [[ "$upper_new" = "$upper_bound" ]]
+    then
+        log "WARNING: All tests were subcritical"
+        let warning_prev++
+    elif [[ "$lower_new" = "$lower_bound" ]]
+    then
+        log "WARNING: All tests were supercritical"
+        let warning_prev++
+    else
+        warning_prev=0
+    fi
+
+    #Print out specifics on new constraints
+    if [[ $conv_type -eq 0 || "$delta_fast" == "0" || $fast_conv -eq 0 ]]
+    then
+        log "New constraints: $(echo "scale=1;($lower_new - $lower_bound)/$delta" | bc) and $(echo "scale=1;($upper_new - $lower_bound)/$delta" | bc)"
+    fi
+    if [ $conv_type -eq 1 ]
+    then
+        log "New constraints: $(echo "scale=1;($lower_new - $eta_sub)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sub)/$delta_fast" | bc) (sub)"
+    elif [ $conv_type -eq 2 ]
+    then
+        log "New constraints: $(echo "scale=1;($lower_new - $eta_sup)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sup)/$delta_fast" | bc) (sup)"
+    elif [ $conv_type -ge 3 ]
+    then
+        log "New constraints: $(echo "scale=1;($lower_new - $eta_sub)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sub)/$delta_fast" | bc) (sub)"
+        log "                 $(echo "scale=1;($lower_new - $eta_sup)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sup)/$delta_fast" | bc) (sup)"
+        log "                 $(echo "scale=1;($lower_new - $eta_avg)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_avg)/$delta_fast" | bc) (avg)"
+
+    fi
+
+    if [[ 1 -eq "$(echo "$upper_new <= $lower_new" | bc)" ]]
+    then
+        log "ERROR: Bounds flipped..."
+        finish 1
+    fi
+
+    #Print out convergence factor
+    convergence=$(echo "($upper_bound-$lower_bound)/($upper_new-$lower_new)" | bc)
+    log "Converged by ${convergence}x"
+
+    if [ $reconverge -eq 0 ]
+    then
+        echo $lower_new $upper_new >> $suite_path/constraints
+    else
+        echo $lower_new $upper_new > $suite_path/constraints
+        reconverge=0
+    fi
+
+    if [[ $warning_prev -ge 3 ]]
+    then
+        log "ERROR: 3 Warning Strikes..."
+        finish 1
+    fi
+done
+
+log "Maximum number of runs ($max_runs) for 1 job has been reached..."
+finish 0
