@@ -9,9 +9,9 @@ bool Manager::Integrate(double t_max) {
     while (t < t_max) {
         // SetTimeStep(last);
         // for self-similar shift update shift here:
-        if (gauge->GaugeType() == self_sim) {
+        if (GR::gauge->GaugeType() == self_sim) {
             Compute_RHS(t);
-            gauge->overwrite_shift(last, derivs, t);
+            GR::gauge->overwrite_shift(last, derivs, t);
         };
 
         //================================================
@@ -40,7 +40,7 @@ bool Manager::Integrate(double t_max) {
             photons->Update_Photons(t, tau_c, dt, last, curve, aux,
                 constraints->I_Re.Address(),
                 constraints->J_Re.Address(),
-                grid->r_max());
+                GR::grid->r_max());
         }
         //================================================
         // extract waves
@@ -71,15 +71,15 @@ bool Manager::Integrate(double t_max) {
         //================================================
         // check whether it's time to write check point
         //================================================ 
-        if (step % checkpoint->CheckPointStep() == 0)
-            checkpoint->WriteCheckPoint(step, t, tau_c);
+        if (step % GR::checkpoint->CheckPointStep() == 0)
+            GR::checkpoint->WriteCheckPoint(step, t, tau_c);
         //================================================
         // check whether it's time to dump
         //================================================ 
         // (mass needed for horizons below)
         int i = 7.5 / 8. * (N_r - N_g);
         double mass = constraints->ADM_Mass_Surface(last, curve, aux, i);
-        if (dump->time_to_dump(step)) {
+        if (GR::dump->time_to_dump(step)) {
             last->dump_fcts(t, tau_c, step);
             curve->dump_fcts(t, tau_c, step);
             aux->dump_fcts(t, tau_c, step);
@@ -116,7 +116,7 @@ bool Manager::Integrate(double t_max) {
                 CFC_t_norm,
                 CFC_p_norm);
             constraints->dump_fcts(t, tau_c, step);
-            monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
+            GR::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
                 Mom_r_norm, Mom_t_norm, Mom_p_norm,
                 CFC_r_norm, CFC_t_norm, CFC_p_norm);
             //================================================
@@ -126,16 +126,16 @@ bool Manager::Integrate(double t_max) {
                 double I_Re_max = constraints->CurvatureInvariant(last, curve,
                     matter->adm_sources,
                     t, tau_c, step);
-            constraints->Note_Invariants(step, t, tau_c, monitor);
+            constraints->Note_Invariants(step, t, tau_c, GR::monitor);
         }
         //================================================
         // check whether it's time to note...
         //================================================
-        if (monitor->time_to_note(step) || finish_note) {
+        if (GR::monitor->time_to_note(step) || finish_note) {
             double ang_mom = constraints->Angular_Momentum(last, curve, aux, i);
             double lin_mom = constraints->Linear_Momentum(last, curve, aux, i);
             bool force = finish_note;
-            monitor->note(step, t, tau_c, mass, ang_mom,
+            GR::monitor->note(step, t, tau_c, mass, ang_mom,
                 lin_mom, last->phi(0.0, N_g, N_g),
                 last->lapse(0.0, N_g, N_g), last->lapse.min(),
                 last->K(0.0, N_g, N_g), RegridCriterion(), force);
@@ -156,7 +156,7 @@ bool Manager::Integrate(double t_max) {
                 CFC_r_norm,
                 CFC_t_norm,
                 CFC_p_norm);
-            monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
+            GR::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
                 Mom_r_norm, Mom_t_norm, Mom_p_norm,
                 CFC_r_norm, CFC_t_norm, CFC_p_norm);
             //================================================
@@ -164,11 +164,11 @@ bool Manager::Integrate(double t_max) {
             //================================================ 
             double I_Re_max = constraints->CurvatureInvariant(last, curve,
                 matter->adm_sources, t, tau_c, step);
-            constraints->Note_Invariants(step, t, tau_c, monitor);
+            constraints->Note_Invariants(step, t, tau_c, GR::monitor);
             constraints->Compute_Proper_Radius(last, curve, aux, sigma);
-            if (profiles != NULL) profiles->write_profile(t, tau_c);
-            if (photons != NULL) photons->Monitor(t, tau_c);
-            if (waves != NULL) waves->write_wave_data(t, tau_c);
+            if (GR::profiles != NULL) GR::profiles->write_profile(t, tau_c);
+            if (GR::photons != NULL) GR::photons->Monitor(t, tau_c);
+            if (GR::waves != NULL) GR::waves->write_wave_data(t, tau_c);
             matter->Compute_Diagnostics(last, curve);
             matter->Note(step, t, tau_c);
         }

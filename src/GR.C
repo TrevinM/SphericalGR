@@ -3,7 +3,7 @@
 // Code for scalar field in Spherical Coordinates
 //
 //===============================================================
-#include "Manager.h"
+#include "GR.h"
 #include "Read_Input.h"
 //================================================================
 //
@@ -79,7 +79,6 @@ int main(int argc, char* argv[]) {
     // Allocate Grid Class
     //================================================================
     cout << " GR: allocating grid..." << endl;
-    Grid* grid;
     grid = new Grid();
     //================================================================
     // Allocate checkpoint class
@@ -90,11 +89,11 @@ int main(int argc, char* argv[]) {
     //================================================================
     cout << " GR: allocating cosmology..." << endl;
     if (space_type == 1) {
-        Manager::cosmology = new Minkowski();
+        cosmology = new Minkowski();
     } else if (space_type == 2) {
-        Manager::cosmology = new DeSitter();
+        cosmology = new DeSitter();
     } else if (space_type == 3) {
-        Manager::cosmology = new Radiation();
+        cosmology = new Radiation();
     } else {
         cerr << " GR: no cosmology of type " << space_type << "!!" << endl;
         return 1;
@@ -104,17 +103,17 @@ int main(int argc, char* argv[]) {
     //================================================================
     cout << " GR: allocating EOS..." << endl;
     if (eos_type == 0) {
-        Manager::eos = NULL;
+        eos = NULL;
     } else if (eos_type == 1) {
-        Manager::eos = new polytrope((char*)"Polytrope_Input");
+        eos = new polytrope((char*)"Polytrope_Input");
     } else if (eos_type == 2) {
-        Manager::eos = new gamma_law((char*)"Polytrope_Input");
+        eos = new gamma_law((char*)"Polytrope_Input");
     } else if (eos_type == 3) {
-        Manager::eos = new piece_polytrope((char*)"Piece_Polytrope_Input");
+        eos = new piece_polytrope((char*)"Piece_Polytrope_Input");
     } else if (eos_type == 4) {
-        Manager::eos = new ideal_gas();
+        eos = new ideal_gas();
     } else if (eos_type == 5) {
-        Manager::eos = new gas_radiation((char*)"GasRadiation_Input");
+        eos = new gas_radiation((char*)"GasRadiation_Input");
     } else {
         cout << " GR: Unknown EOS for eos_type = " << eos_type << endl;
     }
@@ -123,63 +122,63 @@ int main(int argc, char* argv[]) {
     //================================================================
     cout << " GR: allocating indata..." << endl;
     if (checkpoint.ReadFromChkpt()) {
-        Manager::indata = new ReadFromCheckPoint(read_from_chkpt, grid, cosmology);
+        indata = new ReadFromCheckPoint(read_from_chkpt, grid, cosmology);
     } else if (indata_type == 1) {
-        Manager::indata = new LinWave(indata_input, grid, cosmology);
+        indata = new LinWave(indata_input, grid, cosmology);
     } else if (indata_type == 2) {
-        Manager::indata = new Schwarzschild(indata_input, grid, cosmology);
+        indata = new Schwarzschild(indata_input, grid, cosmology);
     } else if (indata_type == 3) {
-        Manager::indata = new Flat(indata_input, grid, cosmology);
+        indata = new Flat(indata_input, grid, cosmology);
     } else if (indata_type == 4) {
-        Manager::indata = new TOV(indata_input, eos, grid, cosmology);
+        indata = new TOV(indata_input, eos, grid, cosmology);
     } else if (indata_type == 5) {
-        Manager::indata = new Trumpet(indata_input, grid, cosmology);
+        indata = new Trumpet(indata_input, grid, cosmology);
     } else if (indata_type == 6) {
-        Manager::indata = new RNS(indata_input, grid, cosmology);
+        indata = new RNS(indata_input, grid, cosmology);
     } else if (indata_type == 7) {
-        Manager::indata = new Brill(indata_input, grid, cosmology);
+        indata = new Brill(indata_input, grid, cosmology);
     } else if (indata_type == 8) {
-        Manager::indata = new Kerr(indata_input, grid, cosmology);
+        indata = new Kerr(indata_input, grid, cosmology);
     } else if (indata_type == 9) {
-        Manager::indata = new BowenYork(indata_input, grid, cosmology);
+        indata = new BowenYork(indata_input, grid, cosmology);
     } else if (indata_type == 10) {
-        Manager::indata = new KerrSchild(indata_input, grid, cosmology);
+        indata = new KerrSchild(indata_input, grid, cosmology);
     } else if (indata_type == 11) {
-        Manager::indata = new KenTrumpet(indata_input, grid, cosmology);
+        indata = new KenTrumpet(indata_input, grid, cosmology);
     } else if (indata_type == 12) {
-        Manager::indata = new Brill_Lindquist(indata_input, grid, cosmology);
+        indata = new Brill_Lindquist(indata_input, grid, cosmology);
     } else if (indata_type == 13) {
-        Manager::indata = new Shock(indata_input, grid, cosmology);
+        indata = new Shock(indata_input, grid, cosmology);
     } else if (indata_type == 14) {
-        Manager::indata = new EvansColeman(indata_input, grid, cosmology);
+        indata = new EvansColeman(indata_input, grid, cosmology);
     } else if (indata_type == 15) {
-        Manager::indata = new Rad_TOV(indata_input, grid, cosmology);
+        indata = new Rad_TOV(indata_input, grid, cosmology);
     } else if (indata_type == 16) {
-        Manager::indata = new OS(indata_input, grid, cosmology);
+        indata = new OS(indata_input, grid, cosmology);
     } else if (indata_type == 17) {
-        Manager::indata = new RotPerfectFluid(indata_input, grid, cosmology);
+        indata = new RotPerfectFluid(indata_input, grid, cosmology);
     } else if (indata_type == 18) {
-        Manager::indata = new Bondi(indata_input, grid, cosmology);
+        indata = new Bondi(indata_input, grid, cosmology);
     } else if (indata_type == 19) {
-        Manager::indata = new Choptuik(indata_input, grid, cosmology);
+        indata = new Choptuik(indata_input, grid, cosmology);
     } else if (indata_type == 20) {
-        Manager::indata = new EMWave(indata_input, grid, cosmology);
+        indata = new EMWave(indata_input, grid, cosmology);
     } else if (indata_type == 21) {
-        Manager::indata = new RadHydroShockTest(indata_input, grid, cosmology);
+        indata = new RadHydroShockTest(indata_input, grid, cosmology);
     } else if (indata_type == 22) {
-        Manager::indata = new TOV_BH(indata_input, eos, grid, cosmology);
+        indata = new TOV_BH(indata_input, eos, grid, cosmology);
     } else if (indata_type == 23) {
-        Manager::indata = new SMS_TOV(indata_input, eos, grid, cosmology);
+        indata = new SMS_TOV(indata_input, eos, grid, cosmology);
     } else if (indata_type == 24) {
-        Manager::indata = new GaugeWave(indata_input, grid, cosmology);
+        indata = new GaugeWave(indata_input, grid, cosmology);
     } else if (indata_type == 25) {
-        Manager::indata = new WindTunnel(indata_input, eos, grid, cosmology);
+        indata = new WindTunnel(indata_input, eos, grid, cosmology);
     } else if (indata_type == 26) {
-        Manager::indata = new ShibataWave(indata_input, grid, cosmology);
+        indata = new ShibataWave(indata_input, grid, cosmology);
     } else if (indata_type == 27) {
-        Manager::indata = new Disk(indata_input, eos, grid, cosmology);
+        indata = new Disk(indata_input, eos, grid, cosmology);
     } else if (indata_type == 28) {
-        Manager::indata = new DualEMWave(indata_input, grid, cosmology);
+        indata = new DualEMWave(indata_input, grid, cosmology);
     } else {
         cerr << " No such Indata type! " << endl;
         return 1;
@@ -190,13 +189,13 @@ int main(int argc, char* argv[]) {
     // Allocate Slicing Class
     //================================================================
     if (slicing_type == 1) {
-        Manager::slicing = new Geodesic(grid, cosmology, eta_KO);
+        slicing = new Geodesic(grid, cosmology, eta_KO);
     } else if (slicing_type == 2) {
-        Manager::slicing = new OnePlusLog(grid, cosmology, eta_KO);
+        slicing = new OnePlusLog(grid, cosmology, eta_KO);
     } else if (slicing_type == 3) {
-        Manager::slicing = new Advective_OnePlusLog(grid, cosmology, eta_KO);
+        slicing = new Advective_OnePlusLog(grid, cosmology, eta_KO);
     } else if (slicing_type == 4) {
-        Manager::slicing = new Harmonic(grid, cosmology, eta_KO);
+        slicing = new Harmonic(grid, cosmology, eta_KO);
         // } else if (slicing_type == 5) {
         //   slicing = new Maximal(grid);  
         // } else if (slicing_type == 6) {
@@ -204,7 +203,7 @@ int main(int argc, char* argv[]) {
             //  } else if (slicing_type == 7) {
             //    slicing = new KenLog(grid, cosmology);
     } else if (slicing_type == 8) {
-        Manager::slicing = new BonaMasso(grid, cosmology, eta_KO);
+        slicing = new BonaMasso(grid, cosmology, eta_KO);
     } else {
         cerr << " No such Slicing type! " << endl;
         return 1;
@@ -213,21 +212,21 @@ int main(int argc, char* argv[]) {
     // Allocate Gauge Class
     //================================================================
     if (gauge_type == 1) {
-        Manager::gauge = new Constant_Shift(grid);
+        gauge = new Constant_Shift(grid);
     } else if (gauge_type == 2) {
-        Manager::gauge = new Gamma_Driver(grid);
+        gauge = new Gamma_Driver(grid);
     } else if (gauge_type == 3) {
-        Manager::gauge = new Advective_Gamma_Driver(grid);
+        gauge = new Advective_Gamma_Driver(grid);
     } else if (gauge_type == 4) {
-        Manager::gauge = new Jena_Gamma_Driver(grid);
+        gauge = new Jena_Gamma_Driver(grid);
     } else if (gauge_type == 5) {
-        Manager::gauge = new Advective_Jena_Gamma_Driver(grid);
+        gauge = new Advective_Jena_Gamma_Driver(grid);
         // } else if (gauge_type == 6) {
         //   gauge = new Mod_Gamma_Driver(grid,eta);
     } else if (gauge_type == 7) {
-        Manager::gauge = new Covariant_Advective_Jena_Gamma_Driver(grid);
+        gauge = new Covariant_Advective_Jena_Gamma_Driver(grid);
     } else if (gauge_type == 8) {
-        Manager::gauge = new Self_Sim_Shift(grid);
+        gauge = new Self_Sim_Shift(grid);
     } else {
         cerr << " No such gauge type! " << endl;
         return 1;
@@ -236,12 +235,12 @@ int main(int argc, char* argv[]) {
     // Allocate dumper Class
     //================================================================
     cout << " GR: allocating dumper..." << endl;
-    Manager::dump = new dump(dump_step, indata, slicing, gauge);
+    dump = new dump(dump_step, indata, slicing, gauge);
     //================================================================
     // Allocate monitor Class
     //================================================================
     cout << " GR: allocating monitor..." << endl;
-    Manager::monitor = new monitor(note_step, monitor_filename, grid, indata,
+    monitor = new monitor(note_step, monitor_filename, grid, indata,
         slicing, gauge, cosmology,
         eta_KO, sigma,
         z4, kappa_11, kappa_12, kappa_2, kappa_ric,
@@ -251,29 +250,29 @@ int main(int argc, char* argv[]) {
     //================================================================
     if (write_profiles) {
         cout << " GR: allocating profiler..." << endl;
-        Manager::profiles = new Profiles(monitor_filename, grid, note_step, indata,
+        profiles = new Profiles(monitor_filename, grid, note_step, indata,
             slicing, gauge, cosmology);
     } else {
-        Manager::profiles = NULL;
+        profiles = NULL;
     }
     //================================================================
     // Allocate wave extraction class
     //================================================================
     if (extract_waves) {
         cout << " GR: allocating wave extraction..." << endl;
-        Manager::waves = new WaveExtraction(monitor_filename, grid, note_step, indata,
+        waves = new WaveExtraction(monitor_filename, grid, note_step, indata,
             slicing, gauge, cosmology);
     } else {
-        Manager::waves = NULL;
+        waves = NULL;
     }
     //================================================================
     // Allocate photon Class
     //================================================================
     if (track_photons) {
         cout << " GR: allocating photons ..." << endl;
-        Manager::photons = new Photons(monitor_filename, grid);
+        photons = new Photons(monitor_filename, grid);
     } else {
-        Manager::photons = NULL;
+        photons = NULL;
     }
     //================================================================
     // Allocate manager Class

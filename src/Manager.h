@@ -5,26 +5,12 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
-#include "Grid.h"
-#include "dumper.h"
-#include "Monitor.h"
-#include "CheckPoint.h"
-#include "Slicing.h"
-#include "Gauge.h"
-#include "Cosmology.h"
-#include "State.h"
 #include "Curvature.h"
 #include "Auxiliary.h"
 #include "Diagnostics.h"
-#include "InData.h"
 #include "Matter.h"
-#include "EOS.h"
 #include "HorizonFinder.h"
-#include "Photons.h"
 #include "ConstraintSolver.h"
-#include "Profiles.h"
-#include "WaveExtraction.h"
-#include "CheckPoint.h"
 
 class Manager {
 private:
@@ -45,17 +31,6 @@ private:
     int steps_between_regrids, timestep_last_regrid;
     double PI;
 public:
-    static Grid* grid;
-    static dumper* dump;
-    static Monitor* monitor;
-    static CheckPoint* checkpoint;
-    static Profiles* profiles;
-    static WaveExtraction* waves;
-    static InData* indata;
-    static EOS* eos;
-    static Slicing* slicing;
-    static Gauge* gauge;
-    static Cosmology* cosmology;
     static diagnostics* constraints;
     static state* last;
     static state* derivs;
@@ -65,7 +40,6 @@ public:
     static auxiliary* aux;
     static Matter* matter;
     static HorizonFinder* horizonfinder;
-    static Photons* photons;
 
     //===========================================
     // Constructor
