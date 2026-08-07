@@ -11,15 +11,15 @@
 
 class Bondi_Solution_Max : public Bondi_Solution {
 private:
-    SBN * sbn;
+    SBN* sbn;
     double C;
 public:
     //================================================
     // Constructor
     //================================================
- Bondi_Solution_Max(const double M_dot_in, const double R_crit_in, const double M_in,
-		    const double Kappa_in, const double Gamma_in) :
-    Bondi_Solution(M_dot_in, R_crit_in, M_in, Kappa_in, Gamma_in) {
+    Bondi_Solution_Max(const double M_dot_in, const double R_crit_in, const double M_in,
+        const double Kappa_in, const double Gamma_in) :
+        Bondi_Solution(M_dot_in, R_crit_in, M_in, Kappa_in, Gamma_in) {
         //
         // Create instance of SBN class
         //
@@ -34,7 +34,7 @@ public:
     //================================================
     // Destructor
     //================================================
-    ~Bondi_Solution_Max() {delete sbn;}
+    ~Bondi_Solution_Max() { delete sbn; }
     //================================================
     // Methods to calculate fluid parameters as functions of
     // isotropic radius
@@ -43,9 +43,9 @@ public:
     //================================================
     double r_of_R(const double R_in) {
         return (2.0 * R_in + M + sqrt(4.0 * R_in * R_in + 4.0 * M * R_in + 3.0 * M * M)) / 4.0 *
-               pow((4.0 + 3.0 * sqrt(2.0)) * (2.0 * R_in - 3.0 * M) /
-                   (8.0 * R_in + 6.0 * M + 3.0 * sqrt(8.0 * R_in * R_in + 8.0 * M * R_in + 6.0 * M * M)),
-                   1.0 / sqrt(2.0));
+            pow((4.0 + 3.0 * sqrt(2.0)) * (2.0 * R_in - 3.0 * M) /
+                (8.0 * R_in + 6.0 * M + 3.0 * sqrt(8.0 * R_in * R_in + 8.0 * M * R_in + 6.0 * M * M)),
+                1.0 / sqrt(2.0));
     }
     double R_of_r(const double r_in) {
         return sbn->areal(r_in, M);
@@ -133,9 +133,9 @@ public:
     // Rest-mass density of fluid
     //================================================
     double rho_0(const double r_in) {
-      // double rho_0 = rho_0_gen(r_in);
-      // if (r_in < 0.001) cout << " rho at r = " << r_in << " = " << rho_0 << endl;
-      return rho_0_gen(r_in);
+        // double rho_0 = rho_0_gen(r_in);
+        // if (r_in < 0.001) cout << " rho at r = " << r_in << " = " << rho_0 << endl;
+        return rho_0_gen(r_in);
     }
     //================================================
     // Four-velocity of fluid
@@ -153,7 +153,7 @@ public:
             cout << " Warning: within " << span << " of horizon" << endl;
             cout << " Computing u^0 using expanded expression..." << endl;
             return -psi_l * psi_l * r_in * r_in / (2.0 * C * u_r_l) *
-                   (psi_l * psi_l * psi_l * psi_l * u_r_l * u_r_l + 1.0);
+                (psi_l * psi_l * psi_l * psi_l * u_r_l * u_r_l + 1.0);
         } else {
             //
             // Away from horizon, use general expression

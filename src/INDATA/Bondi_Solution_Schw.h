@@ -13,9 +13,10 @@ public:
     //================================================
     // Constructor
     //================================================
- Bondi_Solution_Schw(const double M_dot_in, const double R_crit_in,
-		     const double M_in, const double Kappa_in, const double Gamma_in) :
-  Bondi_Solution(M_dot_in, R_crit_in, M_in, Kappa_in, Gamma_in) {}
+    Bondi_Solution_Schw(const double M_dot_in, const double R_crit_in,
+        const double M_in, const double Kappa_in, const double Gamma_in) :
+        Bondi_Solution(M_dot_in, R_crit_in, M_in, Kappa_in, Gamma_in) {
+    }
     //================================================
     // Destructor
     //================================================

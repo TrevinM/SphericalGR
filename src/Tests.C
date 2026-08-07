@@ -30,60 +30,60 @@
 // This program outputs values to a file called SLy_EOS_Tables.dat
 
 
-void Manager::Test_EOS(){ 
-  double rho_0 = 0.003499997129395651;
-  double epsilon = eos->cold_eps(rho_0);
-  double P = eos->P(rho_0, epsilon);
-  double temp = eos->temperature(rho_0, epsilon);
-  double sound_speed = eos->sound_speed(rho_0, epsilon);
-  cout << "rho_0 = " << rho_0 << " epsilon = " << epsilon << " P = "
-       << P << " temp = " << temp << " sound_speed = " << sound_speed << endl; 
-  cout << "rho_0(P) = " << eos->rho_0(P) << endl;
+void Manager::Test_EOS() {
+    double rho_0 = 0.003499997129395651;
+    double epsilon = eos->cold_eps(rho_0);
+    double P = eos->P(rho_0, epsilon);
+    double temp = eos->temperature(rho_0, epsilon);
+    double sound_speed = eos->sound_speed(rho_0, epsilon);
+    cout << "rho_0 = " << rho_0 << " epsilon = " << epsilon << " P = "
+        << P << " temp = " << temp << " sound_speed = " << sound_speed << endl;
+    cout << "rho_0(P) = " << eos->rho_0(P) << endl;
 
-  ofstream outdata; 
-  outdata.open("PWP_EOS_Tables.txt"); // opens the file
-  if( !outdata ) { // file couldn't be opened
-    cerr << "Error: file could not be opened" << endl;
-    exit(1);
-  }
-  outdata << std::left << setw(16) << "# rho_0 " << std::left 
-	  << setw(16) << "P " << std::left << setw(16) 
-	  << "epsilon " << setw(16) << "sound speed" << endl; 
-  for (double rho_0 = 1.0e-5; rho_0<=1.0e-1; rho_0*=1.05){
-     double epsilon = eos->cold_eps(rho_0);
-     double P = eos->P(rho_0, epsilon);
-     outdata << std::left << setw(16) << rho_0 << std::left 
-	     <<  setw(16) << P << std::left <<  setw(16) 
-	     << epsilon <<  setw(16) << eos->sound_speed(rho_0,epsilon) << endl;
-  }     
-  outdata.close(); 
-  
-  return ;
+    ofstream outdata;
+    outdata.open("PWP_EOS_Tables.txt"); // opens the file
+    if (!outdata) { // file couldn't be opened
+        cerr << "Error: file could not be opened" << endl;
+        exit(1);
+    }
+    outdata << std::left << setw(16) << "# rho_0 " << std::left
+        << setw(16) << "P " << std::left << setw(16)
+        << "epsilon " << setw(16) << "sound speed" << endl;
+    for (double rho_0 = 1.0e-5; rho_0 <= 1.0e-1; rho_0 *= 1.05) {
+        double epsilon = eos->cold_eps(rho_0);
+        double P = eos->P(rho_0, epsilon);
+        outdata << std::left << setw(16) << rho_0 << std::left
+            << setw(16) << P << std::left << setw(16)
+            << epsilon << setw(16) << eos->sound_speed(rho_0, epsilon) << endl;
+    }
+    outdata.close();
+
+    return;
 }
 
 
-void Manager::Test_Indices(){
-  cout << " TESTS: testing indices for r... " << endl;
-  for (int i = 0; i < N_r; i++) {
-    double rl = grid->r(i);
-    int index = grid->i_ind(rl);
-    cout << " i = " << i << " r = " << rl << " found index " 
-	 << index << " for r = " << r[index] << endl;
-  }
-  cout << " TESTS: testing indices for theta... " << endl;
-  for (int j = 0; j < N_t; j++) {
-    double thetal = grid->theta(j);
-    int index = grid->j_ind(thetal);
-    cout << " j = " << j << " theta = " << thetal << " found index " 
-	 << index << " for theta = " << theta[index] << endl;
-  }
-  cout << " TESTS: testing indices for phi... " << endl;
-  for (int k = 0; k < N_p; k++) {
-    double phil = grid->phi(k);
-    int index = grid->k_ind(phil);
-    cout << " k = " << k << " phi = " << phil << " found index " 
-	 << index << " for phi = " << phi[index] << endl;
-  }
+void Manager::Test_Indices() {
+    cout << " TESTS: testing indices for r... " << endl;
+    for (int i = 0; i < N_r; i++) {
+        double rl = grid->r(i);
+        int index = grid->i_ind(rl);
+        cout << " i = " << i << " r = " << rl << " found index "
+            << index << " for r = " << r[index] << endl;
+    }
+    cout << " TESTS: testing indices for theta... " << endl;
+    for (int j = 0; j < N_t; j++) {
+        double thetal = grid->theta(j);
+        int index = grid->j_ind(thetal);
+        cout << " j = " << j << " theta = " << thetal << " found index "
+            << index << " for theta = " << theta[index] << endl;
+    }
+    cout << " TESTS: testing indices for phi... " << endl;
+    for (int k = 0; k < N_p; k++) {
+        double phil = grid->phi(k);
+        int index = grid->k_ind(phil);
+        cout << " k = " << k << " phi = " << phil << " found index "
+            << index << " for phi = " << phi[index] << endl;
+    }
 }
 
 // int Einstein::Test_Gridfunction() {
@@ -179,107 +179,107 @@ void Manager::Test_Indices(){
 //================================================
 //
 void Manager::Test_Ricci_for_Schwarzschild() {
-  const double M = 1.0;
-  cout << " Testing Ricci for Schwarzschild... " << endl;
-  //
-  // first compute h_ij for Schwarzschild solution
-  //
-  for (int i = N_g; i < N_r-N_g; i++)    
-    for (int j = N_g; j < N_t-N_g; j++)
-      for (int k = N_g; k < N_p-N_g; k++) {
-	const double rl = grid->r(i);
-	double psi = 1.0 + M/(2.0*rl);
-	double psi4 = psi*psi*psi*psi;
-	last->h_rr[i][j][k] = psi4 - 1.0;
-	last->h_rt[i][j][k] = 0.0;
-	last->h_rp[i][j][k] = 0.0;
-	last->h_tt[i][j][k] = psi4 - 1.0;
-	last->h_tp[i][j][k] = 0.0;
-	last->h_pp[i][j][k] = psi4 - 1.0;
-      }
-  //
-  // Now compute Connection
-  // 
-  int i = N_r/2;
-  int j = N_t/3;
-  int k = N_g;
-  const double rl = grid->r(i);
-  double r2l = rl*rl;
-  double psi = 1.0 + M/(2.0*rl);
-  double psi4 = psi*psi*psi*psi;
-  double dpsidr = - M/(2.0*r2l);
-
-  curve->Compute_Metric_Derivatives(last);
-  curve->Compute_Inverse_Metric(last);
-
-  cout << "\n Results at r = " << rl << ", theta = " << grid->theta(j) << ", phi = " << grid->phi(k) << endl;
-
-  cout << "\nINVERSE METRIC : " << endl;
-  cout << setw(10) << "gup^{ij} " << setw(15) << "numerical" << setw(15) << "analytical" << endl;
-  cout << setw(10) << "gup^{rr} " << setw(15) << curve->gup_rr(i,j,k) << setw(15) << 1.0/psi4 << endl;
-  cout << setw(10) << "gup^{rt} " << setw(15) << curve->gup_rt(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "gup^{rp} " << setw(15) << curve->gup_rp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "gup^{tt} " << setw(15) << curve->gup_tt(i,j,k) << setw(15) << 1.0/psi4/r2l << endl;
-  cout << setw(10) << "gup^{tp} " << setw(15) << curve->gup_tp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "gup^{pp} " << setw(15) << curve->gup_pp(i,j,k) << setw(15) << 1.0/(psi4*r2l*sintheta[j]*sintheta[j]) << endl;
-
-  curve->Compute_Connection();  
-
-  cout << "\nCONNECTION : (without the flat part) " << endl;
-  cout << setw(10) << "Gam^i_{jk} " << setw(15) << "numerical" << setw(15) << "analytical" << endl;
-  cout << setw(10) << "Gam^r_{rr} " << setw(15) << curve->DG_r_rr(i,j,k) << setw(15) << 2.0*dpsidr/psi << endl;
-  cout << setw(10) << "Gam^r_{rt} " << setw(15) << curve->DG_r_rt(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^r_{rp} " << setw(15) << curve->DG_r_rp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^r_{tt} " << setw(15) << curve->DG_r_tt(i,j,k) << setw(15) << -2.0*r2l*dpsidr/psi << endl;
-  cout << setw(10) << "Gam^r_{tp} " << setw(15) << curve->DG_r_tp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^r_{pp} " << setw(15) << curve->DG_r_pp(i,j,k) << setw(15) << -2.0*r2l*dpsidr/psi*sintheta[j]*sintheta[j] << endl;
-
-  cout << setw(10) << "Gam^t_{rr} " << setw(15) << curve->DG_t_rr(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^t_{rt} " << setw(15) << curve->DG_t_rt(i,j,k) << setw(15) << 2.0*dpsidr/psi << endl;
-  cout << setw(10) << "Gam^t_{rp} " << setw(15) << curve->DG_t_rp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^t_{tt} " << setw(15) << curve->DG_t_tt(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^t_{tp} " << setw(15) << curve->DG_t_tp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^t_{pp} " << setw(15) << curve->DG_t_pp(i,j,k) << setw(15) << 0.0 << endl;
-
-  cout << setw(10) << "Gam^p_{rr} " << setw(15) << curve->DG_p_rr(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^p_{rt} " << setw(15) << curve->DG_p_rt(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^p_{rp} " << setw(15) << curve->DG_p_rp(i,j,k) << setw(15) << 2.0*dpsidr/psi << endl;
-  cout << setw(10) << "Gam^p_{tt} " << setw(15) << curve->DG_p_tt(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^p_{tp} " << setw(15) << curve->DG_p_tp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "Gam^p_{pp} " << setw(15) << curve->DG_p_pp(i,j,k) << setw(15) << 0.0 << endl;
-  //
-  // Before computing Ricci we first compute Lambda's
-  //
-  for (int i = N_g; i < N_r-N_g; i++) { 
+    const double M = 1.0;
+    cout << " Testing Ricci for Schwarzschild... " << endl;
+    //
+    // first compute h_ij for Schwarzschild solution
+    //
+    for (int i = N_g; i < N_r - N_g; i++)
+        for (int j = N_g; j < N_t - N_g; j++)
+            for (int k = N_g; k < N_p - N_g; k++) {
+                const double rl = grid->r(i);
+                double psi = 1.0 + M / (2.0 * rl);
+                double psi4 = psi * psi * psi * psi;
+                last->h_rr[i][j][k] = psi4 - 1.0;
+                last->h_rt[i][j][k] = 0.0;
+                last->h_rp[i][j][k] = 0.0;
+                last->h_tt[i][j][k] = psi4 - 1.0;
+                last->h_tp[i][j][k] = 0.0;
+                last->h_pp[i][j][k] = psi4 - 1.0;
+            }
+    //
+    // Now compute Connection
+    // 
+    int i = N_r / 2;
+    int j = N_t / 3;
+    int k = N_g;
     const double rl = grid->r(i);
-    for (int j = N_g; j < N_t-N_g; j++)
-      for (int k = N_g; k < N_p-N_g; k++) { 
-	double psi = 1.0 + M/(2.0*rl);
-	double psi4 = psi*psi*psi*psi;
-	double dpsidr = - M/(2.0*rl*rl);
-	last->lam_r[i][j][k] = - 2.0 * dpsidr/(psi4*psi); 
-	last->lam_t[i][j][k] = 0.0;
-	last->lam_p[i][j][k] = 0.0;
-      }
-  }
-  curve->Compute_Ricci(last);
+    double r2l = rl * rl;
+    double psi = 1.0 + M / (2.0 * rl);
+    double psi4 = psi * psi * psi * psi;
+    double dpsidr = -M / (2.0 * r2l);
 
-  i = N_r/2;
-  j = N_t/3;
-  k = N_g;
-  r2l = rl*rl;
-  psi = 1.0 + M/(2.0*rl);
-  psi4 = psi*psi*psi*psi;
-  dpsidr = - M/(2.0*r2l);
+    curve->Compute_Metric_Derivatives(last);
+    curve->Compute_Inverse_Metric(last);
 
-  cout << "\nRICCI : " << endl;
-  cout << setw(10) << "R_{ij} " << setw(15) << "numerical" << setw(15) << "analytical" << endl;
-  cout << setw(10) << "R_{rr} " << setw(15) << curve->R_rr(i,j,k) << setw(15) << - 2.0 * M / (psi*psi*r2l*rl)  << endl;
-  cout << setw(10) << "R_{rt} " << setw(15) << curve->R_rt(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "R_{rp} " << setw(15) << curve->R_rp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "R_{tt} " << setw(15) << curve->R_tt(i,j,k) << setw(15) << M / (psi*psi * rl) << endl;
-  cout << setw(10) << "R_{tp} " << setw(15) << curve->R_tp(i,j,k) << setw(15) << 0.0 << endl;
-  cout << setw(10) << "R_{pp} " << setw(15) << curve->R_pp(i,j,k) << setw(15) << M / (psi*psi * rl) * sintheta[j] * sintheta[j] << endl;
+    cout << "\n Results at r = " << rl << ", theta = " << grid->theta(j) << ", phi = " << grid->phi(k) << endl;
+
+    cout << "\nINVERSE METRIC : " << endl;
+    cout << setw(10) << "gup^{ij} " << setw(15) << "numerical" << setw(15) << "analytical" << endl;
+    cout << setw(10) << "gup^{rr} " << setw(15) << curve->gup_rr(i, j, k) << setw(15) << 1.0 / psi4 << endl;
+    cout << setw(10) << "gup^{rt} " << setw(15) << curve->gup_rt(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "gup^{rp} " << setw(15) << curve->gup_rp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "gup^{tt} " << setw(15) << curve->gup_tt(i, j, k) << setw(15) << 1.0 / psi4 / r2l << endl;
+    cout << setw(10) << "gup^{tp} " << setw(15) << curve->gup_tp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "gup^{pp} " << setw(15) << curve->gup_pp(i, j, k) << setw(15) << 1.0 / (psi4 * r2l * sintheta[j] * sintheta[j]) << endl;
+
+    curve->Compute_Connection();
+
+    cout << "\nCONNECTION : (without the flat part) " << endl;
+    cout << setw(10) << "Gam^i_{jk} " << setw(15) << "numerical" << setw(15) << "analytical" << endl;
+    cout << setw(10) << "Gam^r_{rr} " << setw(15) << curve->DG_r_rr(i, j, k) << setw(15) << 2.0 * dpsidr / psi << endl;
+    cout << setw(10) << "Gam^r_{rt} " << setw(15) << curve->DG_r_rt(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^r_{rp} " << setw(15) << curve->DG_r_rp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^r_{tt} " << setw(15) << curve->DG_r_tt(i, j, k) << setw(15) << -2.0 * r2l * dpsidr / psi << endl;
+    cout << setw(10) << "Gam^r_{tp} " << setw(15) << curve->DG_r_tp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^r_{pp} " << setw(15) << curve->DG_r_pp(i, j, k) << setw(15) << -2.0 * r2l * dpsidr / psi * sintheta[j] * sintheta[j] << endl;
+
+    cout << setw(10) << "Gam^t_{rr} " << setw(15) << curve->DG_t_rr(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^t_{rt} " << setw(15) << curve->DG_t_rt(i, j, k) << setw(15) << 2.0 * dpsidr / psi << endl;
+    cout << setw(10) << "Gam^t_{rp} " << setw(15) << curve->DG_t_rp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^t_{tt} " << setw(15) << curve->DG_t_tt(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^t_{tp} " << setw(15) << curve->DG_t_tp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^t_{pp} " << setw(15) << curve->DG_t_pp(i, j, k) << setw(15) << 0.0 << endl;
+
+    cout << setw(10) << "Gam^p_{rr} " << setw(15) << curve->DG_p_rr(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^p_{rt} " << setw(15) << curve->DG_p_rt(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^p_{rp} " << setw(15) << curve->DG_p_rp(i, j, k) << setw(15) << 2.0 * dpsidr / psi << endl;
+    cout << setw(10) << "Gam^p_{tt} " << setw(15) << curve->DG_p_tt(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^p_{tp} " << setw(15) << curve->DG_p_tp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "Gam^p_{pp} " << setw(15) << curve->DG_p_pp(i, j, k) << setw(15) << 0.0 << endl;
+    //
+    // Before computing Ricci we first compute Lambda's
+    //
+    for (int i = N_g; i < N_r - N_g; i++) {
+        const double rl = grid->r(i);
+        for (int j = N_g; j < N_t - N_g; j++)
+            for (int k = N_g; k < N_p - N_g; k++) {
+                double psi = 1.0 + M / (2.0 * rl);
+                double psi4 = psi * psi * psi * psi;
+                double dpsidr = -M / (2.0 * rl * rl);
+                last->lam_r[i][j][k] = -2.0 * dpsidr / (psi4 * psi);
+                last->lam_t[i][j][k] = 0.0;
+                last->lam_p[i][j][k] = 0.0;
+            }
+    }
+    curve->Compute_Ricci(last);
+
+    i = N_r / 2;
+    j = N_t / 3;
+    k = N_g;
+    r2l = rl * rl;
+    psi = 1.0 + M / (2.0 * rl);
+    psi4 = psi * psi * psi * psi;
+    dpsidr = -M / (2.0 * r2l);
+
+    cout << "\nRICCI : " << endl;
+    cout << setw(10) << "R_{ij} " << setw(15) << "numerical" << setw(15) << "analytical" << endl;
+    cout << setw(10) << "R_{rr} " << setw(15) << curve->R_rr(i, j, k) << setw(15) << -2.0 * M / (psi * psi * r2l * rl) << endl;
+    cout << setw(10) << "R_{rt} " << setw(15) << curve->R_rt(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "R_{rp} " << setw(15) << curve->R_rp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "R_{tt} " << setw(15) << curve->R_tt(i, j, k) << setw(15) << M / (psi * psi * rl) << endl;
+    cout << setw(10) << "R_{tp} " << setw(15) << curve->R_tp(i, j, k) << setw(15) << 0.0 << endl;
+    cout << setw(10) << "R_{pp} " << setw(15) << curve->R_pp(i, j, k) << setw(15) << M / (psi * psi * rl) * sintheta[j] * sintheta[j] << endl;
 }
 // //
 // //==========================================================================
@@ -305,57 +305,57 @@ void Manager::Test_Ricci_for_Schwarzschild() {
 // // Test derivatives at interfaces
 // //==========================================================================
 // //
-void Manager::Test_Derivatives() { 
-  //
-  // set up function in interior grid
-  //
-  for (int i = N_g; i < N_r; i++) {
-    const double rl = last->lapse.r(i);
-    for (int j = N_g; j < N_t - N_g; j++) {
-      const double stl = last->lapse.sintheta(j);
-      const double st2 = stl*stl;
-      for (int k = N_g; k < N_p - N_g; k++)
-	last->lapse[i][j][k] = exp(-rl*rl) * (2.0 - 3.0 * st2);
+void Manager::Test_Derivatives() {
+    //
+    // set up function in interior grid
+    //
+    for (int i = N_g; i < N_r; i++) {
+        const double rl = last->lapse.r(i);
+        for (int j = N_g; j < N_t - N_g; j++) {
+            const double stl = last->lapse.sintheta(j);
+            const double st2 = stl * stl;
+            for (int k = N_g; k < N_p - N_g; k++)
+                last->lapse[i][j][k] = exp(-rl * rl) * (2.0 - 3.0 * st2);
+        }
     }
-  }
-  //
-  // fill ghosts...
-  //
-  last->lapse.fill_ghosts();
-  //
-  // now compute derivatives and compare with analytical solutions...
-  //
-  last->shift_r.equals(0.0);
-  last->shift_t.equals(0.0);
-  last->h_rr.equals(0.0);
-  last->h_rt.equals(0.0);
-  last->h_tt.equals(0.0);
-  for (int i = N_g; i < N_r - N_g; i++) {
-    const double rl = last->lapse.r(i);
-    for (int j = N_g; j < N_t - N_g; j++) {
-      const double stl = last->lapse.sintheta(j);
-      const double ctl = last->lapse.costheta(j);
-      for (int k = N_g; k < N_p - N_g; k++) {
-	last->shift_r[i][j][k] = last->lapse.dr(i,j,k,-1.0)
-	  - (- 2.0 * rl * last->lapse(i,j,k) );
-	last->shift_t[i][j][k] = last->lapse.dtheta(i,j,k,-1.0)
-	  - (- 6.0* exp(-rl*rl) * stl * ctl );
-	last->h_rr[i][j][k] = last->lapse.ddr(i,j,k)
-	  - ( (4.0 * rl*rl - 2.0)  * last->lapse(i,j,k) );
-	last->h_rt[i][j][k] = last->lapse.drdtheta(i,j,k)
-	  - ( 12.0 * rl * exp(-rl*rl) * stl * ctl  );
-	last->h_tt[i][j][k] = last->lapse.ddtheta(i,j,k)
-	  - (- 6.0 * exp(-rl*rl) * (ctl * ctl - stl * stl ));
-      }
+    //
+    // fill ghosts...
+    //
+    last->lapse.fill_ghosts();
+    //
+    // now compute derivatives and compare with analytical solutions...
+    //
+    last->shift_r.equals(0.0);
+    last->shift_t.equals(0.0);
+    last->h_rr.equals(0.0);
+    last->h_rt.equals(0.0);
+    last->h_tt.equals(0.0);
+    for (int i = N_g; i < N_r - N_g; i++) {
+        const double rl = last->lapse.r(i);
+        for (int j = N_g; j < N_t - N_g; j++) {
+            const double stl = last->lapse.sintheta(j);
+            const double ctl = last->lapse.costheta(j);
+            for (int k = N_g; k < N_p - N_g; k++) {
+                last->shift_r[i][j][k] = last->lapse.dr(i, j, k, -1.0)
+                    - (-2.0 * rl * last->lapse(i, j, k));
+                last->shift_t[i][j][k] = last->lapse.dtheta(i, j, k, -1.0)
+                    - (-6.0 * exp(-rl * rl) * stl * ctl);
+                last->h_rr[i][j][k] = last->lapse.ddr(i, j, k)
+                    - ((4.0 * rl * rl - 2.0) * last->lapse(i, j, k));
+                last->h_rt[i][j][k] = last->lapse.drdtheta(i, j, k)
+                    - (12.0 * rl * exp(-rl * rl) * stl * ctl);
+                last->h_tt[i][j][k] = last->lapse.ddtheta(i, j, k)
+                    - (-6.0 * exp(-rl * rl) * (ctl * ctl - stl * stl));
+            }
+        }
     }
-  }
-  dump->slice(0.0,0.0,0,last->shift_r.Address());
-  dump->slice(0.0,0.0,0,last->shift_t.Address());
-  dump->slice(0.0,0.0,0,last->h_rr.Address());
-  dump->slice(0.0,0.0,0,last->h_rt.Address());
-  dump->slice(0.0,0.0,0,last->h_tt.Address());
-  dump->dump(0.0,0.0,0,last->h_tt.Address());
-  exit(0);
+    dump->slice(0.0, 0.0, 0, last->shift_r.Address());
+    dump->slice(0.0, 0.0, 0, last->shift_t.Address());
+    dump->slice(0.0, 0.0, 0, last->h_rr.Address());
+    dump->slice(0.0, 0.0, 0, last->h_rt.Address());
+    dump->slice(0.0, 0.0, 0, last->h_tt.Address());
+    dump->dump(0.0, 0.0, 0, last->h_tt.Address());
+    exit(0);
 }
 //   h_rr_o.fill_ghosts();
 //   h_rt_o.fill_ghosts();
@@ -465,7 +465,7 @@ void Manager::Test_Derivatives() {
 //   fctptmp = indata->h_rt_analytical(rl,tl+dt,pl-dp,t);
 //   fctmtpp = indata->h_rt_analytical(rl,tl-dt,pl+dp,t);
 //   fctmtmp = indata->h_rt_analytical(rl,tl-dt,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -503,7 +503,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_rp_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_rp_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_rp_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -533,7 +533,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_tt_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_tt_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_tt_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -563,7 +563,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_tp_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_tp_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_tp_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -593,7 +593,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_pp_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_pp_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_pp_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -623,7 +623,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->phi_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->phi_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->phi_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -671,7 +671,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_rr_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_rr_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_rr_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -702,7 +702,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_rt_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_rt_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_rt_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -732,7 +732,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_rp_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_rp_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_rp_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -762,7 +762,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_tt_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_tt_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_tt_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -792,7 +792,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_tp_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_tp_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_tp_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -822,7 +822,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->h_pp_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->h_pp_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->h_pp_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -852,7 +852,7 @@ void Manager::Test_Derivatives() {
 //   fctmt = indata->phi_analytical(rl,tl-dt,pl,t);
 //   fctpp = indata->phi_analytical(rl,tl,pl+dp,t);
 //   fctmp = indata->phi_analytical(rl,tl,pl-dp,t);
-  
+
 
 //   cout << setprecision(8);
 
@@ -1029,161 +1029,161 @@ void Manager::Test_Derivatives() {
 //=================================================================
 //
 void Manager::Test_Flat_Metric() {
-  cout << " Testing flat metric... " << endl;
-  int i_check = (N_r-4)/2 + 2;
-  int j_check = (N_t-4)/4 + 2;
-  int k_check = (N_p-4)/4 + 2;
-  
-  const int i = i_check;
-  const int j = j_check;
-  const int k = k_check;
-  
-  const double rl = grid->r(i);
-  cout << " Results at r = " << rl << ", theta = " << grid->theta(j) << " and phi = " << grid->phi(k) << endl;
-  
-  const double st = grid->sintheta(j);
-  const double ct = grid->costheta(j);
-  const double sp = sin(grid->phi(k));
-  const double cp = cos(grid->phi(k));
+    cout << " Testing flat metric... " << endl;
+    int i_check = (N_r - 4) / 2 + 2;
+    int j_check = (N_t - 4) / 4 + 2;
+    int k_check = (N_p - 4) / 4 + 2;
 
-  const double A = 0.1;  // make sure these agree with paramters defined in InData.h
-  const double B = 0.3;
-  const double C = 0.5; 
-  const double x = rl * st * cp;
-  const double y = rl * st * sp;
-  const double z = rl * ct;
-  const double f = 1.0 + A * x * x + 0.2;
-  const double g = 1.0 + B * y * y + 0.5;
-  const double h = 1.0 + C * z * z + 0.1;
+    const int i = i_check;
+    const int j = j_check;
+    const int k = k_check;
 
-  // define transformations
-  tensor part_x_part_r(st*cp,     st*sp,    ct,
-		       rl*ct*cp,  rl*ct*sp, -rl*st,
-		       -rl*st*sp, rl*st*cp, 0.0);
-  tensor part_r_part_x(st*cp,       st*sp,      ct,
-		       ct*cp/rl,    ct*sp/rl,   -st/rl,
-		       -sp/(rl*st), cp/(rl*st), 0.0);
+    const double rl = grid->r(i);
+    cout << " Results at r = " << rl << ", theta = " << grid->theta(j) << " and phi = " << grid->phi(k) << endl;
 
-  cout << " h_ij: " << endl;
-  tensor h_ij(last->h_rr(i,j,k),last->h_rt(i,j,k),last->h_rp(i,j,k),
-	      last->h_tt(i,j,k),last->h_tp(i,j,k),last->h_pp(i,j,k));
-  h_ij.print();
+    const double st = grid->sintheta(j);
+    const double ct = grid->costheta(j);
+    const double sp = sin(grid->phi(k));
+    const double cp = cos(grid->phi(k));
 
-  cout << " lam^i : " << endl;
-  vect lam(last->lam_r(i,j,k),last->lam_t(i,j,k),last->lam_p(i,j,k));
-  lam.print();
-  //
-  // cartesian components of vector Lambda^i
-  //
-  double Gamx = A * x / (f*f);
-  double Gamy = B * y / (g*g);
-  double Gamz = C * z / (h*h);
-  vect lam_ana_cart(Gamx,Gamy,Gamz);
-  // now transform to spherical coordinates
-  vect lam_ana;
-  for (int a = 0; a < 3; a++) {
-    lam_ana[a] = 0.0;
-    for (int b = 0; b < 3; b++)
-      lam_ana[a] += part_r_part_x[a][b] * lam_ana_cart[b];
-  }
-  // properly rescale lamba:
-  lam_ana[1] *= rl;
-  lam_ana[2] *= rl*st;
-  cout << " lam^i analytically : " << endl;
-  lam_ana.print();
-  //
-  // derivatives of lambda
-  //
-  tensor D_lam_cart(A/(f*f) - 4.0*A*A*x*x/(f*f*f), 0.0, 0.0, B/(g*g) - 4.0*B*B*y*y/(g*g*g), 
-		    0.0, C/(h*h) - 4.0*C*C*z*z/(h*h*h));
-  tensor D_lam_sc;
-  for (int a = 0; a < 3; a++)
-    for (int b = 0; b < 3; b++) {
-      D_lam_sc[a][b] = 0.0;
-      for (int d = 0; d < 3; d++)
-	for (int e = 0; e < 3; e++)
-	  D_lam_sc[a][b] += part_x_part_r[a][d] * part_r_part_x[b][e] * D_lam_cart[d][e];
-      }
-  cout << " D_i Lam^j analytically: " << endl;
-  D_lam_sc.print();
-  
+    const double A = 0.1;  // make sure these agree with paramters defined in InData.h
+    const double B = 0.3;
+    const double C = 0.5;
+    const double x = rl * st * cp;
+    const double y = rl * st * sp;
+    const double z = rl * ct;
+    const double f = 1.0 + A * x * x + 0.2;
+    const double g = 1.0 + B * y * y + 0.5;
+    const double h = 1.0 + C * z * z + 0.1;
 
-  cout << "==============================================" << endl;
-  cout << "Inverse metric" << endl;
-  tensor g_cart_up(1.0/f, 0.0, 0.0, 1.0/g, 0.0, 1.0/h);
-  tensor g_up_ana;
-  // Now transform...
-  for (int a = 0; a < 3; a++)
-    for (int b = 0; b < 3; b++) {
-      g_up_ana[a][b] = 0.0;
-      for (int d = 0; d < 3; d++)
-	for (int e = 0; e < 3; e++)
-	  g_up_ana[a][b] += part_r_part_x[a][d] * part_r_part_x[b][e] * g_cart_up[d][e];
-      }
-  tensor g_up(curve->gup_rr(i,j,k),curve->gup_rt(i,j,k),curve->gup_rp(i,j,k),
-	      curve->gup_tt(i,j,k),curve->gup_tp(i,j,k),curve->gup_pp(i,j,k));
-  cout << " from code: " << endl;
-  g_up.print();
-  cout << " analytically: " << endl;
-  g_up_ana.print();
-  cout << "==============================================" << endl;
-  cout << " Connection functions..." << endl;
-  double gamxxx = A * x/f;
-  double gamyyy = B * y/g;
-  double gamzzz = C * z/h;
-  rank3tens Gam_cart(gamxxx, 0.0, 0.0, 0.0,    0.0, 0.0, 
-		     0.0,    0.0, 0.0, gamyyy, 0.0, 0.0, 
-		     0.0,    0.0, 0.0, 0.0,    0.0, gamzzz);
-  rank3tens Gam_sc;
-  // Now transform...
-  for (int a = 0; a < 3; a++)
-    for (int b = 0; b < 3; b++)
-      for (int c = 0; c < 3; c++) {
-	Gam_sc[a][b][c] = 0.0;
-	for (int d = 0; d < 3; d++)
-	  for (int e = 0; e < 3; e++)
-	    for (int f = 0; f < 3; f++)
-	      Gam_sc[a][b][c] += part_r_part_x[a][d] * part_x_part_r[b][e] * part_x_part_r[c][f] * Gam_cart[d][e][f];
-      }
+    // define transformations
+    tensor part_x_part_r(st * cp, st * sp, ct,
+        rl * ct * cp, rl * ct * sp, -rl * st,
+        -rl * st * sp, rl * st * cp, 0.0);
+    tensor part_r_part_x(st * cp, st * sp, ct,
+        ct * cp / rl, ct * sp / rl, -st / rl,
+        -sp / (rl * st), cp / (rl * st), 0.0);
 
-  // double test = 0.5 * ( curve->gup_rr(i,j,k) * (2.0 * curve->Dt_e_rt(i,j,k) - curve->Dr_e_tt(i,j,k)) + 
-  // 			curve->gup_rt(i,j,k) * curve->Dt_e_tt(i,j,k) +
-  // 			curve->gup_rp(i,j,k) * (2.0 * curve->Dt_e_tp(i,j,k) - curve->Dp_e_tt(i,j,k)) );
-  cout << "Gam^r_rr : " << setw(16) << curve->DG_r_rr(i,j,k) << setw(16) << Gam_sc[0][0][0] << endl;
-  cout << "Gam^r_rt : " << setw(16) << curve->DG_r_rt(i,j,k) << setw(16) << Gam_sc[0][0][1] << endl;
-  cout << "Gam^r_rp : " << setw(16) << curve->DG_r_rp(i,j,k) << setw(16) << Gam_sc[0][0][2] << endl;
-  cout << "Gam^r_tt : " << setw(16) << curve->DG_r_tt(i,j,k) << setw(16) << Gam_sc[0][1][1] << endl;
-  cout << "Gam^r_tp : " << setw(16) << curve->DG_r_tp(i,j,k) << setw(16) << Gam_sc[0][1][2] << endl;
-  cout << "Gam^r_pp : " << setw(16) << curve->DG_r_pp(i,j,k) << setw(16) << Gam_sc[0][2][2] << endl;
+    cout << " h_ij: " << endl;
+    tensor h_ij(last->h_rr(i, j, k), last->h_rt(i, j, k), last->h_rp(i, j, k),
+        last->h_tt(i, j, k), last->h_tp(i, j, k), last->h_pp(i, j, k));
+    h_ij.print();
 
-  cout << "Gam^t_rr : " << setw(16) << curve->DG_t_rr(i,j,k) << setw(16) << Gam_sc[1][0][0] << endl;
-  cout << "Gam^t_rt : " << setw(16) << curve->DG_t_rt(i,j,k) << setw(16) << Gam_sc[1][0][1] << endl;
-  cout << "Gam^t_rp : " << setw(16) << curve->DG_t_rp(i,j,k) << setw(16) << Gam_sc[1][0][2] << endl;
-  cout << "Gam^t_tt : " << setw(16) << curve->DG_t_tt(i,j,k) << setw(16) << Gam_sc[1][1][1] << endl;
-  cout << "Gam^t_tp : " << setw(16) << curve->DG_t_tp(i,j,k) << setw(16) << Gam_sc[1][1][2] << endl;
-  cout << "Gam^t_pp : " << setw(16) << curve->DG_t_pp(i,j,k) << setw(16) << Gam_sc[1][2][2] << endl;
+    cout << " lam^i : " << endl;
+    vect lam(last->lam_r(i, j, k), last->lam_t(i, j, k), last->lam_p(i, j, k));
+    lam.print();
+    //
+    // cartesian components of vector Lambda^i
+    //
+    double Gamx = A * x / (f * f);
+    double Gamy = B * y / (g * g);
+    double Gamz = C * z / (h * h);
+    vect lam_ana_cart(Gamx, Gamy, Gamz);
+    // now transform to spherical coordinates
+    vect lam_ana;
+    for (int a = 0; a < 3; a++) {
+        lam_ana[a] = 0.0;
+        for (int b = 0; b < 3; b++)
+            lam_ana[a] += part_r_part_x[a][b] * lam_ana_cart[b];
+    }
+    // properly rescale lamba:
+    lam_ana[1] *= rl;
+    lam_ana[2] *= rl * st;
+    cout << " lam^i analytically : " << endl;
+    lam_ana.print();
+    //
+    // derivatives of lambda
+    //
+    tensor D_lam_cart(A / (f * f) - 4.0 * A * A * x * x / (f * f * f), 0.0, 0.0, B / (g * g) - 4.0 * B * B * y * y / (g * g * g),
+        0.0, C / (h * h) - 4.0 * C * C * z * z / (h * h * h));
+    tensor D_lam_sc;
+    for (int a = 0; a < 3; a++)
+        for (int b = 0; b < 3; b++) {
+            D_lam_sc[a][b] = 0.0;
+            for (int d = 0; d < 3; d++)
+                for (int e = 0; e < 3; e++)
+                    D_lam_sc[a][b] += part_x_part_r[a][d] * part_r_part_x[b][e] * D_lam_cart[d][e];
+        }
+    cout << " D_i Lam^j analytically: " << endl;
+    D_lam_sc.print();
 
-  cout << "Gam^p_rr : " << setw(16) << curve->DG_p_rr(i,j,k) << setw(16) << Gam_sc[2][0][0] << endl;
-  cout << "Gam^p_rt : " << setw(16) << curve->DG_p_rt(i,j,k) << setw(16) << Gam_sc[2][0][1] << endl;
-  cout << "Gam^p_rp : " << setw(16) << curve->DG_p_rp(i,j,k) << setw(16) << Gam_sc[2][0][2] << endl;
-  cout << "Gam^p_tt : " << setw(16) << curve->DG_p_tt(i,j,k) << setw(16) << Gam_sc[2][1][1] << endl;
-  cout << "Gam^p_tp : " << setw(16) << curve->DG_p_tp(i,j,k) << setw(16) << Gam_sc[2][1][2] << endl;
-  cout << "Gam^p_pp : " << setw(16) << curve->DG_p_pp(i,j,k) << setw(16) << Gam_sc[2][2][2] << endl;
 
-  cout << "==============================================" << endl;  
-  tensor R(curve->R_rr(i,j,k),curve->R_rt(i,j,k),curve->R_rp(i,j,k),
-	   curve->R_tt(i,j,k),curve->R_tp(i,j,k),curve->R_pp(i,j,k));
-  cout << "\nRicci:\n" << endl;
-  R.print();
+    cout << "==============================================" << endl;
+    cout << "Inverse metric" << endl;
+    tensor g_cart_up(1.0 / f, 0.0, 0.0, 1.0 / g, 0.0, 1.0 / h);
+    tensor g_up_ana;
+    // Now transform...
+    for (int a = 0; a < 3; a++)
+        for (int b = 0; b < 3; b++) {
+            g_up_ana[a][b] = 0.0;
+            for (int d = 0; d < 3; d++)
+                for (int e = 0; e < 3; e++)
+                    g_up_ana[a][b] += part_r_part_x[a][d] * part_r_part_x[b][e] * g_cart_up[d][e];
+        }
+    tensor g_up(curve->gup_rr(i, j, k), curve->gup_rt(i, j, k), curve->gup_rp(i, j, k),
+        curve->gup_tt(i, j, k), curve->gup_tp(i, j, k), curve->gup_pp(i, j, k));
+    cout << " from code: " << endl;
+    g_up.print();
+    cout << " analytically: " << endl;
+    g_up_ana.print();
+    cout << "==============================================" << endl;
+    cout << " Connection functions..." << endl;
+    double gamxxx = A * x / f;
+    double gamyyy = B * y / g;
+    double gamzzz = C * z / h;
+    rank3tens Gam_cart(gamxxx, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, gamyyy, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, gamzzz);
+    rank3tens Gam_sc;
+    // Now transform...
+    for (int a = 0; a < 3; a++)
+        for (int b = 0; b < 3; b++)
+            for (int c = 0; c < 3; c++) {
+                Gam_sc[a][b][c] = 0.0;
+                for (int d = 0; d < 3; d++)
+                    for (int e = 0; e < 3; e++)
+                        for (int f = 0; f < 3; f++)
+                            Gam_sc[a][b][c] += part_r_part_x[a][d] * part_x_part_r[b][e] * part_x_part_r[c][f] * Gam_cart[d][e][f];
+            }
 
-  cout << " Norms of Ricci : " 
-       << setw(12) << curve->R_rr.L2_norm() 
-       << setw(12) << curve->R_rt.L2_norm() 
-       << setw(12) << curve->R_rp.L2_norm() 
-       << setw(12) << curve->R_tt.L2_norm() 
-       << setw(12) << curve->R_tp.L2_norm() 
-       << setw(12) << curve->R_pp.L2_norm() 
-       << endl;
+    // double test = 0.5 * ( curve->gup_rr(i,j,k) * (2.0 * curve->Dt_e_rt(i,j,k) - curve->Dr_e_tt(i,j,k)) + 
+    // 			curve->gup_rt(i,j,k) * curve->Dt_e_tt(i,j,k) +
+    // 			curve->gup_rp(i,j,k) * (2.0 * curve->Dt_e_tp(i,j,k) - curve->Dp_e_tt(i,j,k)) );
+    cout << "Gam^r_rr : " << setw(16) << curve->DG_r_rr(i, j, k) << setw(16) << Gam_sc[0][0][0] << endl;
+    cout << "Gam^r_rt : " << setw(16) << curve->DG_r_rt(i, j, k) << setw(16) << Gam_sc[0][0][1] << endl;
+    cout << "Gam^r_rp : " << setw(16) << curve->DG_r_rp(i, j, k) << setw(16) << Gam_sc[0][0][2] << endl;
+    cout << "Gam^r_tt : " << setw(16) << curve->DG_r_tt(i, j, k) << setw(16) << Gam_sc[0][1][1] << endl;
+    cout << "Gam^r_tp : " << setw(16) << curve->DG_r_tp(i, j, k) << setw(16) << Gam_sc[0][1][2] << endl;
+    cout << "Gam^r_pp : " << setw(16) << curve->DG_r_pp(i, j, k) << setw(16) << Gam_sc[0][2][2] << endl;
+
+    cout << "Gam^t_rr : " << setw(16) << curve->DG_t_rr(i, j, k) << setw(16) << Gam_sc[1][0][0] << endl;
+    cout << "Gam^t_rt : " << setw(16) << curve->DG_t_rt(i, j, k) << setw(16) << Gam_sc[1][0][1] << endl;
+    cout << "Gam^t_rp : " << setw(16) << curve->DG_t_rp(i, j, k) << setw(16) << Gam_sc[1][0][2] << endl;
+    cout << "Gam^t_tt : " << setw(16) << curve->DG_t_tt(i, j, k) << setw(16) << Gam_sc[1][1][1] << endl;
+    cout << "Gam^t_tp : " << setw(16) << curve->DG_t_tp(i, j, k) << setw(16) << Gam_sc[1][1][2] << endl;
+    cout << "Gam^t_pp : " << setw(16) << curve->DG_t_pp(i, j, k) << setw(16) << Gam_sc[1][2][2] << endl;
+
+    cout << "Gam^p_rr : " << setw(16) << curve->DG_p_rr(i, j, k) << setw(16) << Gam_sc[2][0][0] << endl;
+    cout << "Gam^p_rt : " << setw(16) << curve->DG_p_rt(i, j, k) << setw(16) << Gam_sc[2][0][1] << endl;
+    cout << "Gam^p_rp : " << setw(16) << curve->DG_p_rp(i, j, k) << setw(16) << Gam_sc[2][0][2] << endl;
+    cout << "Gam^p_tt : " << setw(16) << curve->DG_p_tt(i, j, k) << setw(16) << Gam_sc[2][1][1] << endl;
+    cout << "Gam^p_tp : " << setw(16) << curve->DG_p_tp(i, j, k) << setw(16) << Gam_sc[2][1][2] << endl;
+    cout << "Gam^p_pp : " << setw(16) << curve->DG_p_pp(i, j, k) << setw(16) << Gam_sc[2][2][2] << endl;
+
+    cout << "==============================================" << endl;
+    tensor R(curve->R_rr(i, j, k), curve->R_rt(i, j, k), curve->R_rp(i, j, k),
+        curve->R_tt(i, j, k), curve->R_tp(i, j, k), curve->R_pp(i, j, k));
+    cout << "\nRicci:\n" << endl;
+    R.print();
+
+    cout << " Norms of Ricci : "
+        << setw(12) << curve->R_rr.L2_norm()
+        << setw(12) << curve->R_rt.L2_norm()
+        << setw(12) << curve->R_rp.L2_norm()
+        << setw(12) << curve->R_tt.L2_norm()
+        << setw(12) << curve->R_tp.L2_norm()
+        << setw(12) << curve->R_pp.L2_norm()
+        << endl;
 
 };
 
@@ -1195,7 +1195,7 @@ void Manager::Test_Flat_Metric() {
 //   int i_check = (N_r-4)/2 + 2;
 //   int j_check = (N_theta-4)/2 + 2;
 //   int k_check = (N_phi-4)/2 + 2;
-  
+
 //   for (int i = N_g; i < N_r-N_g; i++)    
 //     for (int j = N_g; j < N_theta-N_g; j++)
 //       for (int k = N_g; k < N_phi-N_g; k++) {
@@ -1209,7 +1209,7 @@ void Manager::Test_Flat_Metric() {
 //   int i = i_check;
 //   int j = j_check;
 //   int k = k_check;
-  
+
 //   cout << " Results at r = " << rl << ", theta = " << grid->theta(j) << " and phi = " << grid->phi(k) << endl;
 //   cout << " Determinant : " << det(i_check,j_check,k_check) << endl;
 //   cout << " Divergence of shift : " << div_shift(i_check,j_check,k_check) << endl;

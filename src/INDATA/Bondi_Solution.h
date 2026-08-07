@@ -17,35 +17,35 @@
 // 
 
 struct Bondi_derivatives {
-  double Gamma;
-  double kappa;
-  double M; 
-  Bondi_derivatives(double M_in, double Gamma_in, double kappa_in) :
-    M(M_in), Gamma(Gamma_in), kappa(kappa_in) {
-  };
-  void operator() (const double r, const VecDoub_I &y, VecDoub_O &dydr) {
-    // unpack variables
-    const double u = y[0];
-    const double rho = y[1];
-    const double u2 = u*u;
-    const double temp1 = Gamma*kappa*pow(rho, Gamma - 1.0);
-    const double a2 = temp1 / (1.0 + temp1 / (Gamma - 1.0));
-    const double temp2 = 1.0 - 2.0*M/r + u2;
-    const double r2 = r*r;
-    // see Eqs. (G.10)-(G.13) in "Compact Objects"
-    const double D1 = ( 2.0 * temp2 * a2 / r - M / r2 ) / rho;
-    const double D2 = ( 2.0 * u2 / r - M / r2 ) / u;
-    const double D = (u2 - temp2 * a2 ) / (rho * u);
-    if (D == 0.0) { // hack...
-      dydr[0] = 0.0;
-      dydr[1] = 0.0;
-    } else {
-      dydr[0] = D1 / D;
-      dydr[1] = - D2 / D;
-    }    
-  };
+    double Gamma;
+    double kappa;
+    double M;
+    Bondi_derivatives(double M_in, double Gamma_in, double kappa_in) :
+        M(M_in), Gamma(Gamma_in), kappa(kappa_in) {
+    };
+    void operator() (const double r, const VecDoub_I& y, VecDoub_O& dydr) {
+        // unpack variables
+        const double u = y[0];
+        const double rho = y[1];
+        const double u2 = u * u;
+        const double temp1 = Gamma * kappa * pow(rho, Gamma - 1.0);
+        const double a2 = temp1 / (1.0 + temp1 / (Gamma - 1.0));
+        const double temp2 = 1.0 - 2.0 * M / r + u2;
+        const double r2 = r * r;
+        // see Eqs. (G.10)-(G.13) in "Compact Objects"
+        const double D1 = (2.0 * temp2 * a2 / r - M / r2) / rho;
+        const double D2 = (2.0 * u2 / r - M / r2) / u;
+        const double D = (u2 - temp2 * a2) / (rho * u);
+        if (D == 0.0) { // hack...
+            dydr[0] = 0.0;
+            dydr[1] = 0.0;
+        } else {
+            dydr[0] = D1 / D;
+            dydr[1] = -D2 / D;
+        }
+    };
 };
-  
+
 class Bondi_Solution {
 protected:
     double PI;
@@ -63,37 +63,37 @@ protected:
     //================================================
     // Fluid parameters at critical radius
     //================================================
-  double u_crit(void) {
-    return sqrt(M / (2.0 * R_crit));
-  }
-  double a_crit(void) {
-    return u_crit_l / sqrt(1.0 - 3.0 * u_crit_l * u_crit_l);
-  }
-  double rho_0_crit(void) {
-    return M_dot / (4.0 * PI * R_crit * R_crit * u_crit_l);
-  }
+    double u_crit(void) {
+        return sqrt(M / (2.0 * R_crit));
+    }
+    double a_crit(void) {
+        return u_crit_l / sqrt(1.0 - 3.0 * u_crit_l * u_crit_l);
+    }
+    double rho_0_crit(void) {
+        return M_dot / (4.0 * PI * R_crit * R_crit * u_crit_l);
+    }
 
-  //================================================
-  // Radial component of fluid four-velocity computed in
-  // normal Schwarzschild coords (used to compute u^r
-  // in other coord systems, so it makes sense to define it
-  // in the base class)
-  //================================================
-  double u_r_schw(const double r_in) {
-    const double R = R_of_r(r_in);
-    const double rho_0_l = rho_0(r_in);
-    return -M_dot / (4.0 * PI * R * R * rho_0_l);
-  }
- public:
+    //================================================
+    // Radial component of fluid four-velocity computed in
+    // normal Schwarzschild coords (used to compute u^r
+    // in other coord systems, so it makes sense to define it
+    // in the base class)
+    //================================================
+    double u_r_schw(const double r_in) {
+        const double R = R_of_r(r_in);
+        const double rho_0_l = rho_0(r_in);
+        return -M_dot / (4.0 * PI * R * R * rho_0_l);
+    }
+public:
     //================================================
     // Constructor
     //================================================
- Bondi_Solution(const double M_dot_in, const double R_crit_in, const double M_in,
-		const double Kappa_in, const double Gamma_in) :
-    M_dot(M_dot_in), R_crit(R_crit_in), M(M_in), Kappa(Kappa_in), Gamma(Gamma_in) {
-   //
-        // Initialize variables, constants
+    Bondi_Solution(const double M_dot_in, const double R_crit_in, const double M_in,
+        const double Kappa_in, const double Gamma_in) :
+        M_dot(M_dot_in), R_crit(R_crit_in), M(M_in), Kappa(Kappa_in), Gamma(Gamma_in) {
         //
+             // Initialize variables, constants
+             //
         PI = acos(-1.0);
         R_hor = 2.0 * M;
         x1_init = 0.0;
@@ -108,12 +108,12 @@ protected:
         a_crit_l = a_crit();
         rho_0_crit_l = rho_0_crit();
         // B_const_l = B_const();
-	cout << " Kappa = " << Kappa << endl;
-	cout << " Gamma = " << Gamma << endl;
-	cout << " R_crit = " << R_crit << endl;
-	cout << " u_crit = " << u_crit_l << endl;
-	cout << " a_crit = " << a_crit_l << endl;
-	cout << " rho_0_crit = " << rho_0_crit_l << endl;
+        cout << " Kappa = " << Kappa << endl;
+        cout << " Gamma = " << Gamma << endl;
+        cout << " R_crit = " << R_crit << endl;
+        cout << " u_crit = " << u_crit_l << endl;
+        cout << " a_crit = " << a_crit_l << endl;
+        cout << " rho_0_crit = " << rho_0_crit_l << endl;
     }
     //================================================
     // Destructor
@@ -166,20 +166,20 @@ protected:
     // now: alpha = rho_0...
     //
     double alpha(const double r_in) {
-      // find areal radius:
-      const double R = R_of_r(r_in);
-      // prepare for integration...
-      VecDoub ystart(2);
-      ystart[0] = - u_crit_l;
-      ystart[1] = rho_0_crit_l;
-      const Doub atol = 1.e-12, rtol = atol, h1=0.001, hmin=0.0;
-      Output out;
-      Bondi_derivatives derivs(M, Gamma, Kappa);
-      Odeint<StepperDopr5<Bondi_derivatives> > ode(ystart, R_crit, R,
-						   atol, rtol, h1, hmin, out,
-						   derivs);
-      ode.integrate();
-      return ystart[1];
+        // find areal radius:
+        const double R = R_of_r(r_in);
+        // prepare for integration...
+        VecDoub ystart(2);
+        ystart[0] = -u_crit_l;
+        ystart[1] = rho_0_crit_l;
+        const Doub atol = 1.e-12, rtol = atol, h1 = 0.001, hmin = 0.0;
+        Output out;
+        Bondi_derivatives derivs(M, Gamma, Kappa);
+        Odeint<StepperDopr5<Bondi_derivatives> > ode(ystart, R_crit, R,
+            atol, rtol, h1, hmin, out,
+            derivs);
+        ode.integrate();
+        return ystart[1];
     }
     //
     // General expression for rest-mass density rho_0
@@ -199,16 +199,16 @@ protected:
         const double shift_r_l = shift_r(r_in);
         const double u_r_l = u_r(r_in);
         return (psi4 * shift_r_l * u_r_l +
-                sqrt(psi4 * psi4 * shift_r_l * shift_r_l * u_r_l * u_r_l +
-                     (lapse_l * lapse_l - psi4 * shift_r_l * shift_r_l) *
-                     (psi4 * u_r_l * u_r_l + 1.0))) /
-               (lapse_l * lapse_l - psi4 * shift_r_l * shift_r_l);
+            sqrt(psi4 * psi4 * shift_r_l * shift_r_l * u_r_l * u_r_l +
+                (lapse_l * lapse_l - psi4 * shift_r_l * shift_r_l) *
+                (psi4 * u_r_l * u_r_l + 1.0))) /
+            (lapse_l * lapse_l - psi4 * shift_r_l * shift_r_l);
     }
     //================================================
     // Three-velocity of fluid
     //================================================
     double v_r(const double r_in) {
-      return u_r(r_in) / u_0(r_in);
+        return u_r(r_in) / u_0(r_in);
     }
     double v_t(const double r_in) {
         return u_t(r_in) / u_0(r_in);
@@ -220,14 +220,14 @@ protected:
     // Three-velocity of fluid as seen by a normal observer
     //================================================
     double v_norm_r(const double r_in) {
-      double temp = (u_r(r_in) / u_0(r_in) + shift_r(r_in)) / lapse(r_in);
-      if (!isfinite(temp)) {
-	cout << " v_norm_r not finite..." << endl;
-	cout << "  u_r = " << u_r(r_in) 
-	     << "  u_0 = " << u_0(r_in)
-	     << "  lapse = " << lapse(r_in) << endl;
-      }
-      return (u_r(r_in) / u_0(r_in) + shift_r(r_in)) / lapse(r_in);
+        double temp = (u_r(r_in) / u_0(r_in) + shift_r(r_in)) / lapse(r_in);
+        if (!isfinite(temp)) {
+            cout << " v_norm_r not finite..." << endl;
+            cout << "  u_r = " << u_r(r_in)
+                << "  u_0 = " << u_0(r_in)
+                << "  lapse = " << lapse(r_in) << endl;
+        }
+        return (u_r(r_in) / u_0(r_in) + shift_r(r_in)) / lapse(r_in);
     }
     double v_norm_t(const double r_in) {
         return (u_t(r_in) / u_0(r_in) + shift_t(r_in)) / lapse(r_in);

@@ -16,9 +16,10 @@ public:
     // Constructor
     //================================================
     Bondi_Solution_Iso(const double M_dot_in, const double R_crit_in, const double M_in,
-		       const double Kappa_in, const double Gamma_in,
-		       const bool use_artificial_in) :
-    Bondi_Solution(M_dot_in, R_crit_in, M_in, Kappa_in, Gamma_in), use_artificial(use_artificial_in) {}
+        const double Kappa_in, const double Gamma_in,
+        const bool use_artificial_in) :
+        Bondi_Solution(M_dot_in, R_crit_in, M_in, Kappa_in, Gamma_in), use_artificial(use_artificial_in) {
+    }
     //================================================
     // Destructor
     //================================================
@@ -130,18 +131,18 @@ public:
     // Derivative of rest-mass density d(rho_0)/dr
     //================================================
     double rho_0_deriv(const double r_in) {
-      cout << " Bondi_Solution_Iso NOT implemented... " << endl;
-      exit(1);       
-      /*        const double R = R_of_r(r_in);
-        const double alpha_l = alpha(r_in);
-        const double alpha6 = alpha_l * alpha_l * alpha_l * alpha_l * alpha_l * alpha_l;
-        const double coef = 3.0 * alpha_l * alpha_l;
-        const double term1 = 2.0 * M / (R * R);
-        const double term2 = M_dot * M_dot / (4.0 * PI * PI * R * R * R * R * R * alpha6);
-        const double term3 = 3.0 * M_dot * M_dot / (8.0 * PI * PI * R * R * R * R * alpha6 * alpha_l);
-        const double term4 = 8.0 * Kappa * B_const_l * B_const_l / pow(1.0 + 4.0 * Kappa * alpha_l, 3);
-        return coef * (term1 - term2) / (term3 - term4);
-      */
+        cout << " Bondi_Solution_Iso NOT implemented... " << endl;
+        exit(1);
+        /*        const double R = R_of_r(r_in);
+          const double alpha_l = alpha(r_in);
+          const double alpha6 = alpha_l * alpha_l * alpha_l * alpha_l * alpha_l * alpha_l;
+          const double coef = 3.0 * alpha_l * alpha_l;
+          const double term1 = 2.0 * M / (R * R);
+          const double term2 = M_dot * M_dot / (4.0 * PI * PI * R * R * R * R * R * alpha6);
+          const double term3 = 3.0 * M_dot * M_dot / (8.0 * PI * PI * R * R * R * R * alpha6 * alpha_l);
+          const double term4 = 8.0 * Kappa * B_const_l * B_const_l / pow(1.0 + 4.0 * Kappa * alpha_l, 3);
+          return coef * (term1 - term2) / (term3 - term4);
+        */
     }
     //================================================
     // Four-velocity of fluid
