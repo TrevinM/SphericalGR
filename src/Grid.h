@@ -231,7 +231,7 @@ public:
     } else
       return false;
   }
-  int Regrid(VecDoub & r_new, double criterion) {
+  int Regrid(VecDoub & r_new) {
     //
     // function returns vector with new radial gridpoints, but
     // doesn't do anything else yet -- need to complete regridding by
@@ -244,7 +244,7 @@ public:
     // in i_ind during regridding (where old grid is needed)...
     r_max_old = r_max_current;
     if (regrid_type == 2) {
-      r_max_new = r_max_current - criterion;
+      r_max_new = r_max_current - cutoff;
     }
     else {
       r_max_new = r_max_current * r_max_factor;

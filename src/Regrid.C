@@ -56,7 +56,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double & t_max) {
     // returns new grid points only -- need to finish up regrid with call
     // to Setup_Radial_Grid() below.
     //
-    bool regrid = grid->Regrid(r_new, criterion);
+    bool regrid = grid->Regrid(r_new);
     //
     // now make sure to regrid every dynamical variable
     //
