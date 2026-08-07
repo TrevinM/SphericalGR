@@ -1,8 +1,8 @@
 import glob
-from Reader import Reader
+from Reader3D import Reader3D
 import math
 
-class SliceReader(Reader):
+class SliceReader(Reader3D):
 
     def __init__(self, path, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid, color=None):
         self._files = glob.glob(path+'/'+var_name+'_slice_*')
