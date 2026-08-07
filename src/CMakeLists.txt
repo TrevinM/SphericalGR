@@ -69,6 +69,7 @@ MESSAGE("   Compiling with options ${COMPILE_OPTIONS}")
 # Build the APP and link to Trilinos
 # add_executable(MyApp ${CMAKE_CURRENT_SOURCE_DIR}/app.cpp)
 add_executable(SphericalGR ${CMAKE_CURRENT_SOURCE_DIR}/GR.C /
+  ${CMAKE_CURRENT_SOURCE_DIR}/Manager.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/Initialize.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/Integrate.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/Curvature.C /
@@ -82,7 +83,9 @@ add_executable(SphericalGR ${CMAKE_CURRENT_SOURCE_DIR}/GR.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/Tests.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/HorizonFinder.C /
   ${CMAKE_CURRENT_SOURCE_DIR}/dumper.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C)
+  ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C
+
+  )
 
 
 target_include_directories(SphericalGR PRIVATE

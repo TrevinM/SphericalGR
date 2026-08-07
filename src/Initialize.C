@@ -5,20 +5,21 @@
 // Note: will initialize State last
 //================================================
 #include "Manager.h"
+#include "GR.h"
 
 bool Manager::Initialize() {
     //
     // initialize gravitational fields
     // 
     cout << " INITIALIZE: t = " << t << endl;
-    bool success = indata->Initialize_Metric(last);
+    bool success = GR::indata->Initialize_Metric(last);
     if (!success) return false;
-    indata->Initialize_Lapse(last);
-    indata->Initialize_Shift(last);
-    indata->Initialize_ExCurvature(last);
+    GR::indata->Initialize_Lapse(last);
+    GR::indata->Initialize_Shift(last);
+    GR::indata->Initialize_ExCurvature(last);
 
     curve->Update(last);
-    indata->Initialize_ConfConn(last, curve);
+    GR::indata->Initialize_ConfConn(last, curve);
     // if (indata->Type() == brill || indata->Type() == kerr || indata->Type() == linwave) {
     // //  if (indata->Type() == brill || indata->Type() == kerr ) {
     //   indata->Initialize_ConfConn(last, curve);

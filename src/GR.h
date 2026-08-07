@@ -1,3 +1,5 @@
+#include "Manager.h"
+
 #include "Grid.h"
 #include "Cosmology.h"
 #include "EOS.h"
@@ -9,11 +11,12 @@
 #include "Profiles.h"
 #include "WaveExtraction.h"
 #include "Photons.h"
-#include "Manager.h"
 #include "CheckPoint.h"
 
 class GR {
 public:
+    static Manager* manager;
+
     static Grid* grid;
     static Cosmology* cosmology;
     static EOS* eos;
@@ -25,7 +28,5 @@ public:
     static Profiles* profiles;
     static WaveExtraction* waves;
     static Photons* photons;
-    static Manager* manager;
     static CheckPoint* checkpoint;
-
-}
+};

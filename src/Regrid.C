@@ -4,6 +4,7 @@
 //
 //================================================
 #include "Manager.h"
+#include "GR.h"
 
 double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
     //  cout << " Manager: in Regrid()... " << endl;
@@ -56,7 +57,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         // returns new grid points only -- need to finish up regrid with call
         // to Setup_Radial_Grid() below.
         //
-        bool regrid = grid->Regrid(r_new);
+        bool regrid = GR::grid->Regrid(r_new);
         //
         // now make sure to regrid every dynamical variable
         //
@@ -162,7 +163,7 @@ double Manager::RegridCriterion() {
     } else if (GR::grid->Regrid_Type() == 1) {
         return GR::grid->RegridCriterion(tau_c);
     } else if (GR::grid->Regrid_Type() == 2) {
-        return (GR::grid->r_max() - grid->r_max_final()) - (t_max - t);
+        return (GR::grid->r_max() - GR::grid->r_max_final()) - (t_max - t);
     } else {
         return 0;
     }

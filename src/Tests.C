@@ -8,6 +8,7 @@
 #include "Manager.h"
 #include "InData.h"
 #include "Transformations.h"
+#include "GR.h"
 
 //#include <iostream>
 //#include <cmath>
@@ -349,12 +350,12 @@ void Manager::Test_Derivatives() {
             }
         }
     }
-    dump->slice(0.0, 0.0, 0, last->shift_r.Address());
-    dump->slice(0.0, 0.0, 0, last->shift_t.Address());
-    dump->slice(0.0, 0.0, 0, last->h_rr.Address());
-    dump->slice(0.0, 0.0, 0, last->h_rt.Address());
-    dump->slice(0.0, 0.0, 0, last->h_tt.Address());
-    dump->dump(0.0, 0.0, 0, last->h_tt.Address());
+    GR::dump->slice(0.0, 0.0, 0, last->shift_r.Address());
+    GR::dump->slice(0.0, 0.0, 0, last->shift_t.Address());
+    GR::dump->slice(0.0, 0.0, 0, last->h_rr.Address());
+    GR::dump->slice(0.0, 0.0, 0, last->h_rt.Address());
+    GR::dump->slice(0.0, 0.0, 0, last->h_tt.Address());
+    GR::dump->dump(0.0, 0.0, 0, last->h_tt.Address());
     exit(0);
 }
 //   h_rr_o.fill_ghosts();

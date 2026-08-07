@@ -4,6 +4,7 @@
 //
 //================================================
 #include "Manager.h"
+#include "GR.h"
 
 bool Manager::Integrate(double t_max) {
     while (t < t_max) {
@@ -35,9 +36,9 @@ bool Manager::Integrate(double t_max) {
         //================================================
         //      inter->equals(last);
         curve->Update(last);
-        if (!(photons == NULL)) {
+        if (!(GR::photons == NULL)) {
             aux->Compute_r_derivs(last, curve);
-            photons->Update_Photons(t, tau_c, dt, last, curve, aux,
+            GR::photons->Update_Photons(t, tau_c, dt, last, curve, aux,
                 constraints->I_Re.Address(),
                 constraints->J_Re.Address(),
                 GR::grid->r_max());
@@ -45,11 +46,11 @@ bool Manager::Integrate(double t_max) {
         //================================================
         // extract waves
         //================================================
-        if (waves != NULL) {
+        if (GR::waves != NULL) {
             double I_Re_max = constraints->CurvatureInvariant(last, curve,
                 matter->adm_sources,
                 t, tau_c, step);
-            waves->Update(dt);
+            GR::waves->Update(dt);
         }
         //================================================
         //  check whether it's finished
@@ -122,7 +123,7 @@ bool Manager::Integrate(double t_max) {
             //================================================
             // evaluate curvature invariants
             //================================================ 
-            if (waves == NULL) // otherwise they are computed above already...
+            if (GR::waves == NULL) // otherwise they are computed above already...
                 double I_Re_max = constraints->CurvatureInvariant(last, curve,
                     matter->adm_sources,
                     t, tau_c, step);

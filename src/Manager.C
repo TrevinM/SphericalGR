@@ -2,8 +2,6 @@
 //================================================
 // Class containing all the integration stuff...
 //================================================
-#ifndef MANAGER_H
-#define MANAGER_H
 
 #include "Manager.h"
 #include "GR.h"
@@ -127,10 +125,10 @@ Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
         GR::waves->Initialize(constraints->psi4_Re.Address(),
             constraints->psi4_Im.Address());
     }
-    N_g = inter->GR::grid->N_ghosts();
-    N_r = inter->GR::grid->N_r_tot();
-    N_t = inter->GR::grid->N_theta_tot();
-    N_p = inter->GR::grid->N_phi_tot();
+    N_g = inter->grid->N_ghosts();
+    N_r = inter->grid->N_r_tot();
+    N_t = inter->grid->N_theta_tot();
+    N_p = inter->grid->N_phi_tot();
     //
     steps_between_regrids = 100;
     timestep_last_regrid = -steps_between_regrids;  // to allow regrid at t=0
@@ -141,13 +139,13 @@ Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
 //===========================================
 // Find time step
 //===========================================
-Manager::SetTimeStep() {
+void Manager::SetTimeStep() {
     int N_g = GR::grid->N_ghosts();
-    dt = GR::grid->courant_factor() * 0.5 * GR : grid->delta_r(N_g)
-        * GR : grid->delta_theta(N_g);
+    dt = GR::grid->courant_factor() * 0.5 * GR::grid->delta_r(N_g)
+        * GR::grid->delta_theta(N_g);
     cout << " MANAGER: using dt = " << dt << endl;
 };
-Manager::SetTimeStep(state* s) {
+void Manager::SetTimeStep(state* s) {
     int N_g = GR::grid->N_ghosts();
     const double gamma_tt = (1.0 + s->h_tt(N_g, N_g, N_g)) * exp(4.0 * s->phi(N_g, N_g, N_g));
     // const double factor = sqrt(gamma_tt) / s->lapse(N_g, N_g, N_g); // + abs(s->shift_r(N_g, N_g, N_g));
@@ -158,14 +156,14 @@ Manager::SetTimeStep(state* s) {
 //===========================================
 // Initialize
 //===========================================
-Manager::Set_t_max(double set_t) { t_max = set_t; }
+void Manager::Set_t_max(double set_t) { t_max = set_t; }
 
 //================================================
 //
 // Rescale metric
 // 
 //================================================
-Manager::Rescale_Metric(state* s) {
+void Manager::Rescale_Metric(state* s) {
     curve->Compute_Determinant(s);
 #pragma omp parallel for collapse(3)
     for (int i = 0; i < N_r; i++)
@@ -188,7 +186,7 @@ Manager::Rescale_Metric(state* s) {
 // Remove trace
 // 
 //================================================
-Manager::Remove_Trace(state* s) {
+void Manager::Remove_Trace(state* s) {
     curve->Compute_Trace(s);
     const double onethird = 1.0 / 3.0;
 #pragma omp parallel for collapse(3)
@@ -205,6 +203,3 @@ Manager::Remove_Trace(state* s) {
             }
     curve->Compute_Trace(s);
 };
-
-
-#endif  /* MANAGER_H */

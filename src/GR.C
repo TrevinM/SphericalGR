@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     // tell initial data whether initial metric should be rescaled
-    indata->RescaleMetric(rescale_metric);
+    GR::indata->RescaleMetric(rescale_metric);
     //================================================================
     // Allocate Slicing Class
     //================================================================
@@ -236,12 +236,12 @@ int main(int argc, char* argv[]) {
     // Allocate dumper Class
     //================================================================
     cout << " GR: allocating dumper..." << endl;
-    GR::dump = new dump(dump_step, indata, slicing, gauge);
+    GR::dump = new dumper(dump_step, GR::indata, GR::slicing, GR::gauge);
     //================================================================
     // Allocate monitor Class
     //================================================================
     cout << " GR: allocating monitor..." << endl;
-    GR::monitor = new monitor(note_step, monitor_filename, GR::grid, GR::indata,
+    GR::monitor = new Monitor(note_step, monitor_filename, GR::grid, GR::indata,
         GR::slicing, GR::gauge, GR::cosmology,
         eta_KO, sigma,
         z4, kappa_11, kappa_12, kappa_2, kappa_ric,
@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
     // Allocate manager Class
     //================================================================
     cout << " GR: allocating manager..." << endl;
-    GR::manager = new manager(matter_type,
+    GR::manager = new Manager(matter_type,
         sigma, cowling, eta_KO,
         z4, kappa_11, kappa_12, kappa_2, kappa_ric,
         RK_order, char_OB, solve_constraints);

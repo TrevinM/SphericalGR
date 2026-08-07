@@ -1,4 +1,5 @@
 #include "Manager.h"
+#include "GR.h"
 
 void Manager::Compute_RHS(double time) {
     if (cowling == 1)

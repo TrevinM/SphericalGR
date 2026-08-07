@@ -8,6 +8,8 @@
 #define CURVATURE_H
 
 #include "gridfunction.h"
+#include "dumper.h"
+#include "State.h"
 #include "Grid.h"
 
 class curvature {
