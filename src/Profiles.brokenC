@@ -6,37 +6,14 @@
 //
 //================================================
 //
-#ifndef PROFILES_H
-#define PROFILES_H
 
-#include "Grid.h"
-#include "gridfunction.h"
-#include "Slicing.h"
-#include "InData.h"
-#include "Gauge.h"
-#include "Cosmology.h"
+#include "Profiles.h"
 
-class Profiles {
- private:
-  Grid *grid;
-  InData *indata;
-  Slicing *slicing;
-  Gauge *gauge;
-  Cosmology *cosmology;
-  int N_fcts;     // actual number
-  int N_fcts_max; // maximum number - set below...
-  int N_r, N_theta, N_phi, N_g;
-  ofstream outfile_ax, outfile_eq;
-  gf3d ** fct_list;
-  gf3d * inv_radius;
-  const char * filestem;
-  int note_step;
-  double PI, PI_half;
-public:
+
   //==========================================
   // Constructor
   //==========================================
-  Profiles(const char * filename_i, Grid *grid_i, int note_step_i, InData *indata_i, Slicing *slicing_i,
+  Profiles::Profiles(const char * filename_i, Grid *grid_i, int note_step_i, InData *indata_i, Slicing *slicing_i,
 	   Gauge *gauge_i, Cosmology *cosmology_i) :
     grid(grid_i), indata(indata_i), slicing(slicing_i), gauge(gauge_i),
     cosmology(cosmology_i), note_step(note_step_i), filestem(filename_i)
@@ -52,19 +29,11 @@ public:
     PI_half = PI / 2.0;
     inv_radius = NULL;
   };
-  //==========================================
-  // Destructor
-  //==========================================
-  ~Profiles() {
-    delete fct_list;
-    if (outfile_ax) outfile_ax.close();
-    if (outfile_eq) outfile_eq.close();
-    cout << " PROFILES: destructing profiles... " << endl;
-  }
+
   //==========================================
   // initialize profile files
   //==========================================
-  int initialize_file(gf3d * prop_radius) {
+  int Profiles::initialize_file(gf3d * prop_radius) {
     inv_radius = prop_radius;
     ostringstream profilename_ax, profilename_eq;
     //
@@ -148,7 +117,7 @@ public:
   //==========================================
   // write profile
   //==========================================
-  int write_profile(double coord_time, double prop_time) {
+  int Profiles::write_profile(double coord_time, double prop_time) {
       //      outfile_ax << setw(16) << coord_time << setw(16) << prop_time;
     //
     // first on axis... 
@@ -193,8 +162,8 @@ public:
   //==========================================
   // assemble profile list
   //==========================================
-  template <class bundle>
-  int add_to_profile_list(const char * profile_list_file, bundle *s) {
+  template <class bundle>;
+  int Profiles::add_to_profile_list(const char * profile_list_file, bundle *s) {
     ifstream infile;
     infile.open(profile_list_file);
     if (!infile) {
@@ -223,7 +192,3 @@ public:
     }
     return N_fcts;
   }
-
-};
-
-#endif  /* PROFILES_H */
