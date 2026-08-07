@@ -290,8 +290,8 @@ int main(int argc, char* argv[]) {
     if (t_max > grid->r_max())
         t_max = grid->r_max();
 
-    GR::manager.Set_t_max(t_max);
-    bool success = GR::manager.Initialize();
+    GR::manager->Set_t_max(t_max);
+    bool success = GR::manager->Initialize();
     //  manager.Test_Indices();
     //  einstein.Test_Gridfunction();
     //  manager.Test_Ricci_for_Schwarzschild();
@@ -304,11 +304,11 @@ int main(int argc, char* argv[]) {
     //================================================================
     // Integrate to time t_max
     //================================================================
-    if (success) GR::manager.Integrate(t_max);
+    if (success) GR::manager->Integrate(t_max);
     //
-    if (eos != NULL) delete GR::eos;
-    if (profiles != NULL) delete GR::profiles;
-    if (waves != NULL) delete GR::waves;
+    if (GR::eos != NULL) delete GR::eos;
+    if (GR::profiles != NULL) delete GR::profiles;
+    if (GR::waves != NULL) delete GR::waves;
     delete GR::gauge;
     delete GR::slicing;
     delete GR::cosmology;
