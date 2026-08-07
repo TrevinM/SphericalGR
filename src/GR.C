@@ -78,16 +78,16 @@ int main(int argc, char* argv[]) {
     //================================================================
     // Allocate Grid Class
     //================================================================
-    cout << " GR: allocating grid..." << endl;
-    grid = new Grid();
+    cout << " GR: allocating GR::grid..." << endl;
+    GR::grid = new Grid();
     //================================================================
     // Allocate checkpoint class
     //================================================================
-    CheckPoint checkpoint(read_from_chkpt, chkpt_step, grid);
+    CheckPoint checkpoint(read_from_chkpt, chkpt_step, GR::grid);
     //================================================================
     // Allocate Cosmology Class
     //================================================================
-    cout << " GR: allocating cosmology..." << endl;
+    cout << " GR: allocating GR::cosmology..." << endl;
     if (space_type == 1) {
         GR::cosmology = new Minkowski();
     } else if (space_type == 2) {
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     } else if (space_type == 3) {
         GR::cosmology = new Radiation();
     } else {
-        cerr << " GR: no cosmology of type " << space_type << "!!" << endl;
+        cerr << " GR: no GR::cosmology of type " << space_type << "!!" << endl;
         return 1;
     }
     //================================================================
@@ -121,64 +121,65 @@ int main(int argc, char* argv[]) {
     // Allocate InData Class
     //================================================================
     cout << " GR: allocating indata..." << endl;
+    GR::cosmology = 0;
     if (checkpoint.ReadFromChkpt()) {
-        GR::indata = new ReadFromCheckPoint(read_from_chkpt, grid, cosmology);
+        GR::indata = new ReadFromCheckPoint(read_from_chkpt, GR::grid, GR::cosmology);
     } else if (indata_type == 1) {
-        GR::indata = new LinWave(indata_input, grid, cosmology);
+        GR::indata = new LinWave(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 2) {
-        GR::indata = new Schwarzschild(indata_input, grid, cosmology);
+        GR::indata = new Schwarzschild(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 3) {
-        GR::indata = new Flat(indata_input, grid, cosmology);
+        GR::indata = new Flat(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 4) {
-        GR::indata = new TOV(indata_input, eos, grid, cosmology);
+        GR::indata = new TOV(indata_input, GR::eos, GR::grid, GR::cosmology);
     } else if (indata_type == 5) {
-        GR::indata = new Trumpet(indata_input, grid, cosmology);
+        GR::indata = new Trumpet(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 6) {
-        GR::indata = new RNS(indata_input, grid, cosmology);
+        GR::indata = new RNS(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 7) {
-        GR::indata = new Brill(indata_input, grid, cosmology);
+        GR::indata = new Brill(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 8) {
-        GR::indata = new Kerr(indata_input, grid, cosmology);
+        GR::indata = new Kerr(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 9) {
-        GR::indata = new BowenYork(indata_input, grid, cosmology);
+        GR::indata = new BowenYork(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 10) {
-        GR::indata = new KerrSchild(indata_input, grid, cosmology);
+        GR::indata = new KerrSchild(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 11) {
-        GR::indata = new KenTrumpet(indata_input, grid, cosmology);
+        GR::indata = new KenTrumpet(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 12) {
-        GR::indata = new Brill_Lindquist(indata_input, grid, cosmology);
+        GR::indata = new Brill_Lindquist(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 13) {
-        GR::indata = new Shock(indata_input, grid, cosmology);
+        GR::indata = new Shock(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 14) {
-        GR::indata = new EvansColeman(indata_input, grid, cosmology);
+        GR::indata = new EvansColeman(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 15) {
-        GR::indata = new Rad_TOV(indata_input, grid, cosmology);
+        GR::indata = new Rad_TOV(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 16) {
-        GR::indata = new OS(indata_input, grid, cosmology);
+        GR::indata = new OS(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 17) {
-        GR::indata = new RotPerfectFluid(indata_input, grid, cosmology);
+        GR::indata = new RotPerfectFluid(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 18) {
-        GR::indata = new Bondi(indata_input, grid, cosmology);
+        GR::indata = new Bondi(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 19) {
-        GR::indata = new Choptuik(indata_input, grid, cosmology);
+        GR::indata = new Choptuik(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 20) {
-        GR::indata = new EMWave(indata_input, grid, cosmology);
+        GR::indata = new EMWave(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 21) {
-        GR::indata = new RadHydroShockTest(indata_input, grid, cosmology);
+        GR::indata = new RadHydroShockTest(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 22) {
-        GR::indata = new TOV_BH(indata_input, eos, grid, cosmology);
+        GR::indata = new TOV_BH(indata_input, GR::eos, GR::grid, GR::cosmology);
     } else if (indata_type == 23) {
-        GR::indata = new SMS_TOV(indata_input, eos, grid, cosmology);
+        GR::indata = new SMS_TOV(indata_input, GR::eos, GR::grid, GR::cosmology);
     } else if (indata_type == 24) {
-        GR::indata = new GaugeWave(indata_input, grid, cosmology);
+        GR::indata = new GaugeWave(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 25) {
-        GR::indata = new WindTunnel(indata_input, eos, grid, cosmology);
+        GR::indata = new WindTunnel(indata_input, GR::eos, GR::grid, GR::cosmology);
     } else if (indata_type == 26) {
-        GR::indata = new ShibataWave(indata_input, grid, cosmology);
+        GR::indata = new ShibataWave(indata_input, GR::grid, GR::cosmology);
     } else if (indata_type == 27) {
-        GR::indata = new Disk(indata_input, eos, grid, cosmology);
+        GR::indata = new Disk(indata_input, GR::eos, GR::grid, GR::cosmology);
     } else if (indata_type == 28) {
-        GR::indata = new DualEMWave(indata_input, grid, cosmology);
+        GR::indata = new DualEMWave(indata_input, GR::grid, GR::cosmology);
     } else {
         cerr << " No such Indata type! " << endl;
         return 1;
@@ -189,21 +190,21 @@ int main(int argc, char* argv[]) {
     // Allocate Slicing Class
     //================================================================
     if (slicing_type == 1) {
-        GR::slicing = new Geodesic(grid, cosmology, eta_KO);
+        GR::slicing = new Geodesic(GR::grid, GR::cosmology, eta_KO);
     } else if (slicing_type == 2) {
-        GR::slicing = new OnePlusLog(grid, cosmology, eta_KO);
+        GR::slicing = new OnePlusLog(GR::grid, GR::cosmology, eta_KO);
     } else if (slicing_type == 3) {
-        GR::slicing = new Advective_OnePlusLog(grid, cosmology, eta_KO);
+        GR::slicing = new Advective_OnePlusLog(GR::grid, GR::cosmology, eta_KO);
     } else if (slicing_type == 4) {
-        GR::slicing = new Harmonic(grid, cosmology, eta_KO);
+        GR::slicing = new Harmonic(GR::grid, GR::cosmology, eta_KO);
         // } else if (slicing_type == 5) {
-        //   slicing = new Maximal(grid);  
+        //   slicing = new Maximal(GR::grid);  
         // } else if (slicing_type == 6) {
-        //   slicing = new Maximal_so(grid);
+        //   slicing = new Maximal_so(GR::grid);
             //  } else if (slicing_type == 7) {
-            //    slicing = new KenLog(grid, cosmology);
+            //    slicing = new KenLog(GR::grid, GR::cosmology);
     } else if (slicing_type == 8) {
-        GR::slicing = new BonaMasso(grid, cosmology, eta_KO);
+        GR::slicing = new BonaMasso(GR::grid, GR::cosmology, eta_KO);
     } else {
         cerr << " No such Slicing type! " << endl;
         return 1;
@@ -212,21 +213,21 @@ int main(int argc, char* argv[]) {
     // Allocate Gauge Class
     //================================================================
     if (gauge_type == 1) {
-        GR::gauge = new Constant_Shift(grid);
+        GR::gauge = new Constant_Shift(GR::grid);
     } else if (gauge_type == 2) {
-        GR::gauge = new Gamma_Driver(grid);
+        GR::gauge = new Gamma_Driver(GR::grid);
     } else if (gauge_type == 3) {
-        GR::gauge = new Advective_Gamma_Driver(grid);
+        GR::gauge = new Advective_Gamma_Driver(GR::grid);
     } else if (gauge_type == 4) {
-        GR::gauge = new Jena_Gamma_Driver(grid);
+        GR::gauge = new Jena_Gamma_Driver(GR::grid);
     } else if (gauge_type == 5) {
-        GR::gauge = new Advective_Jena_Gamma_Driver(grid);
+        GR::gauge = new Advective_Jena_Gamma_Driver(GR::grid);
         // } else if (gauge_type == 6) {
-        //   gauge = new Mod_Gamma_Driver(grid,eta);
+        //   gauge = new Mod_Gamma_Driver(GR::grid,eta);
     } else if (gauge_type == 7) {
-        GR::gauge = new Covariant_Advective_Jena_Gamma_Driver(grid);
+        GR::gauge = new Covariant_Advective_Jena_Gamma_Driver(GR::grid);
     } else if (gauge_type == 8) {
-        GR::gauge = new Self_Sim_Shift(grid);
+        GR::gauge = new Self_Sim_Shift(GR::grid);
     } else {
         cerr << " No such gauge type! " << endl;
         return 1;
@@ -240,8 +241,8 @@ int main(int argc, char* argv[]) {
     // Allocate monitor Class
     //================================================================
     cout << " GR: allocating monitor..." << endl;
-    GR::monitor = new monitor(note_step, monitor_filename, grid, indata,
-        slicing, gauge, cosmology,
+    GR::monitor = new monitor(note_step, monitor_filename, GR::grid, GR::indata,
+        GR::slicing, GR::gauge, GR::cosmology,
         eta_KO, sigma,
         z4, kappa_11, kappa_12, kappa_2, kappa_ric,
         RK_order, char_OB);
@@ -250,8 +251,8 @@ int main(int argc, char* argv[]) {
     //================================================================
     if (write_profiles) {
         cout << " GR: allocating profiler..." << endl;
-        GR::profiles = new Profiles(monitor_filename, grid, note_step, indata,
-            slicing, gauge, cosmology);
+        GR::profiles = new Profiles(monitor_filename, GR::grid, note_step, GR::indata,
+            GR::slicing, GR::gauge, GR::cosmology);
     } else {
         GR::profiles = NULL;
     }
@@ -260,8 +261,8 @@ int main(int argc, char* argv[]) {
     //================================================================
     if (extract_waves) {
         cout << " GR: allocating wave extraction..." << endl;
-        GR::waves = new WaveExtraction(monitor_filename, grid, note_step, indata,
-            slicing, gauge, cosmology);
+        GR::waves = new WaveExtraction(monitor_filename, GR::grid, note_step, GR::indata,
+            GR::slicing, GR::gauge, GR::cosmology);
     } else {
         GR::waves = NULL;
     }
@@ -270,7 +271,7 @@ int main(int argc, char* argv[]) {
     //================================================================
     if (track_photons) {
         cout << " GR: allocating photons ..." << endl;
-        GR::photons = new Photons(monitor_filename, grid);
+        GR::photons = new Photons(monitor_filename, GR::grid);
     } else {
         GR::photons = NULL;
     }
@@ -278,17 +279,15 @@ int main(int argc, char* argv[]) {
     // Allocate manager Class
     //================================================================
     cout << " GR: allocating manager..." << endl;
-    GR::manager = new manager(grid, &dump, &monitor, &checkpoint, profiles,
-        waves, indata, eos,
-        slicing, gauge, cosmology, photons, matter_type,
+    GR::manager = new manager(matter_type,
         sigma, cowling, eta_KO,
         z4, kappa_11, kappa_12, kappa_2, kappa_ric,
         RK_order, char_OB, solve_constraints);
     //================================================================
     // Initialize
     //================================================================
-    if (t_max > grid->r_max())
-        t_max = grid->r_max();
+    if (t_max > GR::grid->r_max())
+        t_max = GR::grid->r_max();
 
     GR::manager->Set_t_max(t_max);
     bool success = GR::manager->Initialize();
