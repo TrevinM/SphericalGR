@@ -13,7 +13,7 @@ export OMP_NUM_THREADS=16
 export dir=/mnt/research/tbaumgar/Students/tmacomber/SphericalGR
 
 #Name of critical collapse suite to be run (with sbatch) or created (with bash)
-suite=ODEqH
+suite=ODEq
 
 max_runs=3
 verbose=1   # 1+: Slurm debug prints
@@ -560,10 +560,10 @@ do
                 while read -r line
                 do
                     split=( $line )
-                    [[ ${split[0]} != "#" ]] && rho_c_max=${split[3]}
+                    [[ ${split[0]} != "#" ]] && rho_c_max_MAX=${split[5]}
                 done < output/DualMaxwell*.dualmaxwell_mon
 
-                echo $eta $rho_c_max >> $suite_path/data_sub
+                echo $eta $rho_c_max_MAX >> $suite_path/data_sub
                 let num_data_sub++
             else
                 log "WARNING: Couldn't open dualmaxwell monitor..." 
