@@ -4,7 +4,7 @@
 //
 //================================================
 #include "Manager.h"
-#include "GR.h"
+#include "Container.h"
 
 double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
     //  cout << " Manager: in Regrid()... " << endl;
@@ -12,7 +12,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
     // check whether it's time to regrid
     // 
     double criterion = RegridCriterion();
-    bool regrid = GR::grid->TimeToRegrid(criterion);
+    bool regrid = Container::grid->TimeToRegrid(criterion);
     if (timestep - timestep_last_regrid < steps_between_regrids)
         regrid = false;
     //
@@ -26,7 +26,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         double mass = constraints->ADM_Mass_Surface(last, curve, aux, i);
         double ang_mom = constraints->Angular_Momentum(last, curve, aux, i);
         double lin_mom = constraints->Linear_Momentum(last, curve, aux, i);
-        GR::monitor->note(step, t, tau_c, mass, ang_mom,
+        Container::monitor->note(step, t, tau_c, mass, ang_mom,
             lin_mom, last->phi(0.0, N_g, N_g),
             last->lapse(0.0, N_g, N_g), last->lapse.min(),
             last->K(0.0, N_g, N_g), RegridCriterion(), true);
@@ -57,7 +57,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         // returns new grid points only -- need to finish up regrid with call
         // to Setup_Radial_Grid() below.
         //
-        bool regrid = GR::grid->Regrid(r_new);
+        bool regrid = Container::grid->Regrid(r_new);
         //
         // now make sure to regrid every dynamical variable
         //
@@ -84,12 +84,12 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         //
         // finally update radius
         // 
-        GR::grid->Setup_Radial_Grid(r, r2);
+        Container::grid->Setup_Radial_Grid(r, r2);
         //
         last->dump_fcts(t, tau_c, timestep, "_after_regrid");
         matter->dump_fcts(t, tau_c, timestep, "_after_regrid");
         constraints->dump_fcts(t, tau_c, timestep, "_after_regrid");
-        GR::monitor->regrid(GR::grid->r_max());
+        Container::monitor->regrid(Container::grid->r_max());
         horizonfinder->SetRMaxMin();
         SetTimeStep();
         //
@@ -112,10 +112,10 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         //
         // finally adjust t_max if necessary
         //
-        if (t + GR::grid->r_max() < t_max) {
-            t_max = t + GR::grid->r_max();
+        if (t + Container::grid->r_max() < t_max) {
+            t_max = t + Container::grid->r_max();
             cout << " REGRID: set t_max to " << t_max << endl;
-            GR::monitor->set_t_max(t_max);
+            Container::monitor->set_t_max(t_max);
         }
         //
         // ... and take note right after regrid...
@@ -123,7 +123,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         mass = constraints->ADM_Mass_Surface(last, curve, aux, i);
         ang_mom = constraints->Angular_Momentum(last, curve, aux, i);
         lin_mom = constraints->Linear_Momentum(last, curve, aux, i);
-        GR::monitor->note(step, t, tau_c, mass, ang_mom,
+        Container::monitor->note(step, t, tau_c, mass, ang_mom,
             lin_mom, last->phi(0.0, N_g, N_g),
             last->lapse(0.0, N_g, N_g), last->lapse.min(),
             last->K(0.0, N_g, N_g), criterion, true);
@@ -136,7 +136,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
 // the cutoff specified in Grid_Input, we regrid
 //================================================
 double Manager::RegridCriterion() {
-    if (GR::grid->Regrid_Type() == 0) {
+    if (Container::grid->Regrid_Type() == 0) {
         if (!strcmp(matter->Name(), "vacuum")) {  // vacuum...
             double diff = 0.0;
             double max_diff = 0.0;
@@ -160,10 +160,10 @@ double Manager::RegridCriterion() {
         } else {
             return matter->RegridCriterion();
         }
-    } else if (GR::grid->Regrid_Type() == 1) {
-        return GR::grid->RegridCriterion(tau_c);
-    } else if (GR::grid->Regrid_Type() == 2) {
-        return (GR::grid->r_max() - GR::grid->r_max_final()) - (t_max - t);
+    } else if (Container::grid->Regrid_Type() == 1) {
+        return Container::grid->RegridCriterion(tau_c);
+    } else if (Container::grid->Regrid_Type() == 2) {
+        return (Container::grid->r_max() - Container::grid->r_max_final()) - (t_max - t);
     } else {
         return 0;
     }

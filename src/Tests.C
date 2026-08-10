@@ -8,7 +8,7 @@
 #include "Manager.h"
 #include "InData.h"
 #include "Transformations.h"
-#include "GR.h"
+#include "Container.h"
 
 //#include <iostream>
 //#include <cmath>
@@ -33,13 +33,13 @@
 
 void Manager::Test_EOS() {
     double rho_0 = 0.003499997129395651;
-    double epsilon = GR::eos->cold_eps(rho_0);
-    double P = GR::eos->P(rho_0, epsilon);
-    double temp = GR::eos->temperature(rho_0, epsilon);
-    double sound_speed = GR::eos->sound_speed(rho_0, epsilon);
+    double epsilon = Container::eos->cold_eps(rho_0);
+    double P = Container::eos->P(rho_0, epsilon);
+    double temp = Container::eos->temperature(rho_0, epsilon);
+    double sound_speed = Container::eos->sound_speed(rho_0, epsilon);
     cout << "rho_0 = " << rho_0 << " epsilon = " << epsilon << " P = "
         << P << " temp = " << temp << " sound_speed = " << sound_speed << endl;
-    cout << "rho_0(P) = " << GR::eos->rho_0(P) << endl;
+    cout << "rho_0(P) = " << Container::eos->rho_0(P) << endl;
 
     ofstream outdata;
     outdata.open("PWP_EOS_Tables.txt"); // opens the file
@@ -51,11 +51,11 @@ void Manager::Test_EOS() {
         << setw(16) << "P " << std::left << setw(16)
         << "epsilon " << setw(16) << "sound speed" << endl;
     for (double rho_0 = 1.0e-5; rho_0 <= 1.0e-1; rho_0 *= 1.05) {
-        double epsilon = GR::eos->cold_eps(rho_0);
-        double P = GR::eos->P(rho_0, epsilon);
+        double epsilon = Container::eos->cold_eps(rho_0);
+        double P = Container::eos->P(rho_0, epsilon);
         outdata << std::left << setw(16) << rho_0 << std::left
             << setw(16) << P << std::left << setw(16)
-            << epsilon << setw(16) << GR::eos->sound_speed(rho_0, epsilon) << endl;
+            << epsilon << setw(16) << Container::eos->sound_speed(rho_0, epsilon) << endl;
     }
     outdata.close();
 
@@ -66,22 +66,22 @@ void Manager::Test_EOS() {
 void Manager::Test_Indices() {
     cout << " TESTS: testing indices for r... " << endl;
     for (int i = 0; i < N_r; i++) {
-        double rl = GR::grid->r(i);
-        int index = GR::grid->i_ind(rl);
+        double rl = Container::grid->r(i);
+        int index = Container::grid->i_ind(rl);
         cout << " i = " << i << " r = " << rl << " found index "
             << index << " for r = " << r[index] << endl;
     }
     cout << " TESTS: testing indices for theta... " << endl;
     for (int j = 0; j < N_t; j++) {
-        double thetal = GR::grid->theta(j);
-        int index = GR::grid->j_ind(thetal);
+        double thetal = Container::grid->theta(j);
+        int index = Container::grid->j_ind(thetal);
         cout << " j = " << j << " theta = " << thetal << " found index "
             << index << " for theta = " << theta[index] << endl;
     }
     cout << " TESTS: testing indices for phi... " << endl;
     for (int k = 0; k < N_p; k++) {
-        double phil = GR::grid->phi(k);
-        int index = GR::grid->k_ind(phil);
+        double phil = Container::grid->phi(k);
+        int index = Container::grid->k_ind(phil);
         cout << " k = " << k << " phi = " << phil << " found index "
             << index << " for phi = " << phi[index] << endl;
     }
@@ -91,7 +91,7 @@ void Manager::Test_Indices() {
 //   for (int i = N_g; i < N_r; i++)    
 //     for (int j = N_g; j < N_theta-N_g; j++)
 //       for (int k = N_g; k < N_phi-N_g; k++) {    
-// 	lapse_o[i][j][k] = exp(r[i] * r[i]) * costheta[j] * costheta[j] * cos(2.0*GR::grid->phi(k)) * cos(2.0 * GR::grid->phi(k));
+// 	lapse_o[i][j][k] = exp(r[i] * r[i]) * costheta[j] * costheta[j] * cos(2.0*Container::grid->phi(k)) * cos(2.0 * Container::grid->phi(k));
 //       }
 //   lapse_o.fill_ghosts();
 
@@ -106,7 +106,7 @@ void Manager::Test_Indices() {
 //       const double costhetal = costheta[j];
 //       const double sinthetal = sintheta[j];
 //       for (int k = N_g; k < N_phi-N_g; k++) {    
-// 	const double phil = GR::grid->phi(k);
+// 	const double phil = Container::grid->phi(k);
 // 	//
 // 	const double f_r = 2.0*rl * exp(rl*rl) * costhetal * costhetal *  cos(2.0*phil) * cos(2.0*phil);
 // 	const double f_t = - 2.0 * exp(rl*rl) * costhetal * sinthetal * cos(2.0*phil) * cos(2.0*phil);
@@ -120,7 +120,7 @@ void Manager::Test_Indices() {
 // 	const double f_pp = 4.0 * exp(rl*rl) * costhetal * costhetal * (2.0 - 4.0 * cos(2.0*phil) * cos(2.0*phil));
 // 	//
 // 	if (i == N_g && j == N_theta/2 && k == N_g) {
-// 	  cout << " Function at r = " << r[i] << ", theta = " << GR::grid->theta(j)	
+// 	  cout << " Function at r = " << r[i] << ", theta = " << Container::grid->theta(j)	
 // 	       << ", phi = " << phil << " is : " << lapse_o[i][j][k] 
 // 	       << " = " << lapse_o(i,j,k) << endl;
 // 	  cout << " Derivatives... " << endl;
@@ -188,7 +188,7 @@ void Manager::Test_Ricci_for_Schwarzschild() {
     for (int i = N_g; i < N_r - N_g; i++)
         for (int j = N_g; j < N_t - N_g; j++)
             for (int k = N_g; k < N_p - N_g; k++) {
-                const double rl = GR::grid->r(i);
+                const double rl = Container::grid->r(i);
                 double psi = 1.0 + M / (2.0 * rl);
                 double psi4 = psi * psi * psi * psi;
                 last->h_rr[i][j][k] = psi4 - 1.0;
@@ -204,7 +204,7 @@ void Manager::Test_Ricci_for_Schwarzschild() {
     int i = N_r / 2;
     int j = N_t / 3;
     int k = N_g;
-    const double rl = GR::grid->r(i);
+    const double rl = Container::grid->r(i);
     double r2l = rl * rl;
     double psi = 1.0 + M / (2.0 * rl);
     double psi4 = psi * psi * psi * psi;
@@ -213,7 +213,7 @@ void Manager::Test_Ricci_for_Schwarzschild() {
     curve->Compute_Metric_Derivatives(last);
     curve->Compute_Inverse_Metric(last);
 
-    cout << "\n Results at r = " << rl << ", theta = " << GR::grid->theta(j) << ", phi = " << GR::grid->phi(k) << endl;
+    cout << "\n Results at r = " << rl << ", theta = " << Container::grid->theta(j) << ", phi = " << Container::grid->phi(k) << endl;
 
     cout << "\nINVERSE METRIC : " << endl;
     cout << setw(10) << "gup^{ij} " << setw(15) << "numerical" << setw(15) << "analytical" << endl;
@@ -252,7 +252,7 @@ void Manager::Test_Ricci_for_Schwarzschild() {
     // Before computing Ricci we first compute Lambda's
     //
     for (int i = N_g; i < N_r - N_g; i++) {
-        const double rl = GR::grid->r(i);
+        const double rl = Container::grid->r(i);
         for (int j = N_g; j < N_t - N_g; j++)
             for (int k = N_g; k < N_p - N_g; k++) {
                 double psi = 1.0 + M / (2.0 * rl);
@@ -308,7 +308,7 @@ void Manager::Test_Ricci_for_Schwarzschild() {
 // //
 void Manager::Test_Derivatives() {
     //
-    // set up function in interior GR::grid
+    // set up function in interior Container::grid
     //
     for (int i = N_g; i < N_r; i++) {
         const double rl = last->lapse.r(i);
@@ -350,12 +350,12 @@ void Manager::Test_Derivatives() {
             }
         }
     }
-    GR::dump->slice(0.0, 0.0, 0, last->shift_r.Address());
-    GR::dump->slice(0.0, 0.0, 0, last->shift_t.Address());
-    GR::dump->slice(0.0, 0.0, 0, last->h_rr.Address());
-    GR::dump->slice(0.0, 0.0, 0, last->h_rt.Address());
-    GR::dump->slice(0.0, 0.0, 0, last->h_tt.Address());
-    GR::dump->dump(0.0, 0.0, 0, last->h_tt.Address());
+    Container::dump->slice(0.0, 0.0, 0, last->shift_r.Address());
+    Container::dump->slice(0.0, 0.0, 0, last->shift_t.Address());
+    Container::dump->slice(0.0, 0.0, 0, last->h_rr.Address());
+    Container::dump->slice(0.0, 0.0, 0, last->h_rt.Address());
+    Container::dump->slice(0.0, 0.0, 0, last->h_tt.Address());
+    Container::dump->dump(0.0, 0.0, 0, last->h_tt.Address());
     exit(0);
 }
 //   h_rr_o.fill_ghosts();
@@ -379,8 +379,8 @@ void Manager::Test_Derivatives() {
 
 //   i = 2;
 //   double rl = r[i];
-//   double tl = GR::grid->theta(j);
-//   double pl = GR::grid->phi(k);  
+//   double tl = Container::grid->theta(j);
+//   double pl = Container::grid->phi(k);  
 
 //   cout << " at r = " << rl << ", theta = " << tl << ", phi = " << pl << endl;
 //   cout << " at x = " << rl*sin(tl)*cos(pl) << ", y = " << rl*sin(tl)*sin(pl) << ", z = " << rl*cos(tl) << endl << endl;
@@ -390,28 +390,28 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_rr \n" << endl;
 
-//   double fct_l = GR::indata->h_rr_analytical(rl,tl,pl,t);
-//   double fctpr = GR::indata->h_rr_analytical(rl+dr,tl,pl,t);
-//   double fctmr = GR::indata->h_rr_analytical(rl-dr,tl,pl,t);
-//   double fctpt = GR::indata->h_rr_analytical(rl,tl+dt,pl,t);
-//   double fctmt = GR::indata->h_rr_analytical(rl,tl-dt,pl,t);
-//   double fctpp = GR::indata->h_rr_analytical(rl,tl,pl+dp,t);
-//   double fctmp = GR::indata->h_rr_analytical(rl,tl,pl-dp,t);
+//   double fct_l = Container::indata->h_rr_analytical(rl,tl,pl,t);
+//   double fctpr = Container::indata->h_rr_analytical(rl+dr,tl,pl,t);
+//   double fctmr = Container::indata->h_rr_analytical(rl-dr,tl,pl,t);
+//   double fctpt = Container::indata->h_rr_analytical(rl,tl+dt,pl,t);
+//   double fctmt = Container::indata->h_rr_analytical(rl,tl-dt,pl,t);
+//   double fctpp = Container::indata->h_rr_analytical(rl,tl,pl+dp,t);
+//   double fctmp = Container::indata->h_rr_analytical(rl,tl,pl-dp,t);
 
-//   double fctprpt = GR::indata->h_rr_analytical(rl+dr,tl+dt,pl,t);
-//   double fctprmt = GR::indata->h_rr_analytical(rl+dr,tl-dt,pl,t);
-//   double fctmrpt = GR::indata->h_rr_analytical(rl-dr,tl+dt,pl,t);
-//   double fctmrmt = GR::indata->h_rr_analytical(rl-dr,tl-dt,pl,t);
+//   double fctprpt = Container::indata->h_rr_analytical(rl+dr,tl+dt,pl,t);
+//   double fctprmt = Container::indata->h_rr_analytical(rl+dr,tl-dt,pl,t);
+//   double fctmrpt = Container::indata->h_rr_analytical(rl-dr,tl+dt,pl,t);
+//   double fctmrmt = Container::indata->h_rr_analytical(rl-dr,tl-dt,pl,t);
 
-//   double fctprpp = GR::indata->h_rr_analytical(rl+dr,tl,pl+dp,t);
-//   double fctprmp = GR::indata->h_rr_analytical(rl+dr,tl,pl-dp,t);
-//   double fctmrpp = GR::indata->h_rr_analytical(rl-dr,tl,pl+dp,t);
-//   double fctmrmp = GR::indata->h_rr_analytical(rl-dr,tl,pl-dp,t);
+//   double fctprpp = Container::indata->h_rr_analytical(rl+dr,tl,pl+dp,t);
+//   double fctprmp = Container::indata->h_rr_analytical(rl+dr,tl,pl-dp,t);
+//   double fctmrpp = Container::indata->h_rr_analytical(rl-dr,tl,pl+dp,t);
+//   double fctmrmp = Container::indata->h_rr_analytical(rl-dr,tl,pl-dp,t);
 
-//   double fctptpp = GR::indata->h_rr_analytical(rl,tl+dt,pl+dp,t);
-//   double fctptmp = GR::indata->h_rr_analytical(rl,tl+dt,pl-dp,t);
-//   double fctmtpp = GR::indata->h_rr_analytical(rl,tl-dt,pl+dp,t);
-//   double fctmtmp = GR::indata->h_rr_analytical(rl,tl-dt,pl-dp,t);
+//   double fctptpp = Container::indata->h_rr_analytical(rl,tl+dt,pl+dp,t);
+//   double fctptmp = Container::indata->h_rr_analytical(rl,tl+dt,pl-dp,t);
+//   double fctmtpp = Container::indata->h_rr_analytical(rl,tl-dt,pl+dp,t);
+//   double fctmtmp = Container::indata->h_rr_analytical(rl,tl-dt,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -444,28 +444,28 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_rt \n" << endl;
 
-//   fct_l = GR::indata->h_rt_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_rt_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_rt_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_rt_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_rt_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_rt_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_rt_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_rt_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_rt_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_rt_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_rt_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_rt_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_rt_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_rt_analytical(rl,tl,pl-dp,t);
 
-//   fctprpt = GR::indata->h_rt_analytical(rl+dr,tl+dt,pl,t);
-//   fctprmt = GR::indata->h_rt_analytical(rl+dr,tl-dt,pl,t);
-//   fctmrpt = GR::indata->h_rt_analytical(rl-dr,tl+dt,pl,t);
-//   fctmrmt = GR::indata->h_rt_analytical(rl-dr,tl-dt,pl,t);
+//   fctprpt = Container::indata->h_rt_analytical(rl+dr,tl+dt,pl,t);
+//   fctprmt = Container::indata->h_rt_analytical(rl+dr,tl-dt,pl,t);
+//   fctmrpt = Container::indata->h_rt_analytical(rl-dr,tl+dt,pl,t);
+//   fctmrmt = Container::indata->h_rt_analytical(rl-dr,tl-dt,pl,t);
 
-//   fctprpp = GR::indata->h_rt_analytical(rl+dr,tl,pl+dp,t);
-//   fctprmp = GR::indata->h_rt_analytical(rl+dr,tl,pl-dp,t);
-//   fctmrpp = GR::indata->h_rt_analytical(rl-dr,tl,pl+dp,t);
-//   fctmrmp = GR::indata->h_rt_analytical(rl-dr,tl,pl-dp,t);
+//   fctprpp = Container::indata->h_rt_analytical(rl+dr,tl,pl+dp,t);
+//   fctprmp = Container::indata->h_rt_analytical(rl+dr,tl,pl-dp,t);
+//   fctmrpp = Container::indata->h_rt_analytical(rl-dr,tl,pl+dp,t);
+//   fctmrmp = Container::indata->h_rt_analytical(rl-dr,tl,pl-dp,t);
 
-//   fctptpp = GR::indata->h_rt_analytical(rl,tl+dt,pl+dp,t);
-//   fctptmp = GR::indata->h_rt_analytical(rl,tl+dt,pl-dp,t);
-//   fctmtpp = GR::indata->h_rt_analytical(rl,tl-dt,pl+dp,t);
-//   fctmtmp = GR::indata->h_rt_analytical(rl,tl-dt,pl-dp,t);
+//   fctptpp = Container::indata->h_rt_analytical(rl,tl+dt,pl+dp,t);
+//   fctptmp = Container::indata->h_rt_analytical(rl,tl+dt,pl-dp,t);
+//   fctmtpp = Container::indata->h_rt_analytical(rl,tl-dt,pl+dp,t);
+//   fctmtmp = Container::indata->h_rt_analytical(rl,tl-dt,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -497,13 +497,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_rp \n" << endl;
 
-//   fct_l = GR::indata->h_rp_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_rp_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_rp_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_rp_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_rp_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_rp_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_rp_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_rp_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_rp_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_rp_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_rp_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_rp_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_rp_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_rp_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -527,13 +527,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_tt \n" << endl;
 
-//   fct_l = GR::indata->h_tt_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_tt_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_tt_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_tt_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_tt_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_tt_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_tt_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_tt_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_tt_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_tt_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_tt_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_tt_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_tt_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_tt_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -557,13 +557,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_tp \n" << endl;
 
-//   fct_l = GR::indata->h_tp_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_tp_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_tp_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_tp_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_tp_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_tp_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_tp_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_tp_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_tp_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_tp_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_tp_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_tp_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_tp_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_tp_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -587,13 +587,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_pp \n" << endl;
 
-//   fct_l = GR::indata->h_pp_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_pp_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_pp_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_pp_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_pp_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_pp_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_pp_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_pp_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_pp_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_pp_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_pp_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_pp_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_pp_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_pp_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -617,13 +617,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n phi \n" << endl;
 
-//   fct_l = GR::indata->phi_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->phi_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->phi_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->phi_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->phi_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->phi_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->phi_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->phi_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->phi_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->phi_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->phi_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->phi_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->phi_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->phi_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -653,8 +653,8 @@ void Manager::Test_Derivatives() {
 
 //   j = 2;
 //   rl = r[i];
-//   tl = GR::grid->theta(j);
-//   pl = GR::grid->phi(k);  
+//   tl = Container::grid->theta(j);
+//   pl = Container::grid->phi(k);  
 
 
 //   cout << " at r = " << rl << ", theta = " << tl << ", phi = " << pl << endl;
@@ -665,13 +665,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_rr \n" << endl;
 
-//   fct_l = GR::indata->h_rr_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_rr_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_rr_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_rr_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_rr_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_rr_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_rr_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_rr_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_rr_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_rr_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_rr_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_rr_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_rr_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_rr_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -696,13 +696,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_rt \n" << endl;
 
-//   fct_l = GR::indata->h_rt_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_rt_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_rt_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_rt_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_rt_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_rt_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_rt_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_rt_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_rt_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_rt_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_rt_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_rt_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_rt_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_rt_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -726,13 +726,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_rp \n" << endl;
 
-//   fct_l = GR::indata->h_rp_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_rp_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_rp_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_rp_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_rp_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_rp_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_rp_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_rp_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_rp_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_rp_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_rp_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_rp_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_rp_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_rp_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -756,13 +756,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_tt \n" << endl;
 
-//   fct_l = GR::indata->h_tt_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_tt_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_tt_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_tt_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_tt_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_tt_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_tt_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_tt_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_tt_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_tt_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_tt_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_tt_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_tt_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_tt_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -786,13 +786,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_tp \n" << endl;
 
-//   fct_l = GR::indata->h_tp_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_tp_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_tp_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_tp_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_tp_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_tp_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_tp_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_tp_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_tp_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_tp_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_tp_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_tp_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_tp_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_tp_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -816,13 +816,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n h_pp \n" << endl;
 
-//   fct_l = GR::indata->h_pp_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->h_pp_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->h_pp_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->h_pp_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->h_pp_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->h_pp_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->h_pp_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->h_pp_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->h_pp_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->h_pp_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->h_pp_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->h_pp_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->h_pp_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->h_pp_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -846,13 +846,13 @@ void Manager::Test_Derivatives() {
 //   //==========================================================================
 //   cout << "\n phi \n" << endl;
 
-//   fct_l = GR::indata->phi_analytical(rl,tl,pl,t);
-//   fctpr = GR::indata->phi_analytical(rl+dr,tl,pl,t);
-//   fctmr = GR::indata->phi_analytical(rl-dr,tl,pl,t);
-//   fctpt = GR::indata->phi_analytical(rl,tl+dt,pl,t);
-//   fctmt = GR::indata->phi_analytical(rl,tl-dt,pl,t);
-//   fctpp = GR::indata->phi_analytical(rl,tl,pl+dp,t);
-//   fctmp = GR::indata->phi_analytical(rl,tl,pl-dp,t);
+//   fct_l = Container::indata->phi_analytical(rl,tl,pl,t);
+//   fctpr = Container::indata->phi_analytical(rl+dr,tl,pl,t);
+//   fctmr = Container::indata->phi_analytical(rl-dr,tl,pl,t);
+//   fctpt = Container::indata->phi_analytical(rl,tl+dt,pl,t);
+//   fctmt = Container::indata->phi_analytical(rl,tl-dt,pl,t);
+//   fctpp = Container::indata->phi_analytical(rl,tl,pl+dp,t);
+//   fctmp = Container::indata->phi_analytical(rl,tl,pl-dp,t);
 
 
 //   cout << setprecision(8);
@@ -940,9 +940,9 @@ void Manager::Test_Derivatives() {
 //       for (int k = N_g; k < N_phi-N_g; k++) {
 //   	bool print = (i == 1 && j == j_check && k == k_check);
 //   	// create vector (upper indices) 
-//   	lam_r_o[i][j][k] = Vr(r[i],GR::grid->theta(j),GR::grid->phi(k));
-//   	lam_t_o[i][j][k] = Vt(r[i],GR::grid->theta(j),GR::grid->phi(k));
-//   	lam_p_o[i][j][k] = Vp(r[i],GR::grid->theta(j),GR::grid->phi(k));
+//   	lam_r_o[i][j][k] = Vr(r[i],Container::grid->theta(j),Container::grid->phi(k));
+//   	lam_t_o[i][j][k] = Vt(r[i],Container::grid->theta(j),Container::grid->phi(k));
+//   	lam_p_o[i][j][k] = Vp(r[i],Container::grid->theta(j),Container::grid->phi(k));
 //       }
 //   lam_r_o.fill_ghosts();
 //   lam_t_o.fill_ghosts();
@@ -961,10 +961,10 @@ void Manager::Test_Derivatives() {
 //   int k = k_check;
 
 //   cout << endl << " Testing at CENTER " << endl << endl;
-//   cout << " r = " << r[i] << " theta = " << GR::grid->theta(j) << " phi = " << GR::grid->phi(k) << endl;
+//   cout << " r = " << r[i] << " theta = " << Container::grid->theta(j) << " phi = " << Container::grid->phi(k) << endl;
 //   Doub rl = r[i];
-//   Doub tl = GR::grid->theta(j);
-//   Doub pl = GR::grid->phi(k);
+//   Doub tl = Container::grid->theta(j);
+//   Doub pl = Container::grid->phi(k);
 //   Doub Vrr_ana = (Vr(rl+dr,tl,pl) - Vr(rl-dr,tl,pl))/(2.0*dr);
 //   Doub Vtr_ana = (Vt(rl+dr,tl,pl) - Vt(rl-dr,tl,pl))/(2.0*dr);
 //   Doub Vpr_ana = (Vp(rl+dr,tl,pl) - Vp(rl-dr,tl,pl))/(2.0*dr);
@@ -984,10 +984,10 @@ void Manager::Test_Derivatives() {
 //   k = k_check;
 
 //   cout << endl << " Testing at AXIS " << endl << endl;
-//   cout << " r = " << r[i] << " theta = " << GR::grid->theta(j) << " phi = " << GR::grid->phi(k) << endl;
+//   cout << " r = " << r[i] << " theta = " << Container::grid->theta(j) << " phi = " << Container::grid->phi(k) << endl;
 //   rl = r[i];
-//   tl = GR::grid->theta(j);
-//   pl = GR::grid->phi(k);
+//   tl = Container::grid->theta(j);
+//   pl = Container::grid->phi(k);
 //   Doub Vrt_ana = (Vr(rl,tl+dt,pl) - Vr(rl,tl-dt,pl))/(2.0*dt);
 //   Doub Vtt_ana = (Vt(rl,tl+dt,pl) - Vt(rl,tl-dt,pl))/(2.0*dt);
 //   Doub Vpt_ana = (Vp(rl,tl+dt,pl) - Vp(rl,tl-dt,pl))/(2.0*dt);
@@ -1008,10 +1008,10 @@ void Manager::Test_Derivatives() {
 //   k = 1;
 
 //   cout << endl << " Testing PERIODICITY " << endl << endl;
-//   cout << " r = " << r[i] << " theta = " << GR::grid->theta(j) << " phi = " << GR::grid->phi(k) << endl;
+//   cout << " r = " << r[i] << " theta = " << Container::grid->theta(j) << " phi = " << Container::grid->phi(k) << endl;
 //   rl = r[i];
-//   tl = GR::grid->theta(j);
-//   pl = GR::grid->phi(k);
+//   tl = Container::grid->theta(j);
+//   pl = Container::grid->phi(k);
 //   Doub Vrp_ana = (Vr(rl,tl,pl+dp) - Vr(rl,tl,pl-dp))/(2.0*dp);
 //   Doub Vtp_ana = (Vt(rl,tl,pl+dp) - Vt(rl,tl,pl-dp))/(2.0*dp);
 //   Doub Vpp_ana = (Vp(rl,tl,pl+dp) - Vp(rl,tl,pl-dp))/(2.0*dp);
@@ -1039,13 +1039,13 @@ void Manager::Test_Flat_Metric() {
     const int j = j_check;
     const int k = k_check;
 
-    const double rl = GR::grid->r(i);
-    cout << " Results at r = " << rl << ", theta = " << GR::grid->theta(j) << " and phi = " << GR::grid->phi(k) << endl;
+    const double rl = Container::grid->r(i);
+    cout << " Results at r = " << rl << ", theta = " << Container::grid->theta(j) << " and phi = " << Container::grid->phi(k) << endl;
 
-    const double st = GR::grid->sintheta(j);
-    const double ct = GR::grid->costheta(j);
-    const double sp = sin(GR::grid->phi(k));
-    const double cp = cos(GR::grid->phi(k));
+    const double st = Container::grid->sintheta(j);
+    const double ct = Container::grid->costheta(j);
+    const double sp = sin(Container::grid->phi(k));
+    const double cp = cos(Container::grid->phi(k));
 
     const double A = 0.1;  // make sure these agree with paramters defined in InData.h
     const double B = 0.3;
@@ -1202,19 +1202,19 @@ void Manager::Test_Flat_Metric() {
 //       for (int k = N_g; k < N_phi-N_g; k++) {
 // 	//	bool print = (i == 1 && j == j_check && k == k_check);
 //   	// create vector (upper indices)  (already rescaled!)
-//   	shift_r_o[i][j][k] = Vr(rl,GR::grid->theta(j),GR::grid->phi(k));
-//   	shift_t_o[i][j][k] = Vt(rl,GR::grid->theta(j),GR::grid->phi(k));
-//   	shift_p_o[i][j][k] = Vp(rl,GR::grid->theta(j),GR::grid->phi(k));
+//   	shift_r_o[i][j][k] = Vr(rl,Container::grid->theta(j),Container::grid->phi(k));
+//   	shift_t_o[i][j][k] = Vt(rl,Container::grid->theta(j),Container::grid->phi(k));
+//   	shift_p_o[i][j][k] = Vp(rl,Container::grid->theta(j),Container::grid->phi(k));
 //       }
 //   DivShift(shift_r_o,shift_t_o,shift_p_o);
 //   int i = i_check;
 //   int j = j_check;
 //   int k = k_check;
 
-//   cout << " Results at r = " << rl << ", theta = " << GR::grid->theta(j) << " and phi = " << GR::grid->phi(k) << endl;
+//   cout << " Results at r = " << rl << ", theta = " << Container::grid->theta(j) << " and phi = " << Container::grid->phi(k) << endl;
 //   cout << " Determinant : " << det(i_check,j_check,k_check) << endl;
 //   cout << " Divergence of shift : " << div_shift(i_check,j_check,k_check) << endl;
-//   const double x = r[i_check] * sintheta[j_check] * cos(GR::grid->phi(k_check));
+//   const double x = r[i_check] * sintheta[j_check] * cos(Container::grid->phi(k_check));
 //   cout << " Analytically        : " << 2.0 * x + 1.0 << endl;
 // };
 
@@ -1252,7 +1252,7 @@ void Manager::Test_Flat_Metric() {
 // 	Doub r_l = r[i];
 // 	shift_t_o[i][j][k] = Polynomial(r_l,A,B,C);
 //       }
-//   Doub r_max = GR::grid->r_max();
+//   Doub r_max = Container::grid->r_max();
 //   cout << " TEST_REGRID: initial r_max = " << r_max << endl;
 //   int j = N_g;
 //   int k = N_g;

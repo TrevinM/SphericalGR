@@ -1,5 +1,5 @@
 #include "Manager.h"
-#include "GR.h"
+#include "Container.h"
 
 void Manager::Compute_RHS(double time) {
     if (cowling == 1)
@@ -31,8 +31,8 @@ void Manager::Compute_RHS(double time) {
         // NOTE: call dot_shift *after* dot_Gamma, since time
         // derivatives of Gamma are needed for some gauge conditions.
         // 
-        GR::slicing->dot_lapse(inter, derivs);
-        GR::gauge->dot_shift(inter, derivs);
+        Container::slicing->dot_lapse(inter, derivs);
+        Container::gauge->dot_shift(inter, derivs);
         //
         // Outer boundaries:
         //
@@ -85,7 +85,7 @@ void Manager::dot_metric(state* s, double time) {
                     aux->Lie(s->shift_r, s->shift_t, s->shift_p, s->phi, i, j, k) +
                     eta_KO * s->phi.KO(i, j, k) + sigma * aux->div_shift(i, j, k) / 6.0
                     // add cosmological term
-                    - GR::cosmology->Hubble(time) / 2.0;
+                    - Container::cosmology->Hubble(time) / 2.0;
             }
 };
 //
@@ -94,8 +94,8 @@ void Manager::dot_metric(state* s, double time) {
 //==============================================================
 //
 void Manager::dot_ext_curv(state* s, double time) {
-    const double lambda = GR::cosmology->Lambda();
-    const double a_friedmann = GR::cosmology->a(time);
+    const double lambda = Container::cosmology->Lambda();
+    const double a_friedmann = Container::cosmology->a(time);
     //
     // first compute Lie derivative of extrinsic curvature...
     // 
@@ -113,11 +113,11 @@ void Manager::dot_ext_curv(state* s, double time) {
     for (int i = N_g; i < N_r - N_g; i++) {
         for (int j = N_g; j < N_t - N_g; j++) {
             for (int k = N_g; k < N_p - N_g; k++) {
-                const double rl = GR::grid->r(i);
+                const double rl = Container::grid->r(i);
                 const double r2 = rl * rl;
-                const double stl = GR::grid->sintheta(j);
+                const double stl = Container::grid->sintheta(j);
                 const double st2 = stl * stl;
-                const double ctl = GR::grid->costheta(j);
+                const double ctl = Container::grid->costheta(j);
                 //
                 // First the terms that, in PIRK scheme, were "well-behaved" L3 terms...
                     //
@@ -307,7 +307,7 @@ void Manager::dot_ext_curv(state* s, double time) {
 //==============================================================
 //
 void Manager::dot_connection(state* s, double time) {
-    const double a_friedmann = GR::cosmology->a(time);
+    const double a_friedmann = Container::cosmology->a(time);
     //
     // Comment added 5/2/22: careful in this routine with rescaling...
     //
@@ -329,12 +329,12 @@ void Manager::dot_connection(state* s, double time) {
     for (int i = N_g; i < N_r - N_g; i++) {
         for (int j = N_g; j < N_t - N_g; j++) {
             for (int k = N_g; k < N_p - N_g; k++) {
-                const double rl = GR::grid->r(i);
+                const double rl = Container::grid->r(i);
                 const double r2 = rl * rl;
-                const double stl = GR::grid->sintheta(j);
+                const double stl = Container::grid->sintheta(j);
                 const double st2 = stl * stl;
                 const double rst = rl * stl;
-                const double ctl = GR::grid->costheta(j);
+                const double ctl = Container::grid->costheta(j);
                 //
                 // "L3" terms in old PIRK scheme
                 //

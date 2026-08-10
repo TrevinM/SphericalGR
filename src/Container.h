@@ -13,10 +13,9 @@
 #include "Photons.h"
 #include "CheckPoint.h"
 
-class GR {
+class Container {
 public:
     static Manager* manager;
-
     static Grid* grid;
     static Cosmology* cosmology;
     static EOS* eos;

@@ -4,36 +4,47 @@
 //================================================
 
 #include "Manager.h"
-#include "GR.h"
+#include "Container.h"
 
 //===========================================
 // Constructor
 //===========================================
+state* Manager::last = nullptr;
+state* Manager::derivs = nullptr;
+state* Manager::inter = nullptr;
+state* Manager::updates = nullptr;
+curvature* Manager::curve = nullptr;
+auxiliary* Manager::aux = nullptr;
+HorizonFinder* Manager::horizonfinder = nullptr;
+diagnostics* Manager::constraints = nullptr;
+Matter* Manager::matter = nullptr;
+
+
 Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
     int z4_i, double kappa_11_i, double kappa_12_i, double kappa_2_i,
     double kappa_ric_i, int RK_order_i,
     int char_OB_i, int solve_constraints_i) :
     sigma(sigma_i), cowling(cowling_i), eta(eta_i), z4(z4_i), kappa_11(kappa_11_i),
     kappa_12(kappa_12_i), kappa_2(kappa_2_i), kappa_ric(kappa_ric_i), RK_order(RK_order_i),
-    char_OB(char_OB_i), solve_constraints(solve_constraints_i), r(GR::grid->N_r_tot()),
-    r2(GR::grid->N_r_tot()), theta(GR::grid->N_theta_tot()), sintheta(GR::grid->N_theta_tot()),
-    sin2theta(GR::grid->N_theta_tot()), costheta(GR::grid->N_theta_tot()), phi(GR::grid->N_phi_tot()) {
+    char_OB(char_OB_i), solve_constraints(solve_constraints_i), r(Container::grid->N_r_tot()),
+    r2(Container::grid->N_r_tot()), theta(Container::grid->N_theta_tot()), sintheta(Container::grid->N_theta_tot()),
+    sin2theta(Container::grid->N_theta_tot()), costheta(Container::grid->N_theta_tot()), phi(Container::grid->N_phi_tot()) {
     //
     cout << " MANAGER: Constructing manager... " << endl;
     //
     // initial times and step counter (provided by CheckPoint.h, which
     // returns zero unless data are read in from checkpoint files)
     //
-    t = GR::checkpoint->TStart();
+    t = Container::checkpoint->TStart();
     cout << " MANAGER: t = " << t << endl;
-    tau_c = GR::checkpoint->TauStart();
-    step = GR::checkpoint->TimeStepStart();
-    GR::grid->Setup_Grid(r, r2, theta, sintheta, sin2theta, costheta, phi);
+    tau_c = Container::checkpoint->TauStart();
+    step = Container::checkpoint->TimeStepStart();
+    Container::grid->Setup_Grid(r, r2, theta, sintheta, sin2theta, costheta, phi);
     //
     // Sanity check
     //
 #ifdef EIGHTHORDERTHETA
-    if (GR::grid->N_ghosts() < 4) {
+    if (Container::grid->N_ghosts() < 4) {
         cerr << " MANAGER: Need N_ghosts >= 4 when using eighth-order differencing! " << endl;
         exit(0);
     }
@@ -42,35 +53,35 @@ Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
     // create state for dynamical variables
     //
     cout << " MANAGER: setting up states... " << endl;
-    last = new state(GR::grid, GR::dump, "last");
-    derivs = new state(GR::grid, GR::dump, "derivs");
-    inter = new state(GR::grid, GR::dump, "inter");
-    updates = new state(GR::grid, GR::dump, "updates");
+    last = new state(Container::grid, Container::dump, "last");
+    derivs = new state(Container::grid, Container::dump, "derivs");
+    inter = new state(Container::grid, Container::dump, "inter");
+    updates = new state(Container::grid, Container::dump, "updates");
     // create dump list for state last:
     last->assemble_dump_list("Dump_List");
     // let checkpointer know about last:
-    GR::checkpoint->CollectDynVariables(last);
+    Container::checkpoint->CollectDynVariables(last);
 
     // 
     // create curvature class
     // 
-    curve = new curvature(GR::grid, GR::dump, "curve");
+    curve = new curvature(Container::grid, Container::dump, "curve");
     curve->assemble_dump_list("Dump_List");
     //
     // create class with auxiliary functions
     //
-    aux = new auxiliary(GR::grid, GR::dump, "auxiliaries");
+    aux = new auxiliary(Container::grid, Container::dump, "auxiliaries");
     aux->assemble_dump_list("Dump_List");
     //
     // create horizon finder
     //
-    horizonfinder = new HorizonFinder(GR::grid, last, curve, aux,
-        GR::monitor->Filestem());
+    horizonfinder = new HorizonFinder(Container::grid, last, curve, aux,
+        Container::monitor->Filestem());
     //
     // create diagnostics class
     //
     cout << " MANAGER: setting up diagnostics... " << endl;
-    constraints = new diagnostics(GR::grid, GR::dump, GR::monitor, GR::cosmology,
+    constraints = new diagnostics(Container::grid, Container::dump, Container::monitor, Container::cosmology,
         horizonfinder, "constraints");
     constraints->assemble_dump_list("Dump_List");
     //
@@ -79,50 +90,50 @@ Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
     SetTimeStep();
     eta_KO = eta;
     cout << " MANAGER: using Kreiss-Oliger coefficient " << eta_KO << endl;
-    GR::gauge->Set_eta(eta_KO);
+    Container::gauge->Set_eta(eta_KO);
     //
     // create matter
     //
     if (matter_type == 1) {
-        matter = new Vacuum(GR::grid, GR::dump, GR::indata, cowling, GR::cosmology);
+        matter = new Vacuum(Container::grid, Container::dump, Container::indata, cowling, Container::cosmology);
     } else if (matter_type == 3) {
-        if (!GR::eos) {
+        if (!Container::eos) {
             cerr << " MANAGER: Can't set up Hydro without eos! " << endl;
             exit(1);
         }
-        matter = new Hydro(GR::grid, GR::dump, GR::indata, GR::eos, cowling, GR::cosmology,
-            GR::monitor, horizonfinder, GR::checkpoint);
+        matter = new Hydro(Container::grid, Container::dump, Container::indata, Container::eos, cowling, Container::cosmology,
+            Container::monitor, horizonfinder, Container::checkpoint);
     } else if (matter_type == 5) {
-        matter = new ScalarField(GR::grid, GR::dump, GR::indata, cowling, GR::cosmology,
-            GR::monitor, eta_KO, GR::checkpoint);
+        matter = new ScalarField(Container::grid, Container::dump, Container::indata, cowling, Container::cosmology,
+            Container::monitor, eta_KO, Container::checkpoint);
     } else if (matter_type == 6) {
-        matter = new RadHydro(GR::grid, GR::dump, GR::indata, GR::eos, cowling, GR::cosmology,
-            GR::monitor, GR::checkpoint);
+        matter = new RadHydro(Container::grid, Container::dump, Container::indata, Container::eos, cowling, Container::cosmology,
+            Container::monitor, Container::checkpoint);
     } else if (matter_type == 7) {
-        matter = new Maxwell(GR::grid, GR::dump, GR::indata, cowling, char_OB, GR::cosmology,
-            GR::monitor, eta_KO, GR::checkpoint);
+        matter = new Maxwell(Container::grid, Container::dump, Container::indata, cowling, char_OB, Container::cosmology,
+            Container::monitor, eta_KO, Container::checkpoint);
     } else if (matter_type == 8) {
-        matter = new DualMaxwell(GR::grid, GR::dump, GR::indata, cowling, char_OB, GR::cosmology,
-            GR::monitor, eta_KO, GR::checkpoint);
+        matter = new DualMaxwell(Container::grid, Container::dump, Container::indata, cowling, char_OB, Container::cosmology,
+            Container::monitor, eta_KO, Container::checkpoint);
     } else {
         cerr << " MANAGER: Unknown matter type!!! " << endl;
     }
     //===========================================
     // set up profiles
     //===========================================
-    if (!(GR::profiles == NULL)) {
-        GR::profiles->add_to_profile_list("Profile_List", last);
-        GR::profiles->add_to_profile_list("Profile_List", curve);
-        GR::profiles->add_to_profile_list("Profile_List", aux);
-        GR::profiles->add_to_profile_list("Profile_List", constraints);
-        GR::profiles->initialize_file(constraints->R_prop.Address());
+    if (!(Container::profiles == NULL)) {
+        Container::profiles->add_to_profile_list("Profile_List", last);
+        Container::profiles->add_to_profile_list("Profile_List", curve);
+        Container::profiles->add_to_profile_list("Profile_List", aux);
+        Container::profiles->add_to_profile_list("Profile_List", constraints);
+        Container::profiles->initialize_file(constraints->R_prop.Address());
     }
     //
     //===========================================
     // initialize wave extraction
     //===========================================
-    if (!(GR::waves == NULL)) {
-        GR::waves->Initialize(constraints->psi4_Re.Address(),
+    if (!(Container::waves == NULL)) {
+        Container::waves->Initialize(constraints->psi4_Re.Address(),
             constraints->psi4_Im.Address());
     }
     N_g = inter->grid->N_ghosts();
@@ -140,17 +151,17 @@ Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
 // Find time step
 //===========================================
 void Manager::SetTimeStep() {
-    int N_g = GR::grid->N_ghosts();
-    dt = GR::grid->courant_factor() * 0.5 * GR::grid->delta_r(N_g)
-        * GR::grid->delta_theta(N_g);
+    int N_g = Container::grid->N_ghosts();
+    dt = Container::grid->courant_factor() * 0.5 * Container::grid->delta_r(N_g)
+        * Container::grid->delta_theta(N_g);
     cout << " MANAGER: using dt = " << dt << endl;
 };
 void Manager::SetTimeStep(state* s) {
-    int N_g = GR::grid->N_ghosts();
+    int N_g = Container::grid->N_ghosts();
     const double gamma_tt = (1.0 + s->h_tt(N_g, N_g, N_g)) * exp(4.0 * s->phi(N_g, N_g, N_g));
     // const double factor = sqrt(gamma_tt) / s->lapse(N_g, N_g, N_g); // + abs(s->shift_r(N_g, N_g, N_g));
     const double factor = sqrt(gamma_tt); // + abs(s->shift_r(N_g, N_g, N_g));
-    dt = GR::grid->courant_factor() * 0.5 * GR::grid->delta_r(N_g) * GR::grid->delta_theta(N_g) * factor;
+    dt = Container::grid->courant_factor() * 0.5 * Container::grid->delta_r(N_g) * Container::grid->delta_theta(N_g) * factor;
 };
 
 //===========================================

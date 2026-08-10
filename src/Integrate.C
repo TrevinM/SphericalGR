@@ -4,15 +4,15 @@
 //
 //================================================
 #include "Manager.h"
-#include "GR.h"
+#include "Container.h"
 
 bool Manager::Integrate(double t_max) {
     while (t < t_max) {
         // SetTimeStep(last);
         // for self-similar shift update shift here:
-        if (GR::gauge->GaugeType() == self_sim) {
+        if (Container::gauge->GaugeType() == self_sim) {
             Compute_RHS(t);
-            GR::gauge->overwrite_shift(last, derivs, t);
+            Container::gauge->overwrite_shift(last, derivs, t);
         };
 
         //================================================
@@ -36,21 +36,21 @@ bool Manager::Integrate(double t_max) {
         //================================================
         //      inter->equals(last);
         curve->Update(last);
-        if (!(GR::photons == NULL)) {
+        if (!(Container::photons == NULL)) {
             aux->Compute_r_derivs(last, curve);
-            GR::photons->Update_Photons(t, tau_c, dt, last, curve, aux,
+            Container::photons->Update_Photons(t, tau_c, dt, last, curve, aux,
                 constraints->I_Re.Address(),
                 constraints->J_Re.Address(),
-                GR::grid->r_max());
+                Container::grid->r_max());
         }
         //================================================
         // extract waves
         //================================================
-        if (GR::waves != NULL) {
+        if (Container::waves != NULL) {
             double I_Re_max = constraints->CurvatureInvariant(last, curve,
                 matter->adm_sources,
                 t, tau_c, step);
-            GR::waves->Update(dt);
+            Container::waves->Update(dt);
         }
         //================================================
         //  check whether it's finished
@@ -72,15 +72,15 @@ bool Manager::Integrate(double t_max) {
         //================================================
         // check whether it's time to write check point
         //================================================ 
-        if (step % GR::checkpoint->CheckPointStep() == 0)
-            GR::checkpoint->WriteCheckPoint(step, t, tau_c);
+        if (step % Container::checkpoint->CheckPointStep() == 0)
+            Container::checkpoint->WriteCheckPoint(step, t, tau_c);
         //================================================
         // check whether it's time to dump
         //================================================ 
         // (mass needed for horizons below)
         int i = 7.5 / 8. * (N_r - N_g);
         double mass = constraints->ADM_Mass_Surface(last, curve, aux, i);
-        if (GR::dump->time_to_dump(step)) {
+        if (Container::dump->time_to_dump(step)) {
             last->dump_fcts(t, tau_c, step);
             curve->dump_fcts(t, tau_c, step);
             aux->dump_fcts(t, tau_c, step);
@@ -117,26 +117,26 @@ bool Manager::Integrate(double t_max) {
                 CFC_t_norm,
                 CFC_p_norm);
             constraints->dump_fcts(t, tau_c, step);
-            GR::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
+            Container::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
                 Mom_r_norm, Mom_t_norm, Mom_p_norm,
                 CFC_r_norm, CFC_t_norm, CFC_p_norm);
             //================================================
             // evaluate curvature invariants
             //================================================ 
-            if (GR::waves == NULL) // otherwise they are computed above already...
+            if (Container::waves == NULL) // otherwise they are computed above already...
                 double I_Re_max = constraints->CurvatureInvariant(last, curve,
                     matter->adm_sources,
                     t, tau_c, step);
-            constraints->Note_Invariants(step, t, tau_c, GR::monitor);
+            constraints->Note_Invariants(step, t, tau_c, Container::monitor);
         }
         //================================================
         // check whether it's time to note...
         //================================================
-        if (GR::monitor->time_to_note(step) || finish_note) {
+        if (Container::monitor->time_to_note(step) || finish_note) {
             double ang_mom = constraints->Angular_Momentum(last, curve, aux, i);
             double lin_mom = constraints->Linear_Momentum(last, curve, aux, i);
             bool force = finish_note;
-            GR::monitor->note(step, t, tau_c, mass, ang_mom,
+            Container::monitor->note(step, t, tau_c, mass, ang_mom,
                 lin_mom, last->phi(0.0, N_g, N_g),
                 last->lapse(0.0, N_g, N_g), last->lapse.min(),
                 last->K(0.0, N_g, N_g), RegridCriterion(), force);
@@ -157,7 +157,7 @@ bool Manager::Integrate(double t_max) {
                 CFC_r_norm,
                 CFC_t_norm,
                 CFC_p_norm);
-            GR::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
+            Container::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
                 Mom_r_norm, Mom_t_norm, Mom_p_norm,
                 CFC_r_norm, CFC_t_norm, CFC_p_norm);
             //================================================
@@ -165,11 +165,11 @@ bool Manager::Integrate(double t_max) {
             //================================================ 
             double I_Re_max = constraints->CurvatureInvariant(last, curve,
                 matter->adm_sources, t, tau_c, step);
-            constraints->Note_Invariants(step, t, tau_c, GR::monitor);
+            constraints->Note_Invariants(step, t, tau_c, Container::monitor);
             constraints->Compute_Proper_Radius(last, curve, aux, sigma);
-            if (GR::profiles != NULL) GR::profiles->write_profile(t, tau_c);
-            if (GR::photons != NULL) GR::photons->Monitor(t, tau_c);
-            if (GR::waves != NULL) GR::waves->write_wave_data(t, tau_c);
+            if (Container::profiles != NULL) Container::profiles->write_profile(t, tau_c);
+            if (Container::photons != NULL) Container::photons->Monitor(t, tau_c);
+            if (Container::waves != NULL) Container::waves->write_wave_data(t, tau_c);
             matter->Compute_Diagnostics(last, curve);
             matter->Note(step, t, tau_c);
         }

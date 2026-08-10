@@ -68,26 +68,36 @@ MESSAGE("   Compiling with options ${COMPILE_OPTIONS}")
 
 # Build the APP and link to Trilinos
 # add_executable(MyApp ${CMAKE_CURRENT_SOURCE_DIR}/app.cpp)
-add_executable(SphericalGR ${CMAKE_CURRENT_SOURCE_DIR}/GR.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Manager.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Initialize.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Integrate.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Curvature.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Compute_RHS.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Diagnostics.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/ScalarField.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Maxwell.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/DualMaxwell.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Hydro.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/RadHydro.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Tests.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/HorizonFinder.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/dumper.C /
-  ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C
+add_executable(SphericalGR ${CMAKE_CURRENT_SOURCE_DIR}/GR.C)
 
-  )
+target_sources(SphericalGR
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/Initialize.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Integrate.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Curvature.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Compute_RHS.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Diagnostics.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/ScalarField.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Maxwell.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/DualMaxwell.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Hydro.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/RadHydro.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Tests.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/HorizonFinder.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/dumper.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C
+    ${CMAKE_CURRENT_SOURCE_DIR}/Manager.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Container.C /
+)
 
+target_include_directories(SphericalGR 
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR} 
+    ${Trilinos_INCLUDE_DIRS} 
+    ${Trilinos_TPL_INCLUDE_DIRS})
 
-target_include_directories(SphericalGR PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR} ${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
 target_link_libraries(SphericalGR ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES}) 
+
+
+
+

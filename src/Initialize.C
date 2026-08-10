@@ -5,21 +5,21 @@
 // Note: will initialize State last
 //================================================
 #include "Manager.h"
-#include "GR.h"
+#include "Container.h"
 
 bool Manager::Initialize() {
     //
     // initialize gravitational fields
     // 
     cout << " INITIALIZE: t = " << t << endl;
-    bool success = GR::indata->Initialize_Metric(last);
+    bool success = Container::indata->Initialize_Metric(last);
     if (!success) return false;
-    GR::indata->Initialize_Lapse(last);
-    GR::indata->Initialize_Shift(last);
-    GR::indata->Initialize_ExCurvature(last);
+    Container::indata->Initialize_Lapse(last);
+    Container::indata->Initialize_Shift(last);
+    Container::indata->Initialize_ExCurvature(last);
 
     curve->Update(last);
-    GR::indata->Initialize_ConfConn(last, curve);
+    Container::indata->Initialize_ConfConn(last, curve);
     // if (indata->Type() == brill || indata->Type() == kerr || indata->Type() == linwave) {
     // //  if (indata->Type() == brill || indata->Type() == kerr ) {
     //   indata->Initialize_ConfConn(last, curve);
@@ -45,7 +45,7 @@ bool Manager::Initialize() {
             << constraints->Hamiltonian(last, curve, aux, matter->adm_sources)
             << endl;
         ConstraintSolver* constraint_solver;
-        constraint_solver = new ConstraintSolver(GR::grid, last, curve, matter);
+        constraint_solver = new ConstraintSolver(Container::grid, last, curve, matter);
         constraint_solver->SolveHamiltonian();
         delete constraint_solver;
         cout << " INITIALIZE: Hamiltonian constraint after solving: "
@@ -61,8 +61,8 @@ bool Manager::Initialize() {
     double lin_mom = constraints->Linear_Momentum(last, curve, aux, i);
     cout << " MANAGER: Found M = " << mass << ", J = " << ang_mom
         << " and P_z = " << lin_mom
-        << " at radius " << GR::grid->r(i) << endl;
-    GR::monitor->note(step, t, tau_c, mass, ang_mom,
+        << " at radius " << Container::grid->r(i) << endl;
+    Container::monitor->note(step, t, tau_c, mass, ang_mom,
         lin_mom, last->phi(0.0, N_g, N_g),
         last->lapse(0.0, N_g, N_g), last->lapse.min(),
         last->K(0.0, N_g, N_g), RegridCriterion());
@@ -91,7 +91,7 @@ bool Manager::Initialize() {
         CFC_t_norm,
         CFC_p_norm);
     constraints->Compute_Proper_Radius(last, curve, aux, sigma);
-    GR::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
+    Container::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
         Mom_r_norm, Mom_t_norm, Mom_p_norm,
         CFC_r_norm, CFC_t_norm, CFC_p_norm);
     //
@@ -99,10 +99,10 @@ bool Manager::Initialize() {
     //
     double I_max = constraints->CurvatureInvariant(last, curve,
         matter->adm_sources, t, tau_c, step);
-    constraints->Note_Invariants(step, t, tau_c, GR::monitor);
-    if (GR::waves != NULL) {
-        GR::waves->Update(0.0);   // needed in order to project psi4 data...
-        GR::waves->write_wave_data(t, tau_c);
+    constraints->Note_Invariants(step, t, tau_c, Container::monitor);
+    if (Container::waves != NULL) {
+        Container::waves->Update(0.0);   // needed in order to project psi4 data...
+        Container::waves->write_wave_data(t, tau_c);
     }
     matter->Compute_Diagnostics(last, curve);
     //
@@ -110,7 +110,7 @@ bool Manager::Initialize() {
     //
     // if (gauge->GaugeType() == self_sim) {
     //    Compute_RHS(0.0);
-    //    GR::gauge->overwrite_shift(last, derivs, 0.0);
+    //    Container::gauge->overwrite_shift(last, derivs, 0.0);
     //  };
     //
     // now dump initial data
@@ -120,8 +120,8 @@ bool Manager::Initialize() {
     aux->dump_fcts(t, tau_c, step);
     matter->dump_fcts(t, tau_c, step);
     constraints->dump_fcts(t, tau_c, step);
-    if (!(GR::profiles == NULL)) {
-        GR::profiles->write_profile(t, tau_c);
+    if (!(Container::profiles == NULL)) {
+        Container::profiles->write_profile(t, tau_c);
     }
     //
     return success;
