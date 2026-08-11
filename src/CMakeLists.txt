@@ -54,7 +54,7 @@ endif()
 # so we make the enable of Fortran optional based on it's enable in Trilinos.
 
 # add_compile_options(-DSR)
-add_compile_options(-DFINISHCONDITION)
+# add_compile_options(-DFINISHCONDITION)
 
 # add_compile_options(-DNoEllSolver)
 add_compile_options(-DEIGHTHORDER)  

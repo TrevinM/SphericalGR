@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --mail-type=FAIL
+#SBATCH --mail-type=FAIL --job-name=manager
 
 export OMP_NUM_THREADS=16
 
@@ -15,12 +15,12 @@ export dir=/mnt/research/tbaumgar/Students/tmacomber/SphericalGR
 #Name of critical collapse suite to be run (with sbatch) or created (with bash)
 suite=KO
 
-max_runs=5
+max_runs=1
 verbose=1   # 1+: Slurm debug prints
 
 #Use this when the critical paramter has changed (ie you changed your resolution)
 #and you need to figure out where your new bounds are
-reconverge=1
+reconverge=0
 
 
 # ========================== #
@@ -429,7 +429,6 @@ do
     # ========================== #
     #          RUN JOBS          #
     # ========================== #
-
 
     bug "Etas: ${etas[*]}"
 
