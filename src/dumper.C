@@ -5,6 +5,24 @@
 #include "Gauge.h"
 
 //================================================
+// reset dump_step
+//================================================
+int dumper::reset_dumpstep(int step) {
+    dump_step = step;
+    return dump_step;
+}
+
+//================================================
+// "Conditional dump"
+//================================================
+void dumper::cond_dump(double phys_time, double prop_time, int timestep, gf3d* fct,
+    const char* suffix) {
+    // time to dump?      
+    if (time_to_dump(timestep) || strcmp(suffix, ""))
+        dump(phys_time, prop_time, timestep, fct, suffix);
+};
+
+//================================================
 // forced dump
 //================================================
 void dumper::dump(double phys_time, double prop_time, int timestep, gf3d* fct,
@@ -96,6 +114,14 @@ void dumper::dump(double phys_time, double prop_time, int timestep, gf3d* fct,
     outfile.close();
 };
 
+//================================================
+// "Conditional slice" dump
+//================================================
+void dumper::cond_slice(double phys_time, double prop_time, int timestep, gf3d* fct,
+    const char* suffix) {
+    if (time_to_dump(timestep) || strcmp(suffix, ""))
+        slice(phys_time, prop_time, timestep, fct, suffix);
+};
 
 //================================================
 // forced slice dump

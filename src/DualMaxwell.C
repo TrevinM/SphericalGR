@@ -7,12 +7,85 @@
 #include "Matter.h"
 #include <ctime>
 #include "tensors.h"
+
+DualMaxwell::DualMaxwell(Grid* grid_i, dumper* dump_i, InData* indata_i,
+    int cowling_i, int char_OB_i, Cosmology* cosmology_i,
+    Monitor* monitor_i, double eta_KO_i, CheckPoint* checkpoint_i) :
+    Matter(grid_i, dump_i, indata_i, cowling_i, cosmology_i),
+    char_OB(char_OB_i), monitor(monitor_i), eta_KO(eta_KO_i),
+    checkpoint(checkpoint_i) {
+    cout << " DUALMAXWELL: setting up dualmaxwell... " << endl;
+    // 
+    // create states for dynamical variables
+    // 
+    cout << " DUALMAXWELL: setting up states... " << endl;
+    last = new dualmaxwell_state(grid, dump, "dualmaxwell_last");
+    derivs = new dualmaxwell_state(grid, dump, "dualmaxwell_derivs");
+    inter = new dualmaxwell_state(grid, dump, "dualmaxwell_inter");
+    updates = new dualmaxwell_state(grid, dump, "dualmaxwell_updates");
+    // create dump list for state last:
+    last->assemble_dump_list("Dump_List");
+    derivs->assemble_dump_list("Dump_List");
+    // let checkpointer know about last
+    checkpoint->CollectDynVariables(last);
+    //
+    // create ADM sources
+    // 
+    adm_sources = new ADM_Source_Terms(grid, dump, "dualmaxwell_souces");
+    adm_sources->assemble_dump_list("Dump_List");
+    //
+    // create auxiliary variables
+    // 
+    aux = new dualmaxwell_aux(grid, dump, "dualmaxwell_aux");
+    aux->assemble_dump_list("Dump_List");
+    //
+   // finally create a monitor file...
+   //
+
+    ostringstream monfilename;
+    monfilename << "output/" << monitor->Filestem() << "_" << N_r - 2 * N_g << "_"
+        << N_t - 2 * N_g << ".dualmaxwell_mon" << ends;
+    monitorfile.open(monfilename.str().c_str());
+    monitorfile.setf(ios::right);
+    time_t clocktime;
+    struct tm* currenttime;
+    time(&clocktime);
+    currenttime = localtime(&clocktime);
+    monitorfile << "# File created on " << asctime(currenttime);
+    monitorfile << "# DualMaxwell evolution " << endl;
+    monitorfile << "# " << setw(16) << "time"
+        << setw(18) << "pr time (r=0)"
+        << setw(18) << "rho_ADM_c"
+        << setw(18) << "rho_ADM_c_max"
+        << setw(18) << "rho_ADM_max"
+        << setw(18) << "rho_ADM_max_MAX"
+        << setw(18) << "r(rho_ADM_max)"
+        << setw(18) << "th(rho_ADM_max)"
+        << setw(18) << "r(lapse_min)"
+        << setw(18) << "th(lapse_min)"
+        << endl;
+    monitorfile << "#=======================================================================================================================================================================" << endl;
+    //
+    rho_center = rho_c_max = drhoddr = 0.0;
+    rho_max = rho_max_MAX = 0.0;
+};
+
+DualMaxwell::~DualMaxwell() {
+    delete last;
+    delete derivs;
+    delete inter;
+    delete updates;
+    delete adm_sources;
+    delete aux;
+    monitorfile.close();
+    cout << " DUALMAXWELL: destructing derived class DualMaxwell " << endl;
+};
+
 //
 //================================================
 // Initialize electromagnetic fields
 //================================================
 // #define FLAT
-
 void DualMaxwell::Initialize(state* s, curvature* c, diagnostics* d) {
     //
     // set up initial data 
@@ -92,11 +165,11 @@ void DualMaxwell::dot_a_as(dualmaxwell_state* m, state* s, double time) {
                 // compute curl of a and as
                 //
                 double curl_a_r, curl_a_t, curl_a_p;   // rescaled, indices upstairs
-                curl(inter->a_r, inter->a_t, inter->a_p,
+                curl(m->a_r, m->a_t, m->a_p,
                     curl_a_r, curl_a_t, curl_a_p, i, j, k, s);
                 vect curl_a(curl_a_r, curl_a_t, curl_a_p);
                 double curl_as_r, curl_as_t, curl_as_p;   // rescaled, indices upstairs
-                curl(inter->as_r, inter->as_t, inter->as_p,
+                curl(m->as_r, m->as_t, m->as_p,
                     curl_as_r, curl_as_t, curl_as_p, i, j, k, s);
                 vect curl_as(curl_as_r, curl_as_t, curl_as_p);
                 //
@@ -144,6 +217,119 @@ void DualMaxwell::dot_a_as(dualmaxwell_state* m, state* s, double time) {
 
 };
 
+void DualMaxwell::Start_RK() {
+    inter->equals(last);
+    updates->equals(last);
+};
+
+void DualMaxwell::Finish_RK(state* s, curvature* c, double dt) {
+    updates->char_OB(last, dt);
+    last->equals(updates);
+    last->fill_ghosts();
+    inter->equals(last);
+    ADM_Sources(s, c);
+}
+
+//===============================================
+// Update matter state (adds dt * derivs to update)
+//===============================================
+void DualMaxwell::Update(double dt) {
+    updates->add(dt, derivs);
+};
+
+//===============================================
+// Compute intermediate state (computes inter = last + dt * derivs )
+//===============================================
+void DualMaxwell::Compute_inter(double dt) {
+    inter->add(last, dt, derivs);
+    inter->fill_ghosts();
+    inter->char_OB(last, dt);
+};
+
+//===============================================
+// Regridding etc
+//===============================================
+int DualMaxwell::Regrid(VecDoub r_new) {
+    last->Regrid(r_new);
+    return 0;
+}
+
+double DualMaxwell::RegridCriterion() {
+    const Doub tiny = 1.e-12;
+    // const Doub drhoddr = abs(a_p_o.ddr(N_g,N_g,N_g));
+    Doub rho_l = fabs(rho_center);
+    if (rho_l < 1.0) rho_l = 1.0;
+    const Doub scale = sqrt(rho_l / (fabs(drhoddr) + tiny));
+    const Doub grid_scale = grid->delta_r(N_g);
+    // if ( grid_scale / scale > 0.15 ) {
+    //   cout << " rho_center = " << rho_center 
+    // 	   << " drhoddr = " << drhoddr 
+    // 	   << " scale = " << scale 
+    // 	   << " grid_scale = " << grid->delta_r(N_g) 
+    // 	   << endl;
+    // }
+    return grid_scale / scale;
+};
+
+gf3d* DualMaxwell::MatterField() {
+    return &last->a_p;
+}
+
+//================================================
+// Note
+//================================================
+void DualMaxwell::Note(int time_step, double time, double tau_c) {
+    if (rho_center > rho_c_max) rho_c_max = rho_center;
+    if (time_step % monitor->Note_Step() == 0) {
+        monitorfile.setf(ios::left);
+        monitorfile << setw(18) << time
+            << setw(18) << tau_c
+            << setprecision(10) << setw(18) << rho_center
+            << setprecision(10) << setw(18) << rho_c_max
+            << setprecision(10) << setw(18) << rho_max
+            << setprecision(10) << setw(18) << rho_max_MAX
+            << setprecision(10) << setw(18) << grid->r(rho_i)
+            << setprecision(10) << setw(18) << grid->theta(rho_j)
+            << setprecision(10) << setw(18) << grid->r(lapse_i)
+            << setprecision(10) << setw(18) << grid->theta(lapse_j)
+            << endl;
+    }
+};
+
+//================================================
+// dump grid functions
+//================================================
+void DualMaxwell::dump_fcts(double time, double prop_time, int timestep,
+    const char* suffix) {
+    if (dump->time_to_dump(timestep) || strcmp(suffix, "")) {
+        cout << " DUALMAXWELL: Dumping matter functions at time t = "
+            << time << endl;
+        last->dump_fcts(time, prop_time, timestep, suffix);
+        adm_sources->dump_fcts(time, prop_time, timestep, suffix);
+        aux->dump_fcts(time, prop_time, timestep, suffix);
+    }
+}
+
+//================================================
+// Diagnostics
+//================================================
+double DualMaxwell::Compute_Diagnostics(state* s, curvature* c) {
+    for (int i = 0; i < N_r; i++) {
+        const double rl = grid->r(i);
+        for (int j = 0; j < N_t; j++) {
+            const double sinthetal = grid->sintheta(j);
+            for (int k = 0; k < N_p; k++) {
+                // recall that gup is *not* rescaled...
+                aux->A2[i][j][k] = exp(-4.0 * s->phi(i, j, k)) * c->gup_pp(i, j, k) *
+                    last->a_p(i, j, k) * last->a_p(i, j, k) * rl * rl * sinthetal * sinthetal;
+                const double g_pp = exp(4.0 * s->phi(i, j, k))
+                    * (1.0 + s->h_pp(i, j, k));
+                aux->A_xi[i][j][k] = last->a_p(i, j, k) / sqrt(g_pp);
+            }
+        }
+    }
+    return aux->A2(0.0, N_g, N_g);
+};
 
 //================================================
 //

@@ -8,6 +8,213 @@
 #include "tensors.h"
 #include <ctime>
 
+
+//================================================
+// Constructor
+//================================================
+HorizonFinder::HorizonFinder(Grid* grid_i, state* s, curvature* c, auxiliary* aux,
+    const char* file_stem) :
+    gup_rr_3d(&(c->gup_rr)), gup_rt_3d(&(c->gup_rt)), gup_rp_3d(&(c->gup_rp)),
+    gup_tt_3d(&(c->gup_tt)), gup_tp_3d(&(c->gup_tp)), gup_pp_3d(&(c->gup_pp)),
+    DG_r_rr_3d(&(c->DG_r_rr)), DG_r_rt_3d(&(c->DG_r_rt)), DG_r_rp_3d(&(c->DG_r_rp)),
+    DG_r_tt_3d(&(c->DG_r_tt)), DG_r_tp_3d(&(c->DG_r_tp)), DG_r_pp_3d(&(c->DG_r_pp)),
+    DG_t_rr_3d(&(c->DG_t_rr)), DG_t_rt_3d(&(c->DG_t_rt)), DG_t_rp_3d(&(c->DG_t_rp)),
+    DG_t_tt_3d(&(c->DG_t_tt)), DG_t_tp_3d(&(c->DG_t_tp)), DG_t_pp_3d(&(c->DG_t_pp)),
+    DG_p_rr_3d(&(c->DG_p_rr)), DG_p_rt_3d(&(c->DG_p_rt)), DG_p_rp_3d(&(c->DG_p_rp)),
+    DG_p_tt_3d(&(c->DG_p_tt)), DG_p_tp_3d(&(c->DG_p_tp)), DG_p_pp_3d(&(c->DG_p_pp)),
+    phi_3d(&(s->phi)), phi_r_3d(&(aux->dphi_dr)), phi_t_3d(&(aux->dphi_dt)), phi_p_3d(&(aux->dphi_dp)),
+    a_rr_3d(&(s->a_rr)), a_rt_3d(&(s->a_rt)), a_rp_3d(&(s->a_rp)),
+    a_tt_3d(&(s->a_tt)), a_tp_3d(&(s->a_tp)), a_pp_3d(&(s->a_pp)),
+    K_3d(&(s->K)),
+    foundhorizon(false), last_step(-1), a_friedmann(0.0), grid(grid_i) {
+    cout << " HORIZONFINDER: Constructing HorizonFinder... " << endl;
+    PI = acos(-1.0);
+    N_g = grid->N_ghosts();
+    N_theta = grid->N_theta_tot();
+    N_phi = grid->N_phi_tot();
+    //
+    // Set up r_min and r_max
+    //
+    SetRMaxMin();
+    //
+    // allocate surface functions
+    //
+    // set up level surface function
+    //
+    h.setup(grid);
+    h_old.setup(grid);
+    //
+    // set up 2D metric functions
+    //
+    gup_rr.setup(grid);
+    gup_rt.setup(grid);
+    gup_rp.setup(grid);
+    gup_tt.setup(grid);
+    gup_tp.setup(grid);
+    gup_pp.setup(grid);
+    m_rr.setup(grid);
+    m_rt.setup(grid);
+    m_rp.setup(grid);
+    m_tt.setup(grid);
+    m_tp.setup(grid);
+    m_pp.setup(grid);
+    //
+    // set up 2D connection coefficients
+    //
+    Gamma_r_rr.setup(grid);
+    Gamma_r_rt.setup(grid);
+    Gamma_r_rp.setup(grid);
+    Gamma_r_tt.setup(grid);
+    Gamma_r_tp.setup(grid);
+    Gamma_r_pp.setup(grid);
+
+    Gamma_t_rr.setup(grid);
+    Gamma_t_rt.setup(grid);
+    Gamma_t_rp.setup(grid);
+    Gamma_t_tt.setup(grid);
+    Gamma_t_tp.setup(grid);
+    Gamma_t_pp.setup(grid);
+
+    Gamma_p_rr.setup(grid);
+    Gamma_p_rt.setup(grid);
+    Gamma_p_rp.setup(grid);
+    Gamma_p_tt.setup(grid);
+    Gamma_p_tp.setup(grid);
+    Gamma_p_pp.setup(grid);
+    //
+    // set up 2D extrinsic curvature
+    //
+    A_rr.setup(grid);
+    A_rt.setup(grid);
+    A_rp.setup(grid);
+    A_tt.setup(grid);
+    A_tp.setup(grid);
+    A_pp.setup(grid);
+    K.setup(grid);
+    //
+    // set up conformal exponent and derivatives
+    //
+    phi_c.setup(grid);
+    phi_r.setup(grid);
+    phi_t.setup(grid);
+    phi_p.setup(grid);
+    //
+    // horizon functions
+    //
+    lambda.setup(grid);
+    expansion.setup(grid);
+    res.setup(grid);
+    rhs_grid.setup(grid);
+    factor.setup(grid);
+    integrand.setup(grid);
+    //
+    // tendicity and vorticity stuff
+    //
+    E_rr.setup(grid);
+    E_rt.setup(grid);
+    E_rp.setup(grid);
+    E_tt.setup(grid);
+    E_tp.setup(grid);
+    E_pp.setup(grid);
+    B_rr.setup(grid);
+    B_rt.setup(grid);
+    B_rp.setup(grid);
+    B_tt.setup(grid);
+    B_tp.setup(grid);
+    B_pp.setup(grid);
+    tendicity.setup(grid);
+    vorticity.setup(grid);
+    //
+    // read parameters from input file
+    //
+    int read_error = ReadInput();
+    //
+    // if error occured, replace input parameters with default values
+    //
+    if (read_error != 0) {
+        eta = -1.0;
+        tol_ell = 1.e-9;
+        tol_exp = 1.e-4;
+        max_iter_ell = 10000;
+        max_iter_exp = 10;
+        find_steps = 0;
+        find_times = 1.0;
+        mass_guess = 1.0;
+        //      strncpy(file_stem,"Horizon",sizeof(file_stem) - 1);
+        //      file_stem[sizeof(file_stem)-1] = 0;
+        //      string name = "Horizon";
+        //      file_stem = name.c_str();
+    }
+    cout << " HORIZONFINDER: using parameters: " << endl;
+    cout << "   find_steps    = " << find_steps << endl;
+    cout << "   find_times    = " << find_times << endl;
+    cout << "   eta          = " << eta << endl;
+    cout << "   tol_ell      = " << tol_ell << endl;
+    cout << "   max_iter_ell = " << max_iter_ell << endl;
+    cout << "   tol_exp      = " << tol_exp << endl;
+    cout << "   max_iter_exp = " << max_iter_exp << endl;
+    cout << "   mass_guess   = " << mass_guess << endl;
+    cout << "   using file names starting with '" << file_stem << "'" << endl;
+    use_time_step_criterion = (find_steps > 0);
+    next_time = 0.0;
+    next_step = 0;
+    //
+    // set up 2D elliptic solver
+    //
+#ifndef NoEllSolver    
+    ellsolver = new EllSolver2D(grid);
+    ellsolver->SetupSolver(eta);
+#endif
+    //
+    // finally create a monitor file...
+    //
+    const int N_r = K_3d->dim1();
+    //    const int c = K_3d->log_factor();
+    ostringstream monfilename;
+    monfilename << "output/" << file_stem << "_" << N_r - 2 * N_g << "_"
+        << N_theta - 2 * N_g << ".hor_mon" << ends;
+    monitorfile.open(monfilename.str().c_str());
+    monitorfile.setf(ios::left);
+    time_t clocktime;
+    struct tm* currenttime;
+    time(&clocktime);
+    currenttime = localtime(&clocktime);
+    monitorfile << "# File created on " << asctime(currenttime);
+    monitorfile << "# " << setw(14) << "time" <<
+        setw(24) << "Irr mass" <<
+        setw(16) << "Spin J" <<
+        setw(16) << "Kerr mass M" <<
+        setw(16) << "J / M^2" <<
+        setw(18) << "Lin Mom P_z" <<
+        setw(16) << "Eq. Circumf." <<
+        setw(16) << "Pol. Circumf." <<
+        setw(16) << "Coord. Eq." <<
+        setw(16) << "Coord. Pole" <<
+        setw(16) << "Tend. M^2 Eq." <<
+        setw(16) << "Tend. M^2 Pole" <<
+        setw(16) << "Accretion rate" << endl;
+    monitorfile << "#===============================================================================================================================================" << endl;
+    //
+    // ... and a surface file
+    //
+    // NOTE: will assume axisymmetry in current implementation
+    //
+    ostringstream surfacefilename;
+    surfacefilename << "output/" << file_stem << "_" << N_r - 2 * N_g << "_"
+        << N_theta - 2 * N_g << ".hor_surface" << ends;
+    surfacefile.open(surfacefilename.str().c_str());
+    surfacefile.setf(ios::right);
+    surfacefile << "# File created on " << asctime(currenttime);
+    surfacefile << "# " << setw(14) << "time" <<
+        setw(16) << "theta" <<
+        setw(16) << "h(theta)" <<
+        setw(16) << "expansion" <<
+        setw(16) << "tendicity*M^2" <<
+        setw(16) << "vorticity*M^2" << endl;
+    surfacefile << "#===============================================================================================" << endl;
+};
+
+
 //================================================
 //
 // Read input from file "AH_finder_Input"
@@ -975,6 +1182,74 @@ inline double HorizonFinder::SurfaceElement(int j, int k, int type) {
     else {
         cerr << " Unknown type " << type << " in HORIZONFINDER:SurfaceElement()! " << endl;
         return sqrt(TT * PP - TP * TP) * r * rst;
+    }
+};
+
+
+void HorizonFinder::Note(double time, double mass, double AngMom, double LinMom,
+    double eqcir, double polcir,
+    double h_eq, double h_pole,
+    double tend_eq, double tend_pole, double accretion) {
+    monitorfile.setf(ios::left);
+    const double j_irr = AngMom / (mass * mass);
+    const double m_kerr = mass * sqrt(1.0 + j_irr * j_irr / 4.0);
+    monitorfile << setw(16) << time
+        << setw(24) << setprecision(10) << mass
+        << setw(16) << AngMom
+        << setw(16) << m_kerr
+        << setw(16) << AngMom / (m_kerr * m_kerr)
+        << setw(18) << LinMom
+        << setw(16) << eqcir
+        << setw(16) << polcir
+        << setw(16) << h_eq
+        << setw(16) << h_pole
+        << setw(16) << tend_eq * mass * mass
+        << setw(16) << tend_pole * mass * mass
+        << setw(16) << accretion
+        << endl;
+};
+
+bool HorizonFinder::AssignEB(gf3d* E_rr_p, gf3d* E_rt_p, gf3d* E_rp_p, gf3d* E_tt_p, gf3d* E_tp_p, gf3d* E_pp_p,
+    gf3d* B_rr_p, gf3d* B_rt_p, gf3d* B_rp_p, gf3d* B_tt_p, gf3d* B_tp_p, gf3d* B_pp_p) {
+    EB_assigned = true;
+    E_rr_3d = E_rr_p;
+    E_rt_3d = E_rt_p;
+    E_rp_3d = E_rp_p;
+    E_tt_3d = E_tt_p;
+    E_tp_3d = E_tp_p;
+    E_pp_3d = E_pp_p;
+    B_rr_3d = B_rr_p;
+    B_rt_3d = B_rt_p;
+    B_rp_3d = B_rp_p;
+    B_tt_3d = B_tt_p;
+    B_tp_3d = B_tp_p;
+    B_pp_3d = B_pp_p;
+    return EB_assigned;
+};
+
+double HorizonFinder::HorizonLocation(int j, int k) {
+    if (foundhorizon)
+        return h[j][k];
+    else
+        return -1.0;
+};
+
+bool HorizonFinder::InsideHorizon(double r, int j, int k) {
+    if (foundhorizon)
+        return (r < h(j, k));
+    else
+        return false;
+};
+
+void HorizonFinder::InitialGuess(double M_init, double P_z) {
+    //    cout << " HORIZONFINDER: Initializing horizon surface..." << endl;
+    const double r_init = 0.5 * M_init;  // makes sense in isotropic coordinates
+    for (int j = 0; j < N_theta; j++) {
+        double ctl = h.costheta(j);
+        for (int k = 0; k < N_phi; k++)
+            //	h[j][k] = r_init * (1.0 + 0.1 * sin(h.theta(j)) * cos(h.phi(k)));
+            // h[j][k] = r_init * (1.0 - 0.1*sin(h.theta(j) ) );
+            h[j][k] = r_init * (1. - P_z * ctl / (8.0 * M_init));
     }
 };
 

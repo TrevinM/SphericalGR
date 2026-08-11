@@ -40,36 +40,31 @@ public:
     // Destructor
     //================================================
     ~dumper() {};
+    
     //================================================
     // reset dump_step
     //================================================
-    int reset_dumpstep(int step) {
-        dump_step = step;
-        return dump_step;
-    }
+    int reset_dumpstep(int step);
+
     //================================================
     // "Conditional dump"
     //================================================
     bool time_to_dump(int timestep) { return (timestep % dump_step == 0); };
     void cond_dump(double phys_time, double prop_time, int timestep, gf3d* fct,
-        const char* suffix = "") {
-        // time to dump?      
-        if (time_to_dump(timestep) || strcmp(suffix, ""))
-            dump(phys_time, prop_time, timestep, fct, suffix);
-    };
+        const char* suffix = "");
+
     //================================================
     // forced dump
     //================================================
     void dump(double phys_time, double prop_time, int timestep, gf3d* fct,
         const char* suffix = "");
+
     //================================================
     // "Conditional slice" dump
     //================================================
     void cond_slice(double phys_time, double prop_time, int timestep, gf3d* fct,
-        const char* suffix = "") {
-        if (time_to_dump(timestep) || strcmp(suffix, ""))
-            slice(phys_time, prop_time, timestep, fct, suffix);
-    };
+        const char* suffix = "");
+
     //================================================
     // forced slice dump
     //================================================
