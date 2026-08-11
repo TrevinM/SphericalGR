@@ -41,15 +41,15 @@ public:
     //
     int gf_counter = 0;
     //
-    fct_list[gf_counter] = a_r.setup(grid, 1, "a_r", gf_counter, -1, +1, +1);
+    fct_list[gf_counter] = a_r.setup(grid, 1, "a_r", gf_counter, -1, +1, -1);
     gf_counter++;
-    fct_list[gf_counter] = a_t.setup(grid, 1, "a_t", gf_counter, +1, -1, -1);
+    fct_list[gf_counter] = a_t.setup(grid, 1, "a_t", gf_counter, +1, -1, +1);
     gf_counter++;
     fct_list[gf_counter] = a_p.setup(grid, 1, "a_p", gf_counter, -1, -1, +1);
     gf_counter++;
-    fct_list[gf_counter] = as_r.setup(grid, 1, "as_r", gf_counter, -1, +1, +1);
+    fct_list[gf_counter] = as_r.setup(grid, 1, "as_r", gf_counter, -1, +1, -1);
     gf_counter++;
-    fct_list[gf_counter] = as_t.setup(grid, 1, "as_t", gf_counter, +1, -1, -1);
+    fct_list[gf_counter] = as_t.setup(grid, 1, "as_t", gf_counter, +1, -1, +1);
     gf_counter++;
     fct_list[gf_counter] = as_p.setup(grid, 1, "as_p", gf_counter, -1, -1, +1);
     gf_counter++;
