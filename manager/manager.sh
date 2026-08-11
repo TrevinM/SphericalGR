@@ -13,7 +13,7 @@ export OMP_NUM_THREADS=16
 export dir=/mnt/research/tbaumgar/Students/tmacomber/SphericalGR
 
 #Name of critical collapse suite to be run (with sbatch) or created (with bash)
-suite=ODEq
+suite=KO
 
 max_runs=5
 verbose=1   # 1+: Slurm debug prints
@@ -69,7 +69,7 @@ then
         wait
 
         #Get Settings
-        read -e -p "Eta Family: " -i "eta_${suite}" family
+        read -e -p "Eta Family: " -i "eta_" family
         read -e -p "Example: " -i "example_DualMax" example
         read -e -p "Lower Bound: " -i "0" lower_bound
         read -e -p "Upper Bound: " -i "10" upper_bound
@@ -92,6 +92,9 @@ then
         echo FastConv   $fast_conv          >> $suite_path/settings
 
         echo "Test suite $suite created!"
+        echo ""
+        echo "!!! Don't forget to add variables to the suite example !!!"
+        echo "See env_* files for variable names"
         exit 0
     fi
 else
@@ -130,6 +133,7 @@ else
             done < $suite_path/data_sup
         fi
     else
+        echo "Suite ${suite} already created."
         echo "Cannot run locally. Use SBATCH..."
         exit 1
     fi
@@ -166,13 +170,14 @@ do
     lower_bound=${constraint[0]}
     upper_bound=${constraint[1]}
 
-    for (( curr_precision=0 ; curr_precision<15 ; curr_precision++ ))
+    #Increase precision until bounds fully represented
+    for (( curr_precision=0 ; curr_precision<$max_precision ; curr_precision++ ))
     do
         rounded_l="$(echo "scale=$curr_precision;$lower_bound/1" | bc)"
         rounded_u="$(echo "scale=$curr_precision;$upper_bound/1" | bc)"
         if [[ 1 -eq "$(echo "$rounded_l==$lower_bound" | bc)" && 1 -eq "$(echo "$rounded_u==$upper_bound" | bc)" ]]
         then
-            #Leave precision for delta
+            #Add precision for delta
             let curr_precision++
             break
         fi
