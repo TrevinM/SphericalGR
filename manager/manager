@@ -484,8 +484,8 @@ do
         cd ${job_dirs[k]}
         eta=${etas[k]}
 
-        sub_crit= $( bash $dir/manager/$sub_test )
-        sup_crit= $( bash $dir/manager/$sup_test )
+        sub_crit= $( python3 $dir/manager/$sub_test )
+        sup_crit= $( python3 $dir/manager/$sup_test )
 
         # #Subcritical tests
         # if [ -e output/DualMaxwell*.mon ]
