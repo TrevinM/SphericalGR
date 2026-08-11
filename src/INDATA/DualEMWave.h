@@ -148,7 +148,7 @@ public:
 		as_p.setup(grid, 1, "as_p", gf_counter++, -1, -1, +1); // vector
 		s_r.setup(grid, 1, "s_r", gf_counter++, -1, +1, +1);
 		s_t.setup(grid, 1, "s_t", gf_counter++, +1, -1, -1);
-		s_p.setup(grid, 1, "s_p", gf_counter++, -1, -1, +1);
+		s_p.setup(grid, 1, "s_p", gf_counter++, -1, -1, -1);
 		// rescaled vector potential for A^{ij}, indices upstairs
 		W_r.setup(grid, 1, "W_r", gf_counter++, -1, +1, +1);
 		W_t.setup(grid, 1, "W_t", gf_counter++, +1, -1, -1);

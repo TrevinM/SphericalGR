@@ -56,11 +56,11 @@ public:
     gf_counter++;
     fct_list[gf_counter] = h_rt.setup(grid, 1, "h_rt", gf_counter,-1,-1,-1);
     gf_counter++;
-    fct_list[gf_counter] = h_rp.setup(grid, 1, "h_rp", gf_counter,+1,-1,+1);
+    fct_list[gf_counter] = h_rp.setup(grid, 1, "h_rp", gf_counter,+1,-1,-1);
     gf_counter++;
     fct_list[gf_counter] = h_tt.setup(grid, 1, "h_tt", gf_counter,+1,+1,+1);
     gf_counter++;
-    fct_list[gf_counter] = h_tp.setup(grid, 1, "h_tp", gf_counter,-1,+1,-1);
+    fct_list[gf_counter] = h_tp.setup(grid, 1, "h_tp", gf_counter,-1,+1,+1);
     gf_counter++;
     fct_list[gf_counter] = h_pp.setup(grid, 1, "h_pp", gf_counter,+1,+1,+1);
     gf_counter++;
@@ -74,11 +74,11 @@ public:
     gf_counter++;
     fct_list[gf_counter] = a_rt.setup(grid, 1, "a_rt", gf_counter,-1,-1,-1);
     gf_counter++;
-    fct_list[gf_counter] = a_rp.setup(grid, 1, "a_rp", gf_counter,+1,-1,+1);
+    fct_list[gf_counter] = a_rp.setup(grid, 1, "a_rp", gf_counter,+1,-1,-1);
     gf_counter++;
     fct_list[gf_counter] = a_tt.setup(grid, 1, "a_tt", gf_counter,+1,+1,+1);
     gf_counter++;
-    fct_list[gf_counter] = a_tp.setup(grid, 1, "a_tp", gf_counter,-1,+1,-1);
+    fct_list[gf_counter] = a_tp.setup(grid, 1, "a_tp", gf_counter,-1,+1,+1);
     gf_counter++;
     fct_list[gf_counter] = a_pp.setup(grid, 1, "a_pp", gf_counter,+1,+1,+1);
     gf_counter++;
@@ -89,7 +89,7 @@ public:
     gf_counter++;
     fct_list[gf_counter] = lam_t.setup(grid, 2, "lam_t", gf_counter,+1,-1,-1);
     gf_counter++;
-    fct_list[gf_counter] = lam_p.setup(grid, 2, "lam_p", gf_counter,-1,-1,+1);
+    fct_list[gf_counter] = lam_p.setup(grid, 2, "lam_p", gf_counter,-1,-1,-1);
     gf_counter++;
     //
     // Theta function for Z4
@@ -109,9 +109,9 @@ public:
     gf_counter++;
     fct_list[gf_counter] = shift_p.setup(grid, 2, "shift_p", gf_counter,-1,-1,+1);
     gf_counter++;
-    fct_list[gf_counter] = B_r.setup(grid, 2, "B_r", gf_counter,-1,+1,+1);
+    fct_list[gf_counter] = B_r.setup(grid, 2, "B_r", gf_counter,-1,+1, -1);
     gf_counter++;
-    fct_list[gf_counter] = B_t.setup(grid, 2, "B_t", gf_counter,+1,-1,-1);
+    fct_list[gf_counter] = B_t.setup(grid, 2, "B_t", gf_counter,+1,-1,+1);
     gf_counter++;
     fct_list[gf_counter] = B_p.setup(grid, 2, "B_p", gf_counter,-1,-1,+1);
     gf_counter++;
