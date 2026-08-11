@@ -1,0 +1,7 @@
+Size of (interior) grid
+    N_r = $nr
+    N_theta = $nt
+Parameters for grid
+    s_param = $sp
+Offset Sinh Parameters
+    r_focus = $rf
