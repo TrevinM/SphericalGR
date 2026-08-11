@@ -214,3 +214,19 @@ void Manager::Remove_Trace(state* s) {
             }
     curve->Compute_Trace(s);
 };
+
+//===========================================
+// Destructor
+//===========================================
+Manager::~Manager() {
+    delete last;
+    delete derivs;
+    delete inter;
+    delete updates;
+    delete curve;
+    delete aux;
+    delete constraints;
+    delete matter;
+    delete horizonfinder;
+    cout << " MANAGER: Destructing manager - bye! " << endl;
+}

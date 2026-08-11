@@ -88,6 +88,8 @@ target_sources(SphericalGR
     ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C
     ${CMAKE_CURRENT_SOURCE_DIR}/Manager.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Container.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Grid.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/InData.C /
 )
 
 target_include_directories(SphericalGR 
