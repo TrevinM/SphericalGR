@@ -2,7 +2,7 @@
 #define CONTAINER_H
 
 #include "Manager.h"
-
+#include "Matter.h"
 #include "Grid.h"
 #include "Cosmology.h"
 #include "EOS.h"
@@ -21,6 +21,9 @@ class Container {
 public:
     // Evolution, times, states
     inline static Manager* manager = nullptr;
+
+    // ADM_Sources, N_r, N_t, N_p, N_g
+    inline static Matter* matter = nullptr;
 
     // Resolution 
     inline static Grid* grid = nullptr;

@@ -17,7 +17,6 @@ curvature* Manager::curve = nullptr;
 auxiliary* Manager::aux = nullptr;
 HorizonFinder* Manager::horizonfinder = nullptr;
 diagnostics* Manager::constraints = nullptr;
-Matter* Manager::matter = nullptr;
 
 
 Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
@@ -95,28 +94,28 @@ Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
     // create matter
     //
     if (matter_type == 1) {
-        matter = new Vacuum(Container::grid, Container::dump, Container::indata, cowling, Container::cosmology);
+        Container::matter = new Vacuum(Container::grid, Container::dump, Container::indata, cowling, Container::cosmology);
     } else if (matter_type == 3) {
         if (!Container::eos) {
             cerr << " MANAGER: Can't set up Hydro without eos! " << endl;
             exit(1);
         }
-        matter = new Hydro(Container::grid, Container::dump, Container::indata, Container::eos, cowling, Container::cosmology,
+        Container::matter = new Hydro(Container::grid, Container::dump, Container::indata, Container::eos, cowling, Container::cosmology,
             Container::monitor, horizonfinder, Container::checkpoint);
     } else if (matter_type == 5) {
-        matter = new ScalarField(Container::grid, Container::dump, Container::indata, cowling, Container::cosmology,
+        Container::matter = new ScalarField(Container::grid, Container::dump, Container::indata, cowling, Container::cosmology,
             Container::monitor, eta_KO, Container::checkpoint);
     } else if (matter_type == 6) {
-        matter = new RadHydro(Container::grid, Container::dump, Container::indata, Container::eos, cowling, Container::cosmology,
+        Container::matter = new RadHydro(Container::grid, Container::dump, Container::indata, Container::eos, cowling, Container::cosmology,
             Container::monitor, Container::checkpoint);
     } else if (matter_type == 7) {
-        matter = new Maxwell(Container::grid, Container::dump, Container::indata, cowling, char_OB, Container::cosmology,
+        Container::matter = new Maxwell(Container::grid, Container::dump, Container::indata, cowling, char_OB, Container::cosmology,
             Container::monitor, eta_KO, Container::checkpoint);
     } else if (matter_type == 8) {
-        matter = new DualMaxwell(Container::grid, Container::dump, Container::indata, cowling, char_OB, Container::cosmology,
+        Container::matter = new DualMaxwell(Container::grid, Container::dump, Container::indata, cowling, char_OB, Container::cosmology,
             Container::monitor, eta_KO, Container::checkpoint);
     } else {
-        cerr << " MANAGER: Unknown matter type!!! " << endl;
+        cerr << " MANAGER: Unknown Container::matter type!!! " << endl;
     }
     //===========================================
     // set up profiles
@@ -226,7 +225,7 @@ Manager::~Manager() {
     delete curve;
     delete aux;
     delete constraints;
-    delete matter;
+    delete Container::matter;
     delete horizonfinder;
     cout << " MANAGER: Destructing manager - bye! " << endl;
 }

@@ -163,12 +163,12 @@ void Manager::dot_ext_curv(state* s, double time) {
                 derivs->K[i][j][k] = aux->Lie(s->shift_r, s->shift_t, s->shift_p, s->K, i, j, k)
                     // note cosmological term
                     + lapse_l * (K_plus_T * K_plus_T / 3.0 + A2_trace
-                        + 4.0 * PI * (matter->adm_sources->rho_ADM(i, j, k) + matter->adm_sources->trace_S(i, j, k)) - lambda
+                        + 4.0 * PI * (Container::matter->adm_sources->rho_ADM(i, j, k) + Container::matter->adm_sources->trace_S(i, j, k)) - lambda
                         + kappa_1 * (1.0 - kappa_2) * s->Theta(i, j, k));
                 // NOTE: absence of "Riccatti" term: replaced K_plus_2T with K_l;  also need to fix lambda term if present.
                 if (lambda != 0.0) cerr << " FIX lambda term in Theta equation! " << endl;
                 if (z4) derivs->Theta[i][j][k] = aux->Lie(s->shift_r, s->shift_t, s->shift_p, s->Theta, i, j, k)
-                    + lapse_l * (K_plus_T * K_plus_T / 3.0 - 0.5 * A2_trace - 8.0 * PI * matter->adm_sources->rho_ADM(i, j, k)
+                    + lapse_l * (K_plus_T * K_plus_T / 3.0 - 0.5 * A2_trace - 8.0 * PI * Container::matter->adm_sources->rho_ADM(i, j, k)
                         - kappa_1 * (2.0 + kappa_2) * s->Theta(i, j, k));
 
                 //
@@ -252,8 +252,8 @@ void Manager::dot_ext_curv(state* s, double time) {
                 tensor R(curve->R_rr(i, j, k), curve->R_rt(i, j, k), curve->R_rp(i, j, k),
                     curve->R_tt(i, j, k), curve->R_tp(i, j, k), curve->R_pp(i, j, k));
                 // NOTE: S_ij is assumed *not* to be rescaled (like R_ij)
-                tensor Stress(matter->adm_sources->S_rr(i, j, k), matter->adm_sources->S_rt(i, j, k), matter->adm_sources->S_rp(i, j, k),
-                    matter->adm_sources->S_tt(i, j, k), matter->adm_sources->S_tp(i, j, k), matter->adm_sources->S_pp(i, j, k));
+                tensor Stress(Container::matter->adm_sources->S_rr(i, j, k), Container::matter->adm_sources->S_rt(i, j, k), Container::matter->adm_sources->S_rp(i, j, k),
+                    Container::matter->adm_sources->S_tt(i, j, k), Container::matter->adm_sources->S_tp(i, j, k), Container::matter->adm_sources->S_pp(i, j, k));
                 tensor L2;
                 tensor g(1.0 + s->h_rr(i, j, k), rl * s->h_rt(i, j, k), rl * stl * s->h_rp(i, j, k),
                     r2 * (1.0 + s->h_tt(i, j, k)), r2 * stl * s->h_tp(i, j, k), r2 * st2 * (1.0 + s->h_pp(i, j, k)));
@@ -576,9 +576,9 @@ void Manager::dot_connection(state* s, double time) {
                 vect D_phi(s->phi.dr(i, j, k), s->phi.dtheta(i, j, k), s->phi.dphi(i, j, k));
                 vect D_K(s->K.dr(i, j, k), s->K.dtheta(i, j, k), s->K.dphi(i, j, k));
                 //
-                // Define vector with matter source term S_i (defined *downstairs*!), assumed *not* to be rescaled
+                // Define vector with Container::matter source term S_i (defined *downstairs*!), assumed *not* to be rescaled
                 //
-                vect S_matter(matter->adm_sources->S_r(i, j, k), matter->adm_sources->S_t(i, j, k), matter->adm_sources->S_p(i, j, k));
+                vect S_matter(Container::matter->adm_sources->S_r(i, j, k), Container::matter->adm_sources->S_t(i, j, k), Container::matter->adm_sources->S_p(i, j, k));
                 //
                 // alternative: compute derivative of phi from X - note cosmological factor
                 //

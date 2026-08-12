@@ -35,7 +35,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         //
         //    cout << " MANAGER: regridding..." << endl;
         last->dump_fcts(t, tau_c, timestep, "_before_regrid");
-        matter->dump_fcts(t, tau_c, timestep, "_before_regrid");
+        Container::matter->dump_fcts(t, tau_c, timestep, "_before_regrid");
         constraints->dump_fcts(t, tau_c, timestep, "_before_regrid");
         //
         // Compute_Inverse_Metric(h_rr_o, h_rt_o, h_rp_o,h_tt_o, h_tp_o, h_pp_o);
@@ -66,7 +66,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         // 
         // regrid matter variables
         //
-        matter->Regrid(r_new);
+        Container::matter->Regrid(r_new);
         //
         // update regrid ADM matter sources
         //
@@ -87,7 +87,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         Container::grid->Setup_Radial_Grid(r, r2);
         //
         last->dump_fcts(t, tau_c, timestep, "_after_regrid");
-        matter->dump_fcts(t, tau_c, timestep, "_after_regrid");
+        Container::matter->dump_fcts(t, tau_c, timestep, "_after_regrid");
         constraints->dump_fcts(t, tau_c, timestep, "_after_regrid");
         Container::monitor->regrid(Container::grid->r_max());
         horizonfinder->SetRMaxMin();
@@ -158,7 +158,7 @@ double Manager::RegridCriterion() {
                     }
             return max_diff;
         } else {
-            return matter->RegridCriterion();
+            return Container::matter->RegridCriterion();
         }
     } else if (Container::grid->Regrid_Type() == 1) {
         return Container::grid->RegridCriterion(tau_c);

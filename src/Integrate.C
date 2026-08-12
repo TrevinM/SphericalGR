@@ -48,7 +48,7 @@ bool Manager::Integrate(double t_max) {
         //================================================
         if (Container::waves != NULL) {
             double I_Re_max = constraints->CurvatureInvariant(last, curve,
-                matter->adm_sources,
+                Container::matter->adm_sources,
                 t, tau_c, step);
             Container::waves->Update(dt);
         }
@@ -88,8 +88,8 @@ bool Manager::Integrate(double t_max) {
             // Compute matter diagnostics
             //================================================ 
             constraints->Compute_Proper_Radius(last, curve, aux, sigma);
-            matter->Compute_Diagnostics(last, curve);
-            matter->dump_fcts(t, tau_c, step);
+            Container::matter->Compute_Diagnostics(last, curve);
+            Container::matter->dump_fcts(t, tau_c, step);
             //================================================
             // Also force a search for horizon, so that we have
             // horizon data at the same time
@@ -97,7 +97,7 @@ bool Manager::Integrate(double t_max) {
             bool force = true;
             double lin_mom_guess = 0.0;
             constraints->FindHorizon(step, t, tau_c, last, curve,
-                matter->adm_sources, matter->fluxes,
+                Container::matter->adm_sources, Container::matter->fluxes,
                 aux, mass, lin_mom_guess, force);
             //================================================
             // evaluate constraints
@@ -106,10 +106,10 @@ bool Manager::Integrate(double t_max) {
             double Mom_r_norm, Mom_t_norm, Mom_p_norm;
             double CFC_r_norm, CFC_t_norm, CFC_p_norm;
             Ham_norm_ex =
-                constraints->Hamiltonian(last, curve, aux, matter->adm_sources, true);
-            Ham_norm = constraints->Hamiltonian(last, curve, aux, matter->adm_sources);
+                constraints->Hamiltonian(last, curve, aux, Container::matter->adm_sources, true);
+            Ham_norm = constraints->Hamiltonian(last, curve, aux, Container::matter->adm_sources);
             constraints->MomentumConstraint(last, curve, inter,
-                matter->adm_sources,
+                Container::matter->adm_sources,
                 Mom_r_norm, Mom_t_norm,
                 Mom_p_norm);
             constraints->ConnectionFunctionConstraint(last, curve,
@@ -125,7 +125,7 @@ bool Manager::Integrate(double t_max) {
             //================================================ 
             if (Container::waves == NULL) // otherwise they are computed above already...
                 double I_Re_max = constraints->CurvatureInvariant(last, curve,
-                    matter->adm_sources,
+                    Container::matter->adm_sources,
                     t, tau_c, step);
             constraints->Note_Invariants(step, t, tau_c, Container::monitor);
         }
@@ -147,10 +147,10 @@ bool Manager::Integrate(double t_max) {
             double Mom_r_norm, Mom_t_norm, Mom_p_norm;
             double CFC_r_norm, CFC_t_norm, CFC_p_norm;
             Ham_norm_ex =
-                constraints->Hamiltonian(last, curve, aux, matter->adm_sources, true);
-            Ham_norm = constraints->Hamiltonian(last, curve, aux, matter->adm_sources);
+                constraints->Hamiltonian(last, curve, aux, Container::matter->adm_sources, true);
+            Ham_norm = constraints->Hamiltonian(last, curve, aux, Container::matter->adm_sources);
             constraints->MomentumConstraint(last, curve, inter,
-                matter->adm_sources,
+                Container::matter->adm_sources,
                 Mom_r_norm, Mom_t_norm,
                 Mom_p_norm);
             constraints->ConnectionFunctionConstraint(last, curve,
@@ -164,20 +164,20 @@ bool Manager::Integrate(double t_max) {
             // evaluate curvature invariants
             //================================================ 
             double I_Re_max = constraints->CurvatureInvariant(last, curve,
-                matter->adm_sources, t, tau_c, step);
+                Container::matter->adm_sources, t, tau_c, step);
             constraints->Note_Invariants(step, t, tau_c, Container::monitor);
             constraints->Compute_Proper_Radius(last, curve, aux, sigma);
             if (Container::profiles != NULL) Container::profiles->write_profile(t, tau_c);
             if (Container::photons != NULL) Container::photons->Monitor(t, tau_c);
             if (Container::waves != NULL) Container::waves->write_wave_data(t, tau_c);
-            matter->Compute_Diagnostics(last, curve);
-            matter->Note(step, t, tau_c);
+            Container::matter->Compute_Diagnostics(last, curve);
+            Container::matter->Note(step, t, tau_c);
         }
         //================================================
         // look for horizons
         //================================================
         constraints->FindHorizon(step, t, tau_c, last, curve,
-            matter->adm_sources, matter->fluxes,
+            Container::matter->adm_sources, Container::matter->fluxes,
             aux, mass);
         //================================================
         // Finally: check for NaN's...
@@ -187,7 +187,7 @@ bool Manager::Integrate(double t_max) {
             curve->dump_fcts(t, tau_c, step, "_crash");
             aux->dump_fcts(t, tau_c, step, "_crash");
             constraints->dump_fcts(t, tau_c, step, "_crash");
-            matter->dump_fcts(t, tau_c, step, "_crash");
+            Container::matter->dump_fcts(t, tau_c, step, "_crash");
             return false;
         }
 
@@ -198,7 +198,7 @@ bool Manager::Integrate(double t_max) {
                 curve->dump_fcts(t, tau_c, step);
                 aux->dump_fcts(t, tau_c, step);
                 constraints->dump_fcts(t, tau_c, step);
-                matter->dump_fcts(t, tau_c, step);
+                Container::matter->dump_fcts(t, tau_c, step);
             }
             break;
         }
@@ -216,14 +216,14 @@ void Manager::Step_RK4(double& t, double& tau_c) {
     // before getting started...
     //
     inter->equals(last);
-    matter->Start_RK();  // sets matter_inter = matter_last
+    Container::matter->Start_RK();  // sets matter_inter = matter_last
     //
     // evaluate k_1 at current time
     // 
     Compute_RHS(t);              // computes derivs from inter
-    matter->Compute_RHS(inter, curve, t);
+    Container::matter->Compute_RHS(inter, curve, t);
     updates->add(last, dt / 6.0, derivs);
-    matter->Update(dt / 6.0);
+    Container::matter->Update(dt / 6.0);
     tau_c += inter->lapse(0.0, N_g, N_g) * dt / 6.0;
     //
     // evaluate k_2 at middle point
@@ -232,12 +232,12 @@ void Manager::Step_RK4(double& t, double& tau_c) {
     inter->fill_ghosts();
     if (char_OB == 1) inter->char_OB(last, 0.5 * dt);
     curve->Update(inter);
-    matter->Compute_inter(0.5 * dt);
-    matter->ADM_Sources(inter, curve);
+    Container::matter->Compute_inter(0.5 * dt);
+    Container::matter->ADM_Sources(inter, curve);
     Compute_RHS(t + 0.5 * dt);    // always compute derivs from inter
-    matter->Compute_RHS(inter, curve, t + 0.5 * dt);
+    Container::matter->Compute_RHS(inter, curve, t + 0.5 * dt);
     updates->add(dt / 3.0, derivs);
-    matter->Update(dt / 3.0);
+    Container::matter->Update(dt / 3.0);
     tau_c += inter->lapse(0.0, N_g, N_g) * dt / 3.0;
     //
     // evaluate k_3 at middle point
@@ -246,12 +246,12 @@ void Manager::Step_RK4(double& t, double& tau_c) {
     inter->fill_ghosts();
     if (char_OB == 1) inter->char_OB(last, 0.5 * dt);
     curve->Update(inter);
-    matter->Compute_inter(0.5 * dt);
-    matter->ADM_Sources(inter, curve);
+    Container::matter->Compute_inter(0.5 * dt);
+    Container::matter->ADM_Sources(inter, curve);
     Compute_RHS(t + 0.5 * dt);    // always compute derivs from inter
-    matter->Compute_RHS(inter, curve, t + 0.5 * dt);
+    Container::matter->Compute_RHS(inter, curve, t + 0.5 * dt);
     updates->add(dt / 3.0, derivs);
-    matter->Update(dt / 3.0);
+    Container::matter->Update(dt / 3.0);
     tau_c += inter->lapse(0.0, N_g, N_g) * dt / 3.0;
     //
     // evaluate k_4 at last point
@@ -260,12 +260,12 @@ void Manager::Step_RK4(double& t, double& tau_c) {
     inter->fill_ghosts();
     if (char_OB == 1) inter->char_OB(last, dt);
     curve->Update(inter);
-    matter->Compute_inter(dt);
-    matter->ADM_Sources(inter, curve);
+    Container::matter->Compute_inter(dt);
+    Container::matter->ADM_Sources(inter, curve);
     Compute_RHS(t + dt);    // always compute derivs from inter
-    matter->Compute_RHS(inter, curve, t + dt);
+    Container::matter->Compute_RHS(inter, curve, t + dt);
     updates->add(dt / 6.0, derivs);
-    matter->Update(dt / 6.0);
+    Container::matter->Update(dt / 6.0);
     tau_c += inter->lapse(0.0, N_g, N_g) * dt / 6.0;
     //
     //
@@ -279,7 +279,7 @@ void Manager::Step_RK4(double& t, double& tau_c) {
     last->equals(updates);
     last->fill_ghosts();
     curve->Update(last);
-    matter->Finish_RK(last, curve, dt);
+    Container::matter->Finish_RK(last, curve, dt);
     //
     t += dt;
 }
@@ -294,14 +294,14 @@ void Manager::Step_RK3(double& t, double& tau_c) {
     // before getting started...
     //
     inter->equals(last);
-    matter->Start_RK();  // sets matter_inter = matter_last
+    Container::matter->Start_RK();  // sets matter_inter = matter_last
     //
     // evaluate k_1 at current time
     // 
     Compute_RHS(t);              // computes derivs from inter
-    matter->Compute_RHS(inter, curve, t);
+    Container::matter->Compute_RHS(inter, curve, t);
     updates->add(last, 2.0 * dt / 9.0, derivs);
-    matter->Update(2.0 * dt / 9.0);
+    Container::matter->Update(2.0 * dt / 9.0);
     tau_c += inter->lapse(0.0, N_g, N_g) * 2.0 * dt / 9.0;
     //
     // evaluate k_2 at middle point
@@ -310,12 +310,12 @@ void Manager::Step_RK3(double& t, double& tau_c) {
     inter->fill_ghosts();
     if (char_OB == 1) inter->char_OB(last, 0.5 * dt);
     curve->Update(inter);
-    matter->Compute_inter(0.5 * dt);
-    matter->ADM_Sources(inter, curve);
+    Container::matter->Compute_inter(0.5 * dt);
+    Container::matter->ADM_Sources(inter, curve);
     Compute_RHS(t + 0.5 * dt);    // always compute derivs from inter
-    matter->Compute_RHS(inter, curve, t + 0.5 * dt);
+    Container::matter->Compute_RHS(inter, curve, t + 0.5 * dt);
     updates->add(dt / 3.0, derivs);
-    matter->Update(dt / 3.0);
+    Container::matter->Update(dt / 3.0);
     tau_c += inter->lapse(0.0, N_g, N_g) * dt / 3.0;
     //
     // evaluate k_3 at point 3/4 down...
@@ -324,12 +324,12 @@ void Manager::Step_RK3(double& t, double& tau_c) {
     inter->fill_ghosts();
     if (char_OB == 1) inter->char_OB(last, 0.75 * dt);
     curve->Update(inter);
-    matter->Compute_inter(0.75 * dt);
-    matter->ADM_Sources(inter, curve);
+    Container::matter->Compute_inter(0.75 * dt);
+    Container::matter->ADM_Sources(inter, curve);
     Compute_RHS(t + 0.75 * dt);    // always compute derivs from inter
-    matter->Compute_RHS(inter, curve, t + 0.75 * dt);
+    Container::matter->Compute_RHS(inter, curve, t + 0.75 * dt);
     updates->add(4.0 * dt / 9.0, derivs);
-    matter->Update(4.0 * dt / 9.0);
+    Container::matter->Update(4.0 * dt / 9.0);
     tau_c += inter->lapse(0.0, N_g, N_g) * 4.0 * dt / 9.0;
     //
     //
@@ -343,7 +343,7 @@ void Manager::Step_RK3(double& t, double& tau_c) {
     last->equals(updates);
     last->fill_ghosts();
     curve->Update(last);
-    matter->Finish_RK(last, curve, dt);
+    Container::matter->Finish_RK(last, curve, dt);
     //
     t += dt;
 }
@@ -358,14 +358,14 @@ void Manager::Step_ICN(double& t, double& tau_c) {
     // before getting started...
     //
     inter->equals(last);
-    matter->Start_RK();  // sets matter_inter = matter_last
+    Container::matter->Start_RK();  // sets matter_inter = matter_last
     //
     // evaluate k_1 at current time
     // 
     Compute_RHS(t);              // computes derivs from inter
-    matter->Compute_RHS(inter, curve, t);
+    Container::matter->Compute_RHS(inter, curve, t);
     updates->add(last, 0.5 * dt, derivs);
-    matter->Update(0.5 * dt);
+    Container::matter->Update(0.5 * dt);
     tau_c += inter->lapse(0.0, N_g, N_g) * 0.5 * dt;
     //
     // evaluate k_2 at end point, but don't update
@@ -374,12 +374,12 @@ void Manager::Step_ICN(double& t, double& tau_c) {
     inter->fill_ghosts();
     if (char_OB == 1) inter->char_OB(last, dt);
     curve->Update(inter);
-    matter->Compute_inter(dt);
-    matter->ADM_Sources(inter, curve);
+    Container::matter->Compute_inter(dt);
+    Container::matter->ADM_Sources(inter, curve);
     Compute_RHS(t + dt);    // always compute derivs from inter
-    matter->Compute_RHS(inter, curve, t + dt);
+    Container::matter->Compute_RHS(inter, curve, t + dt);
     //  updates->add(dt / 3.0, derivs);
-    //  matter->Update(dt / 3.0);
+    //  Container::matter->Update(dt / 3.0);
     //  tau_c += inter->lapse(0.0,N_g,N_g) * dt / 3.0;
     //
     // evaluate k_3 at end point again
@@ -388,12 +388,12 @@ void Manager::Step_ICN(double& t, double& tau_c) {
     inter->fill_ghosts();
     if (char_OB == 1) inter->char_OB(last, dt);
     curve->Update(inter);
-    matter->Compute_inter(dt);
-    matter->ADM_Sources(inter, curve);
+    Container::matter->Compute_inter(dt);
+    Container::matter->ADM_Sources(inter, curve);
     Compute_RHS(t + dt);    // always compute derivs from inter
-    matter->Compute_RHS(inter, curve, t + dt);
+    Container::matter->Compute_RHS(inter, curve, t + dt);
     updates->add(0.5 * dt, derivs);
-    matter->Update(0.5 * dt);
+    Container::matter->Update(0.5 * dt);
     tau_c += inter->lapse(0.0, N_g, N_g) * 0.5 * dt;
     //
     //
@@ -407,7 +407,7 @@ void Manager::Step_ICN(double& t, double& tau_c) {
     last->equals(updates);
     last->fill_ghosts();
     curve->Update(last);
-    matter->Finish_RK(last, curve, dt);
+    Container::matter->Finish_RK(last, curve, dt);
     //
     t += dt;
 }

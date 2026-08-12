@@ -19,7 +19,6 @@ private:
     Grid* grid;
     state* s;
     curvature* curve;
-    Matter* matter;
     int N_g, N_r, N_theta, N_phi;
 #ifndef NoEllSolver
     FlatEllSolver3D* ellsolver;
@@ -33,7 +32,7 @@ public:
     //
     ConstraintSolver(Grid* grid_i, state* s_i, curvature* curve_i,
         Matter* matter_i) :
-        grid(grid_i), s(s_i), curve(curve_i), matter(matter_i) {
+        grid(grid_i), s(s_i), curve(curve_i), Container::matter(matter_i) {
         N_g = grid->N_ghosts();
         N_r = grid->N_r_tot();
         N_theta = grid->N_theta_tot();
@@ -205,12 +204,12 @@ private:
                     u[i][j][k] = -curve->trace_R(i, j, k) / 8.0
                         - 5.0 * psi4 * s->K(i, j, k) * s->K(i, j, k) / 12.0
                         + 5.0 * psi4 * A2(i, j, k) / 8.0
-                        + 10.0 * PI * psi4 * matter->adm_sources->rho_ADM(i, j, k);
+                        + 10.0 * PI * psi4 * Container::matter->adm_sources->rho_ADM(i, j, k);
                     // v:
                     v[i][j][k] = psi_l * curve->trace_R(i, j, k) / 8.0
                         + psi5 * s->K(i, j, k) * s->K(i, j, k) / 12.0
                         - psi5 * A2(i, j, k) / 8.0
-                        - 2.0 * PI * psi5 * matter->adm_sources->rho_ADM(i, j, k);
+                        - 2.0 * PI * psi5 * Container::matter->adm_sources->rho_ADM(i, j, k);
                 }
         return 0;
     };

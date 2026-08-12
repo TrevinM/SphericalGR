@@ -38,7 +38,6 @@ public:
     static state* updates;
     static curvature* curve;
     static auxiliary* aux;
-    static Matter* matter;
     static HorizonFinder* horizonfinder;
 
     //===========================================
