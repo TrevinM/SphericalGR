@@ -1,3 +1,6 @@
+#ifndef CONTAINER_H
+#define CONTAINER_H
+
 #include "Manager.h"
 
 #include "Grid.h"
@@ -12,20 +15,31 @@
 #include "WaveExtraction.h"
 #include "Photons.h"
 #include "CheckPoint.h"
+#include "Tracker.h"
 
 class Container {
 public:
-    static Manager* manager;
-    static Grid* grid;
-    static Cosmology* cosmology;
-    static EOS* eos;
-    static InData* indata;
-    static Slicing* slicing;
-    static Gauge* gauge;
-    static dumper* dump;
-    static Monitor* monitor;
-    static Profiles* profiles;
-    static WaveExtraction* waves;
-    static Photons* photons;
-    static CheckPoint* checkpoint;
+    // Evolution, times, states
+    inline static Manager* manager = nullptr;
+
+    // Resolution 
+    inline static Grid* grid = nullptr;
+    inline static Cosmology* cosmology = nullptr;
+    inline static EOS* eos = nullptr;
+    inline static InData* indata = nullptr;
+    inline static Slicing* slicing = nullptr;
+    inline static Gauge* gauge = nullptr;
+    inline static dumper* dump = nullptr;
+    inline static Monitor* monitor = nullptr;
+    inline static Profiles* profiles = nullptr;
+    inline static WaveExtraction* waves = nullptr;
+    inline static Photons* photons = nullptr;
+    inline static CheckPoint* checkpoint = nullptr;
+
+    // Location and values of various extrema
+    inline static Tracker* tracker = nullptr;
+
 };
+
+
+#endif

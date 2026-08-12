@@ -14,8 +14,6 @@
 
 class Manager {
 private:
-    double t, tau_c, t_max; // coordinate time and proper time at center
-    int step;        // step counter
     double dt;
     int sigma;      // decides between Eulerian and Lagrangian formalism
     int cowling;    // Cowling approximation (0: no, 1: fix gravity, 2: fix matter)
@@ -31,6 +29,8 @@ private:
     int steps_between_regrids, timestep_last_regrid;
     double PI;
 public:
+    double t, tau_c, t_max; // coordinate time and proper time at center
+    int step;        // step counter
     static diagnostics* constraints;
     static state* last;
     static state* derivs;

@@ -1043,6 +1043,21 @@ public:
                 }
         return max;
     };
+    double abs_max(int& i_max, int& j_max, int& k_max) {
+        double max = abs(v[N_g][N_g][N_g]);
+        i_max = j_max = k_max = N_g;
+        for (int i = N_g; i < nr - N_g; i++)
+            for (int j = N_g; j < nt - N_g; j++)
+                for (int k = N_g; k < np - N_g; k++) {
+                    if (abs(v[i][j][k]) > max) {
+                        max = abs(v[i][j][k]);
+                        i_max = i;
+                        j_max = j;
+                        k_max = k;
+                    }
+                }
+        return max;
+    };
     double max(double r_min) {   // finds maximum for all r > r_min
         double max = v[nr - N_g][N_g][N_g];
         for (int i = N_g; i < nr - N_g; i++)

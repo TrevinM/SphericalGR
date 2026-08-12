@@ -90,6 +90,9 @@ target_sources(SphericalGR
     ${CMAKE_CURRENT_SOURCE_DIR}/Container.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Grid.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/InData.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Tracker.C /
+    
+    ${CMAKE_CURRENT_SOURCE_DIR}/INDATA/DualEMWave.C /
 )
 
 target_include_directories(SphericalGR 

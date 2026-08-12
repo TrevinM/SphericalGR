@@ -75,15 +75,18 @@ int main(int argc, char* argv[]) {
     cout << "!! Running code assuming EQSYMMETRY  !! " << endl;
     cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << endl;
 #endif /* EQSYMMETRY */
+
     //================================================================
     // Allocate Grid Class
     //================================================================
     cout << " GR: allocating Container::grid..." << endl;
     Container::grid = new Grid();
+
     //================================================================
     // Allocate checkpoint class
     //================================================================
     Container::checkpoint = new CheckPoint(read_from_chkpt, chkpt_step, Container::grid);
+
     //================================================================
     // Allocate Cosmology Class
     //================================================================
@@ -98,6 +101,7 @@ int main(int argc, char* argv[]) {
         cerr << " GR: no Container::cosmology of type " << space_type << "!!" << endl;
         return 1;
     }
+    
     //================================================================
     // Allocate Equation of State
     //================================================================
@@ -117,6 +121,7 @@ int main(int argc, char* argv[]) {
     } else {
         cout << " GR: Unknown EOS for eos_type = " << eos_type << endl;
     }
+
     //================================================================
     // Allocate InData Class
     //================================================================
@@ -185,6 +190,7 @@ int main(int argc, char* argv[]) {
     }
     // tell initial data whether initial metric should be rescaled
     Container::indata->RescaleMetric(rescale_metric);
+
     //================================================================
     // Allocate Slicing Class
     //================================================================
@@ -208,6 +214,7 @@ int main(int argc, char* argv[]) {
         cerr << " No such Slicing type! " << endl;
         return 1;
     }
+
     //================================================================
     // Allocate Gauge Class
     //================================================================
@@ -231,11 +238,13 @@ int main(int argc, char* argv[]) {
         cerr << " No such gauge type! " << endl;
         return 1;
     }
+
     //================================================================
     // Allocate dumper Class
     //================================================================
     cout << " GR: allocating dumper..." << endl;
     Container::dump = new dumper(dump_step, Container::indata, Container::slicing, Container::gauge);
+
     //================================================================
     // Allocate monitor Class
     //================================================================
@@ -245,6 +254,7 @@ int main(int argc, char* argv[]) {
         eta_KO, sigma,
         z4, kappa_11, kappa_12, kappa_2, kappa_ric,
         RK_order, char_OB);
+
     //================================================================
     // Allocate profile Class
     //================================================================
@@ -255,6 +265,7 @@ int main(int argc, char* argv[]) {
     } else {
         Container::profiles = NULL;
     }
+
     //================================================================
     // Allocate wave extraction class
     //================================================================
@@ -265,6 +276,7 @@ int main(int argc, char* argv[]) {
     } else {
         Container::waves = NULL;
     }
+
     //================================================================
     // Allocate photon Class
     //================================================================
@@ -274,6 +286,7 @@ int main(int argc, char* argv[]) {
     } else {
         Container::photons = NULL;
     }
+
     //================================================================
     // Allocate manager Class
     //================================================================
@@ -282,6 +295,7 @@ int main(int argc, char* argv[]) {
         sigma, cowling, eta_KO,
         z4, kappa_11, kappa_12, kappa_2, kappa_ric,
         RK_order, char_OB, solve_constraints);
+
     //================================================================
     // Initialize
     //================================================================
@@ -299,6 +313,7 @@ int main(int argc, char* argv[]) {
     //  manager.Test_Flat_Metric();
     //  einstein.Test_DivShift();
     //  einstein.Test_Interpolation();
+    
     //================================================================
     // Integrate to time t_max
     //================================================================
