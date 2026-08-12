@@ -13,7 +13,7 @@ export OMP_NUM_THREADS=16
 export dir=/mnt/research/tbaumgar/Students/tmacomber/SphericalGR
 
 #Name of critical collapse suite to be run (with sbatch) or created (with bash)
-suite=KO
+suite=Conv
 
 max_runs=1
 verbose=1   # 1+: Slurm debug prints
@@ -488,8 +488,8 @@ do
         cd ${job_dirs[k]}
         eta=${etas[k]}
 
-        sub_crit= $( python3 $dir/manager/$sub_test )
-        sup_crit= $( python3 $dir/manager/$sup_test )
+        sub_crit= $( bash $dir/manager/$sub_test )
+        sup_crit= $( bash $dir/manager/$sup_test )
 
         # #Subcritical tests
         # if [ -e output/DualMaxwell*.mon ]
