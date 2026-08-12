@@ -8,8 +8,8 @@
 //================================================
 Tracker::Tracker() {
     ostringstream monfilename;
-    monfilename << "output/" << Container::monitor->Filestem() << "_" << Manager::matter->N_r - 2 * Manager::matter->N_g << "_"
-        << Manager::matter->N_t - 2 * Manager::matter->N_g << ".tracker_mon" << ends;
+    monfilename << "output/" << Container::monitor->Filestem() << "_" << Container::matter->N_r - 2 * Container::matter->N_g << "_"
+        << Container::matter->N_t - 2 * Container::matter->N_g << ".tracker_mon" << ends;
     monitorfile.open(monfilename.str().c_str());
     monitorfile.setf(ios::left);
     time_t clocktime;
@@ -44,8 +44,8 @@ Tracker::~Tracker() {
 //================================================
 void Tracker::Execute() {
     lapse_min = Manager::last->lapse.min(lapse_i, lapse_j, lapse_k);
-    rho_max = Manager::matter->adm_sources->rho_ADM.max(lapse_i, lapse_j, lapse_k);
-    S_p_max = Manager::matter->adm_sources->S_p.abs_max(lapse_i, lapse_j, lapse_k);
+    rho_max = Container::matter->adm_sources->rho_ADM.max(lapse_i, lapse_j, lapse_k);
+    S_p_max = Container::matter->adm_sources->S_p.abs_max(lapse_i, lapse_j, lapse_k);
 
     lapse_r = Smooth(lapse_r_past, Container::grid->r(lapse_i));
     lapse_th = Smooth(lapse_th_past, Container::grid->theta(lapse_j));

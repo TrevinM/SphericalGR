@@ -137,7 +137,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
 //================================================
 double Manager::RegridCriterion() {
     if (Container::grid->Regrid_Type() == 0) {
-        if (!strcmp(matter->Name(), "vacuum")) {  // vacuum...
+        if (!strcmp(Container::matter->Name(), "vacuum")) {  // vacuum...
             double diff = 0.0;
             double max_diff = 0.0;
             // first compute maximum of I_Re
