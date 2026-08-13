@@ -72,7 +72,7 @@ bool Manager::Integrate(double t_max) {
         //================================================
         // check whether it's time to write check point
         //================================================ 
-        if (step % Container::checkpoint->CheckPointStep() == 0)
+        if (step % Container::checkpoint->CheckPointStep() == 0 || finished)
             Container::checkpoint->WriteCheckPoint(step, t, tau_c);
         //================================================
         // check whether it's time to dump
@@ -139,7 +139,7 @@ bool Manager::Integrate(double t_max) {
             Container::monitor->note(step, t, tau_c, mass, ang_mom,
                 lin_mom, last->phi(0.0, N_g, N_g),
                 last->lapse(0.0, N_g, N_g), last->lapse.min(),
-                last->K(0.0, N_g, N_g), RegridCriterion(), force);
+                last->K(0.0, N_g, N_g), Container::grid->RegridCriterion(), force);
             //================================================
             // evaluate constraints
             //================================================ 
@@ -194,11 +194,11 @@ bool Manager::Integrate(double t_max) {
 #ifdef FINISHCONDITION
         if (finished) {
             if (finish_dump) {
-                last->dump_fcts(t, tau_c, step);
-                curve->dump_fcts(t, tau_c, step);
-                aux->dump_fcts(t, tau_c, step);
-                constraints->dump_fcts(t, tau_c, step);
-                Container::matter->dump_fcts(t, tau_c, step);
+                last->dump_fcts(t, tau_c, step, "_end");
+                curve->dump_fcts(t, tau_c, step, "_end");
+                aux->dump_fcts(t, tau_c, step, "_end");
+                constraints->dump_fcts(t, tau_c, step, "_end");
+                Container::matter->dump_fcts(t, tau_c, step, "_end");
             }
             break;
         }

@@ -22,10 +22,10 @@ public:
     // Evolution, times, states
     inline static Manager* manager = nullptr;
 
-    // ADM_Sources, N_r, N_t, N_p, N_g
+    // ADM_Sources, matter states
     inline static Matter* matter = nullptr;
 
-    // Resolution 
+    // N_r, N_theta, N_phi, N_ghost
     inline static Grid* grid = nullptr;
     inline static Cosmology* cosmology = nullptr;
     inline static EOS* eos = nullptr;

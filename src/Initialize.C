@@ -65,7 +65,7 @@ bool Manager::Initialize() {
     Container::monitor->note(step, t, tau_c, mass, ang_mom,
         lin_mom, last->phi(0.0, N_g, N_g),
         last->lapse(0.0, N_g, N_g), last->lapse.min(),
-        last->K(0.0, N_g, N_g), RegridCriterion());
+        last->K(0.0, N_g, N_g), Container::grid->RegridCriterion());
     //
     // look for horizons
     //

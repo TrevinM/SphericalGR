@@ -14,8 +14,9 @@
 #define GRID_H
 //
 class Grid {
+public:
+    int N_theta, N_phi, N_r, N_ghost;
 private:
-    int N_theta, N_phi, N_r;
     double r_max_init, r_max_fin;
     int regrids, regrid_counter;
     int regrid_type, grid_type;
@@ -25,10 +26,9 @@ private:
     double courant;
     double cutoff;
     double s_param, t_param, t_amp, theta_param;
-    double r_focus, x_focus;
+    double r_focus, x_focus, r_tracker;
     bool tracking;
     double r_max_current, r_max_old, r_max_new;
-    int N_ghost;
     double r_max_factor;
     bool printed_warning;
     double PI;
@@ -86,8 +86,6 @@ public:
     double costheta(int j) { return costheta_v[j]; }
     double dydtheta(int j) { return dydtheta_v[j]; }
     double ddydtheta(int j) { return ddydtheta_v[j]; }
-    double RegridCriterion(Doub tau_c);
-    int Regrid_Type() { return regrid_type; }
 
     //=================================================
     // Set up grid
@@ -99,8 +97,9 @@ public:
     //=================================================
     // regrid
     //=================================================
-    bool TimeToRegrid(Doub criterion);
+    bool TimeToRegrid(double criterion);
     int Regrid(VecDoub& r_new);
+    double RegridCriterion();
 
     //=================================================
     // Setup radial grid

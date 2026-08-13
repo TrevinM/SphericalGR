@@ -4,6 +4,7 @@
 //
 //================================================
 #include "Manager.h"
+#include "Grid.h"
 #include "Container.h"
 
 double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
@@ -11,7 +12,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
     //
     // check whether it's time to regrid
     // 
-    double criterion = RegridCriterion();
+    double criterion = Container::grid->RegridCriterion();
     bool regrid = Container::grid->TimeToRegrid(criterion);
     if (timestep - timestep_last_regrid < steps_between_regrids)
         regrid = false;
@@ -29,7 +30,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         Container::monitor->note(step, t, tau_c, mass, ang_mom,
             lin_mom, last->phi(0.0, N_g, N_g),
             last->lapse(0.0, N_g, N_g), last->lapse.min(),
-            last->K(0.0, N_g, N_g), RegridCriterion(), true);
+            last->K(0.0, N_g, N_g), Container::grid->RegridCriterion(), true);
         //
         timestep_last_regrid = timestep;
         //
@@ -108,7 +109,7 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
         // 
         //
         //
-        criterion = RegridCriterion();
+        criterion = Container::grid->RegridCriterion();
         //
         // finally adjust t_max if necessary
         //
@@ -135,8 +136,8 @@ double Manager::Regrid(double t, double tau_c, int timestep, double& t_max) {
 // evaluates some criterion so that if this number becomes larger than 
 // the cutoff specified in Grid_Input, we regrid
 //================================================
-double Manager::RegridCriterion() {
-    if (Container::grid->Regrid_Type() == 0) {
+double Grid::RegridCriterion() {
+    if (regrid_type == 0) {
         if (!strcmp(Container::matter->Name(), "vacuum")) {  // vacuum...
             double diff = 0.0;
             double max_diff = 0.0;
@@ -149,10 +150,10 @@ double Manager::RegridCriterion() {
             // 	    I_Re_max = fabs(constraints->I_Re(i,j,k));
             // 	}
             //
-            for (int i = N_g; i < N_r - N_g; i++)
-                for (int j = N_g; j < N_t - N_g; j++)
-                    for (int k = N_g; k < N_p - N_g; k++) {
-                        diff = last->lapse(i + 1, j, k) - last->lapse(i, j, k);
+            for (int i = N_ghost; i < N_r + N_ghost; i++)
+                for (int j = N_ghost; j < N_theta + N_ghost; j++)
+                    for (int k = N_ghost; k < N_phi + N_ghost; k++) {
+                        diff = Container::manager->last->lapse(i + 1, j, k) - Container::manager->last->lapse(i, j, k);
                         // diff = (constraints->I_Re(i+1,j,k) - constraints->I_Re(i,j,k)) / I_Re_max;
                         if (abs(diff) > max_diff) max_diff = abs(diff);
                     }
@@ -160,16 +161,72 @@ double Manager::RegridCriterion() {
         } else {
             return Container::matter->RegridCriterion();
         }
-    } else if (Container::grid->Regrid_Type() == 1) {
-        return Container::grid->RegridCriterion(tau_c);
-    } else if (Container::grid->Regrid_Type() == 2) {
-        return (Container::grid->r_max() - Container::grid->r_max_final()) - (t_max - t);
+    } else if (regrid_type == 1) {
+        return r_max_current / (tau_star - Container::manager->tau_c) / last_selfsim_ratio;
+    } else if (regrid_type == 2) {
+        return (r_max_current - r_max_fin) - (Container::manager->t_max - Container::manager->t);
     } else {
         return 0;
     }
 }
 
+//=================================================
+// Check Criterion
+//=================================================
+bool Grid::TimeToRegrid(Doub criterion) {
+    if (criterion > cutoff) {
+        if (regrid_counter < regrids)
+            return true;
+        else {
+            if (!printed_warning) {
+                printed_warning = true;
+                cout << " GRID: exceeded maximum number of regrids. " << endl;
+            }
+            return false;
+        }
+    } else
+        return false;
+}
 
+//=================================================
+// Creates a new grid for r
+//=================================================
+int Grid::Regrid(VecDoub& r_new) {
+    //
+    // function returns vector with new radial gridpoints, but
+    // doesn't do anything else yet -- need to complete regridding by
+    // calling Setup_Radial_Grid.
+    //
+    regrid_counter++;
+    //
+    // kind of a hack: want to compute new r_max, use it temporarily in
+    // r_fcct, but then want to restore old r_max so that it can be used
+    // in i_ind during regridding (where old grid is needed)...
+    r_max_old = r_max_current;
+    if (regrid_type == 2) {
+        r_max_new = r_max_current - cutoff;
+    } else {
+        r_max_new = r_max_current * r_max_factor;
+    }
+
+    if (grid_type == 1 && tracking) {
+        r_tracker = Container::tracker->rFocus();
+        if (r_tracker != 0.0) {
+            r_focus = r_tracker;
+        }
+    }
+
+    // ... therefore temporarily set r_max_current to r_max_new...
+    r_max_current = r_max_new;
+    cout << " GRID: regridding with r_max = " << r_max_current << endl;
+    double temp1, temp2;
+    for (int i = 0; i < N_r_tot(); i++) {
+        r_new[i] = r_fct(x_v[i], temp1, temp2);
+    }
+    // ... but then restore it
+    r_max_current = r_max_old;
+    return regrid_counter;
+}
 
 
 

@@ -1,9 +1,11 @@
 #include "Grid.h"
+#include "Container.h"
+
 
 //===================================================
 // Constructor
 //===================================================
-Grid::Grid() : regrid_counter(0), N_ghost(4), printed_warning(false), eps(1.e-12) {
+Grid::Grid() : regrid_counter(0), printed_warning(false), eps(1.e-12) {
 #ifdef EIGHTHORDER
     N_ghost = 4;
     cout << " GRID: Using N_ghost = " << N_ghost << " for eighth-oder spatial differencing." << endl;
@@ -119,9 +121,7 @@ Grid::~Grid() {
     cout << " GRID: Regridded " << regrid_counter << " times. " << endl;
 }
 
-double Grid::RegridCriterion(Doub tau_c) {
-    return r_max_current / (tau_star - tau_c) / last_selfsim_ratio;
-}
+
 
 //=================================================
 // Set up grid
@@ -132,52 +132,6 @@ int Grid::Setup_Grid(VecDoub& r, VecDoub& r2, VecDoub& theta,
     Setup_Radial_Grid(r, r2);
     Setup_Angular_Grid(theta, sintheta, sin2theta, costheta, phi);
     return 1;
-}
-
-//=================================================
-// regrid
-//=================================================
-bool Grid::TimeToRegrid(Doub criterion) {
-    if (criterion > cutoff) {
-        if (regrid_counter < regrids)
-            return true;
-        else {
-            if (!printed_warning) {
-                printed_warning = true;
-                cout << " GRID: exceeded maximum number of regrids. " << endl;
-            }
-            return false;
-        }
-    } else
-        return false;
-}
-int Grid::Regrid(VecDoub& r_new) {
-    //
-    // function returns vector with new radial gridpoints, but
-    // doesn't do anything else yet -- need to complete regridding by
-    // calling Setup_Radial_Grid.
-    //
-    regrid_counter++;
-    //
-    // kind of a hack: want to compute new r_max, use it temporarily in
-    // r_fcct, but then want to restore old r_max so that it can be used
-    // in i_ind during regridding (where old grid is needed)...
-    r_max_old = r_max_current;
-    if (regrid_type == 2) {
-        r_max_new = r_max_current - cutoff;
-    } else {
-        r_max_new = r_max_current * r_max_factor;
-    }
-    // ... therefore temporarily set r_max_current to r_max_new...
-    r_max_current = r_max_new;
-    cout << " GRID: regridding with r_max = " << r_max_current << endl;
-    double temp1, temp2;
-    for (int i = 0; i < N_r_tot(); i++) {
-        r_new[i] = r_fct(x_v[i], temp1, temp2);
-    }
-    // ... but then restore it
-    r_max_current = r_max_old;
-    return regrid_counter;
 }
 
 //=================================================
@@ -310,11 +264,14 @@ double Grid::r_fct_offset(Doub x, Doub& x_prime, Doub& x_dprime) {
     double r = 0.0;
 
     if (s_param > 0.) {
+        // Force the function to be odd
         int sign = 1;
         if (x < 0.) {
             x = -x;
             sign = -1;
         }
+
+        // Calculate x_focus from r_focus
         if (r_focus > 0.) {
             const double arg = (r_max_current / r_focus - 1.) * (1. / sinh(s_param)) + (1. / tanh(s_param));
             const double arccosh = log((arg + 1.) / (arg - 1.)) / 2.;

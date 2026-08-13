@@ -93,7 +93,6 @@ public:
     // Regrid
     //===========================================
     double Regrid(double t, double tau_c, int timestep, double& t_max);
-    double RegridCriterion();
 
     //================================================
     //

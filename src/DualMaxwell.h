@@ -1,4 +1,7 @@
 // Tell emacs that this is -*-c++-*- mode
+#ifndef DUALMAXWELL_H
+#define DUALMAXWELL_H
+
 
 #include "DualMaxwell_State.h"
 #include "DualMaxwell_Aux.h"
@@ -103,3 +106,4 @@ public:
 
 
 
+#endif
