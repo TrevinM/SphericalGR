@@ -17,115 +17,178 @@
 
 class state {
 public:
-  // metric components (rescaled as in (BMCM.20))
-  gf3d phi, h_rr, h_rt, h_rp, h_tt, h_tp, h_pp;
-  // extrinsic curvature components (see (BMCM.21))
-  gf3d K,   a_rr, a_rt, a_rp, a_tt, a_tp, a_pp;
-  // connection functions (see (BMCM.22))
-  gf3d lam_r, lam_t, lam_p;
-  // Theta (for Z4)
-  gf3d Theta;
-  // lapse and shift (rescaled!), indices upstairs
-  gf3d lapse, shift_r, shift_t, shift_p;
-  gf3d B_r, B_t, B_p;
-  // 
-  int N_fcts, N_dump;
-  gf3d ** fct_list;   // list of all grid functions in state
-  gf3d ** dump_list;  // list of all grid functions to be dumped
-  Grid *grid;
-  dumper *dump;
-  const char * name;
-public:
-  //===============================================
-  // Constructor
-  //===============================================
-  state(Grid *grid_i, dumper *dump_i, const char * name_i) :
-    grid(grid_i), dump(dump_i), name(name_i)
-  {
-    N_fcts = 25;
-    fct_list = new gf3d*[N_fcts];
-    dump_list = new gf3d*[N_fcts];   // allow for N_fcts, but restrict loops to N_dump...
-    N_dump = 0;                      // set in assemble_dump_list
-    int gf_counter = 0;
-    //
-    // metric components, g_{ij} = exp(4 \phi) (1 + h_{ij}), RESCALED
-    //
-    fct_list[gf_counter] = phi.setup(grid,  1, "phi",  gf_counter,+1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = h_rr.setup(grid, 1, "h_rr", gf_counter,+1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = h_rt.setup(grid, 1, "h_rt", gf_counter,-1,-1,-1);
-    gf_counter++;
-    fct_list[gf_counter] = h_rp.setup(grid, 1, "h_rp", gf_counter,+1,-1,-1);
-    gf_counter++;
-    fct_list[gf_counter] = h_tt.setup(grid, 1, "h_tt", gf_counter,+1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = h_tp.setup(grid, 1, "h_tp", gf_counter,-1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = h_pp.setup(grid, 1, "h_pp", gf_counter,+1,+1,+1);
-    gf_counter++;
-    //
-    // extrinsic curvature components, A_{ij} = exp(4 \phi) a_{ij}, RESCALED
-    //
-    double K_alpha_speed = 1.0;
-    fct_list[gf_counter] = K.setup(grid,    2, "K",    gf_counter,+1,+1,+1, K_alpha_speed);
-    gf_counter++;
-    fct_list[gf_counter] = a_rr.setup(grid, 1, "a_rr", gf_counter,+1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = a_rt.setup(grid, 1, "a_rt", gf_counter,-1,-1,-1);
-    gf_counter++;
-    fct_list[gf_counter] = a_rp.setup(grid, 1, "a_rp", gf_counter,+1,-1,-1);
-    gf_counter++;
-    fct_list[gf_counter] = a_tt.setup(grid, 1, "a_tt", gf_counter,+1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = a_tp.setup(grid, 1, "a_tp", gf_counter,-1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = a_pp.setup(grid, 1, "a_pp", gf_counter,+1,+1,+1);
-    gf_counter++;
-    //
-    // connection functions, \Lambda^i, RESCALED
-    //
-    fct_list[gf_counter] = lam_r.setup(grid, 2, "lam_r", gf_counter,-1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = lam_t.setup(grid, 2, "lam_t", gf_counter,+1,-1,-1);
-    gf_counter++;
-    fct_list[gf_counter] = lam_p.setup(grid, 2, "lam_p", gf_counter,-1,-1,-1);
-    gf_counter++;
-    //
-    // Theta function for Z4
-    //
-    fct_list[gf_counter] = Theta.setup(grid, 2, "Theta", gf_counter,+1,+1,+1);
-    gf_counter++;
-    //
-    // lapse and shift
+    // metric components (rescaled as in (BMCM.20))
+    gf3d phi, h_rr, h_rt, h_rp, h_tt, h_tp, h_pp;
+    // extrinsic curvature components (see (BMCM.21))
+    gf3d K, a_rr, a_rt, a_rp, a_tt, a_tp, a_pp;
+    // connection functions (see (BMCM.22))
+    gf3d lam_r, lam_t, lam_p;
+    // Theta (for Z4)
+    gf3d Theta;
+    // lapse and shift (rescaled!), indices upstairs
+    gf3d lapse, shift_r, shift_t, shift_p;
+    gf3d B_r, B_t, B_p;
     // 
-    double background = 1.0;
-    fct_list[gf_counter] = lapse.setup(grid, 1, "lapse", gf_counter,+1,+1,+1,
-				       K_alpha_speed, background);
-    gf_counter++;
-    fct_list[gf_counter] = shift_r.setup(grid, 2, "shift_r", gf_counter,-1,+1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = shift_t.setup(grid, 2, "shift_t", gf_counter,+1,-1,-1);
-    gf_counter++;
-    fct_list[gf_counter] = shift_p.setup(grid, 2, "shift_p", gf_counter,-1,-1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = B_r.setup(grid, 2, "B_r", gf_counter,-1,+1, -1);
-    gf_counter++;
-    fct_list[gf_counter] = B_t.setup(grid, 2, "B_t", gf_counter,+1,-1,+1);
-    gf_counter++;
-    fct_list[gf_counter] = B_p.setup(grid, 2, "B_p", gf_counter,-1,-1,+1);
-    gf_counter++;
-    //
-    // sanity check
-    //
-    if (gf_counter != N_fcts) cerr << " WRONG FUNCTION COUNT IN STATE!!! " << endl;
-  };
-  //===============================================
-  // check properties
-  //===============================================
-  void check_props() {
-    for (int i = 0; i < N_fcts; i++) {
-      (*fct_list)[i].constants();
+    int N_fcts, N_dump;
+    gf3d** fct_list;   // list of all grid functions in state
+    gf3d** dump_list;  // list of all grid functions to be dumped
+    Grid* grid;
+    dumper* dump;
+    const char* name;
+public:
+    //===============================================
+    // Constructor
+    //===============================================
+    state(Grid* grid_i, dumper* dump_i, const char* name_i) :
+        grid(grid_i), dump(dump_i), name(name_i) {
+        N_fcts = 25;
+        fct_list = new gf3d * [N_fcts];
+        dump_list = new gf3d * [N_fcts];   // allow for N_fcts, but restrict loops to N_dump...
+        N_dump = 0;                      // set in assemble_dump_list
+        int gf_counter = 0;
+        //
+        // metric components, g_{ij} = exp(4 \phi) (1 + h_{ij}), RESCALED
+        //
+        fct_list[gf_counter] = phi.setup(grid, 1, "phi", gf_counter, +1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = h_rr.setup(grid, 1, "h_rr", gf_counter, +1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = h_rt.setup(grid, 1, "h_rt", gf_counter, -1, -1, -1);
+        gf_counter++;
+        fct_list[gf_counter] = h_rp.setup(grid, 1, "h_rp", gf_counter, +1, -1, -1);
+        gf_counter++;
+        fct_list[gf_counter] = h_tt.setup(grid, 1, "h_tt", gf_counter, +1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = h_tp.setup(grid, 1, "h_tp", gf_counter, -1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = h_pp.setup(grid, 1, "h_pp", gf_counter, +1, +1, +1);
+        gf_counter++;
+        //
+        // extrinsic curvature components, A_{ij} = exp(4 \phi) a_{ij}, RESCALED
+        //
+        double K_alpha_speed = 1.0;
+        fct_list[gf_counter] = K.setup(grid, 2, "K", gf_counter, +1, +1, +1, K_alpha_speed);
+        gf_counter++;
+        fct_list[gf_counter] = a_rr.setup(grid, 1, "a_rr", gf_counter, +1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = a_rt.setup(grid, 1, "a_rt", gf_counter, -1, -1, -1);
+        gf_counter++;
+        fct_list[gf_counter] = a_rp.setup(grid, 1, "a_rp", gf_counter, +1, -1, -1);
+        gf_counter++;
+        fct_list[gf_counter] = a_tt.setup(grid, 1, "a_tt", gf_counter, +1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = a_tp.setup(grid, 1, "a_tp", gf_counter, -1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = a_pp.setup(grid, 1, "a_pp", gf_counter, +1, +1, +1);
+        gf_counter++;
+        //
+        // connection functions, \Lambda^i, RESCALED
+        //
+        fct_list[gf_counter] = lam_r.setup(grid, 2, "lam_r", gf_counter, -1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = lam_t.setup(grid, 2, "lam_t", gf_counter, +1, -1, -1);
+        gf_counter++;
+        fct_list[gf_counter] = lam_p.setup(grid, 2, "lam_p", gf_counter, -1, -1, -1);
+        gf_counter++;
+        //
+        // Theta function for Z4
+        //
+        fct_list[gf_counter] = Theta.setup(grid, 2, "Theta", gf_counter, +1, +1, +1);
+        gf_counter++;
+        //
+        // lapse and shift
+        // 
+        double background = 1.0;
+        fct_list[gf_counter] = lapse.setup(grid, 1, "lapse", gf_counter, +1, +1, +1,
+            K_alpha_speed, background);
+        gf_counter++;
+        fct_list[gf_counter] = shift_r.setup(grid, 2, "shift_r", gf_counter, -1, +1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = shift_t.setup(grid, 2, "shift_t", gf_counter, +1, -1, -1);
+        gf_counter++;
+        fct_list[gf_counter] = shift_p.setup(grid, 2, "shift_p", gf_counter, -1, -1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = B_r.setup(grid, 2, "B_r", gf_counter, -1, +1, -1);
+        gf_counter++;
+        fct_list[gf_counter] = B_t.setup(grid, 2, "B_t", gf_counter, +1, -1, +1);
+        gf_counter++;
+        fct_list[gf_counter] = B_p.setup(grid, 2, "B_p", gf_counter, -1, -1, +1);
+        gf_counter++;
+        //
+        // sanity check
+        //
+        if (gf_counter != N_fcts) cerr << " WRONG FUNCTION COUNT IN STATE!!! " << endl;
+    };
+    //===============================================
+    // check properties
+    //===============================================
+    void check_props() {
+        for (int i = 0; i < N_fcts; i++) {
+            (*fct_list)[i].constants();
+        }
+    }
+    //===============================================
+    // fill ghosts
+    //===============================================
+    void fill_ghosts() {
+        for (int i = 0; i < N_fcts; i++)
+            (*fct_list)[i].fill_ghosts();
+    };
+    //===============================================
+    // addition
+    //===============================================
+    void add(double factor, state* rhs) {
+        for (int i = 0; i < N_fcts; i++)
+            (*fct_list)[i].add(factor, rhs->fct_list[i]);
+    };
+    //===============================================
+    // addition 
+    //===============================================
+    void add(state* state1, double factor, state* state2) {
+        for (int i = 0; i < N_fcts; i++)
+            (*fct_list)[i].add(state1->fct_list[i], factor, state2->fct_list[i]);
+    };
+    //===============================================
+    // equals
+    //===============================================
+    void equals(state* rhs) {
+        for (int i = 0; i < N_fcts; i++) {
+            fct_list[i]->equals(rhs->fct_list[i]);
+        }
+    };
+    //===============================================
+    // equals
+    //===============================================
+    void equals(double number) {
+        for (int i = 0; i < N_fcts; i++) {
+            fct_list[i]->equals(number);
+        }
+    };
+    //===============================================
+    // check whether states are equal
+    //===============================================
+    bool IsEqualTo(state* s) {
+        bool fct_equal = true;
+        bool state_equal = true;
+        for (int i = 0; i < N_fcts; i++) {
+            fct_equal = fct_list[i]->IsEqualTo(s->fct_list[i]);
+            if (!fct_equal) {
+                cout << " STATE: Functions " << fct_list[i]->Name() << " in states "
+                    << Name() << " and " << s->Name() << " are different!" << endl;
+                state_equal = false;
+            }
+        }
+        if (state_equal == true)
+            cout << " STATE: states " << Name() << " and " << s->Name()
+            << " are equal! " << endl;
+        return state_equal;
+    };
+    //===============================================
+    // apply characteristic outer boundaries
+    //===============================================
+    void char_OB(state* last, double dt) {
+        for (int i = 0; i < N_fcts; i++)
+            fct_list[i]->fill_outerboundary(*last->fct_list[i], dt);
     }
     //===============================================
     // check whether functions are finite

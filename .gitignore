@@ -4,3 +4,4 @@ build/
 test/
 SphericalGR
 slurm-*
+.DS_Store
