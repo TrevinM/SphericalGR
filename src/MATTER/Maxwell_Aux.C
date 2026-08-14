@@ -1,35 +1,9 @@
-// Tell emacs that this is -*-c++-*- mode
-//================================================
-//
-// Class containing auxiliary functions for maxwell
-//
-//================================================
-#ifndef MAXWELL_AUX_H
-#define MAXWELL_AUX_H
-
-
-#include "gridfunction.h"
-#include "Grid.h"
-#include "dumper.h"
-
-class maxwell_aux {
-public:
-    //
-    // Note: will add functions to maxwell_aux through derived classes
-    //
-    gf3d A_xi, A2;
-    //
-    int N_fcts, N_dump;
-    gf3d** fct_list;   // list of all grid functions in maxwell_aux
-    gf3d** dump_list;  // list of all grid functions to be dumped
-    Grid* grid;
-    dumper* dump;
-    const char* name;
-public:
+#include "Maxwell_Aux.h"
+    
     //===============================================
     // Constructor
     //===============================================
-    maxwell_aux(Grid* grid_i, dumper* dump_i, const char* name_i) :
+    maxwell_aux::maxwell_aux(Grid* grid_i, dumper* dump_i, const char* name_i) :
         grid(grid_i), dump(dump_i), name(name_i) {
         N_fcts = 2;
         fct_list = new gf3d * [N_fcts];
@@ -50,28 +24,28 @@ public:
     //===============================================
     // fill ghosts
     //===============================================
-    void fill_ghosts() {
+    void maxwell_aux::fill_ghosts() {
         for (int i = 0; i < N_fcts; i++)
             (*fct_list)[i].fill_ghosts();
     };
     //===============================================
   // addition
   //===============================================
-    void add(double factor, maxwell_aux* rhs) {
+    void maxwell_aux::add(double factor, maxwell_aux* rhs) {
         for (int i = 0; i < N_fcts; i++)
             (*fct_list)[i].add(factor, rhs->fct_list[i]);
     };
     //===============================================
     // addition 
     //===============================================
-    void add(maxwell_aux* maxwell_aux1, double factor, maxwell_aux* maxwell_aux2) {
+    void maxwell_aux::add(maxwell_aux* maxwell_aux1, double factor, maxwell_aux* maxwell_aux2) {
         for (int i = 0; i < N_fcts; i++)
             (*fct_list)[i].add(maxwell_aux1->fct_list[i], factor, maxwell_aux2->fct_list[i]);
     };
     //===============================================
     // addition
     //===============================================
-    void equals(maxwell_aux* rhs) {
+    void maxwell_aux::equals(maxwell_aux* rhs) {
         for (int i = 0; i < N_fcts; i++) {
             fct_list[i]->equals(rhs->fct_list[i]);
         }
@@ -79,7 +53,7 @@ public:
     //===============================================
     // print list of all functions in maxwell_aux
     //===============================================
-    void function_names() {
+    void maxwell_aux::function_names() {
         cout << " MAXWELL_AUX: List of all functions in maxwell_aux " << name << ": " << endl;
         for (int i = 0; i < N_fcts; i++)
             cout << "      " << fct_list[i]->Name() << endl;
@@ -87,12 +61,12 @@ public:
     //===============================================
     // return name of maxwell_aux
     //===============================================
-    const char* Name() { return name; };
+    const char* maxwell_aux::Name() { return name; };
     //===============================================
     // Dump grid functions
     //===============================================
-    void dump_fcts(double time = 0.0, double prop_time = 0.0, int timestep = 0,
-        const char* suffix = "") {
+    void maxwell_aux::dump_fcts(double time, double prop_time, int timestep,
+        const char* suffix) {
         if (dump->time_to_dump(timestep)) {
             cout << " MAXWELL_AUX: Dumping functions in maxwell_aux "
                 << name << " at time t = " << time << endl;
@@ -105,7 +79,7 @@ public:
     //===============================================
     // Find all functions to be dumped
     //===============================================
-    int assemble_dump_list(const char* dump_list_file) {
+    int maxwell_aux::assemble_dump_list(const char* dump_list_file) {
         ifstream infile;
         infile.open(dump_list_file);
         if (!infile) {
@@ -131,12 +105,8 @@ public:
     //===============================================
     // Destructor
     //===============================================
-    ~maxwell_aux() {
+    maxwell_aux::~maxwell_aux() {
         delete fct_list;
         delete dump_list;
         cout << " MAXWELL_AUX: ... closing maxwell_aux " << name << "... " << endl;
     };
-};
-
-
-#endif  /* MAXWELL_AUX_H */

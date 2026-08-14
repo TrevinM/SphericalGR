@@ -162,9 +162,9 @@ double Grid::RegridCriterion() {
             return Container::matter->RegridCriterion();
         }
     } else if (regrid_type == 1) {
-        return r_max_current / (tau_star - Container::manager->tau_c) / last_selfsim_ratio;
+        return r_max_current / (tau_star - Container::manager->Tau_C()) / last_selfsim_ratio;
     } else if (regrid_type == 2) {
-        return (r_max_current - r_max_fin) - (Container::manager->t_max - Container::manager->t);
+        return (r_max_current - r_max_fin) - (Container::manager->TMax() - Container::manager->Time());
     } else {
         return 0;
     }
@@ -213,6 +213,7 @@ int Grid::Regrid(VecDoub& r_new) {
         r_tracker = Container::tracker->rFocus();
         if (r_tracker != 0.0) {
             r_focus = r_tracker;
+            cout << " GRID: regridding with r_focus = " << r_focus << endl;
         }
     }
 

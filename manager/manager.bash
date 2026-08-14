@@ -13,14 +13,14 @@ export OMP_NUM_THREADS=16
 export dir=/mnt/research/tbaumgar/Students/tmacomber/SphericalGR
 
 #Name of critical collapse suite to be run (with sbatch) or created (with bash)
-suite=Conv
+suite=ODEq
 
-max_runs=1
+max_runs=10
 verbose=1   # 1+: Slurm debug prints
 
 #Use this when the critical paramter has changed (ie you changed your resolution)
 #and you need to figure out where your new bounds are
-reconverge=0
+reconverge=1
 
 
 # ========================== #
@@ -488,8 +488,8 @@ do
         cd ${job_dirs[k]}
         eta=${etas[k]}
 
-        sub_crit= $( bash $dir/manager/$sub_test )
-        sup_crit= $( bash $dir/manager/$sup_test )
+        sub_crit="$( bash $dir/manager/$sub_test )"
+        sup_crit="$( bash $dir/manager/$sup_test )"
 
         # #Subcritical tests
         # if [ -e output/DualMaxwell*.mon ]

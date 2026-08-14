@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
     //================================================================
     // Allocate Grid Class
     //================================================================
-    cout << " GR: allocating Container::grid..." << endl;
+    cout << " GR: allocating grid..." << endl;
     Container::grid = new Grid();
 
     //================================================================
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
     //================================================================
     // Allocate Cosmology Class
     //================================================================
-    cout << " GR: allocating Container::cosmology..." << endl;
+    cout << " GR: allocating cosmology..." << endl;
     if (space_type == 1) {
         Container::cosmology = new Minkowski();
     } else if (space_type == 2) {
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
     } else if (space_type == 3) {
         Container::cosmology = new Radiation();
     } else {
-        cerr << " GR: no Container::cosmology of type " << space_type << "!!" << endl;
+        cerr << " GR: no cosmology of type " << space_type << "!!" << endl;
         return 1;
     }
     
@@ -296,6 +296,8 @@ int main(int argc, char* argv[]) {
         sigma, cowling, eta_KO,
         z4, kappa_11, kappa_12, kappa_2, kappa_ric,
         RK_order, char_OB, solve_constraints);
+
+    Container::tracker = new Tracker();
 
     //================================================================
     // Initialize

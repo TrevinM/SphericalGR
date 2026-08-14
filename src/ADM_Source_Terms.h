@@ -16,7 +16,7 @@ public:
     //
     // Note: all lower indices, NOT rescaled!
     // 
-    gf3d S_r, S_t, S_p;
+    gf3d S_r, S_t, S_p, S_z;
     // 
     gf3d S_rr, S_rt, S_rp, S_tt, S_tp, S_pp, trace_S;
     //
@@ -33,7 +33,7 @@ public:
     //===============================================
     ADM_Source_Terms(Grid* grid_i, dumper* dump_i, const char* name_i) :
         grid(grid_i), dump(dump_i), name(name_i) {
-        N_fcts = 11;
+        N_fcts = 12;
         fct_list = new gf3d * [N_fcts];
         dump_list = new gf3d * [N_fcts];   // allow for N_fcts, but restrict loops to N_dump...
         N_dump = 0;                      // set in assemble_dump_list
@@ -48,7 +48,9 @@ public:
         gf_counter++;
         fct_list[gf_counter] = S_t.setup(grid, 2, "S_t", gf_counter, +1, -1, -1);
         gf_counter++;
-        fct_list[gf_counter] = S_p.setup(grid, 2, "S_p", gf_counter, -1, -1, +1);
+        fct_list[gf_counter] = S_p.setup(grid, 2, "S_p", gf_counter, -1, -1, -1);
+        gf_counter++;
+        fct_list[gf_counter] = S_z.setup(grid, 2, "S_z", gf_counter, +1, +1, -1);
         gf_counter++;
         //
         // inverse metric 

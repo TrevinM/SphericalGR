@@ -94,6 +94,7 @@ bool Manager::Initialize() {
     Container::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
         Mom_r_norm, Mom_t_norm, Mom_p_norm,
         CFC_r_norm, CFC_t_norm, CFC_p_norm);
+    Container::tracker->Note();
     //
     // compute curvature invariants
     //

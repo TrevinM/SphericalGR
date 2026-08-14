@@ -5,19 +5,11 @@
 
 #include "Manager.h"
 #include "Container.h"
+#include "Matters.h"
 
 //===========================================
 // Constructor
 //===========================================
-state* Manager::last = nullptr;
-state* Manager::derivs = nullptr;
-state* Manager::inter = nullptr;
-state* Manager::updates = nullptr;
-curvature* Manager::curve = nullptr;
-auxiliary* Manager::aux = nullptr;
-HorizonFinder* Manager::horizonfinder = nullptr;
-diagnostics* Manager::constraints = nullptr;
-
 
 Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
     int z4_i, double kappa_11_i, double kappa_12_i, double kappa_2_i,
@@ -145,6 +137,14 @@ Manager::Manager(int matter_type, int sigma_i, int cowling_i, double eta_i,
     //
     PI = acos(-1.0);
 }
+
+//===========================================
+// Public Getters
+//===========================================
+double Manager::Time() { return t; }
+double Manager::Tau_C() { return tau_c; }
+double Manager::TMax() { return t_max; }
+int Manager::Step() { return step; }
 
 //===========================================
 // Find time step

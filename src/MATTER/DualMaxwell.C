@@ -7,6 +7,8 @@
 #include "Matter.h"
 #include <ctime>
 #include "tensors.h"
+#include "Container.h"
+#include "DualMaxwell.h"
 
 DualMaxwell::DualMaxwell(Grid* grid_i, dumper* dump_i, InData* indata_i,
     int cowling_i, int char_OB_i, Cosmology* cosmology_i,
@@ -46,7 +48,7 @@ DualMaxwell::DualMaxwell(Grid* grid_i, dumper* dump_i, InData* indata_i,
     monfilename << "output/" << monitor->Filestem() << "_" << N_r - 2 * N_g << "_"
         << N_t - 2 * N_g << ".dualmaxwell_mon" << ends;
     monitorfile.open(monfilename.str().c_str());
-    monitorfile.setf(ios::right);
+    monitorfile.setf(ios::left);
     time_t clocktime;
     struct tm* currenttime;
     time(&clocktime);
@@ -59,15 +61,17 @@ DualMaxwell::DualMaxwell(Grid* grid_i, dumper* dump_i, InData* indata_i,
         << setw(18) << "rho_ADM_c_max"
         << setw(18) << "rho_ADM_max"
         << setw(18) << "rho_ADM_max_MAX"
-        << setw(18) << "r(rho_ADM_max)"
-        << setw(18) << "th(rho_ADM_max)"
-        << setw(18) << "r(lapse_min)"
-        << setw(18) << "th(lapse_min)"
+        << setw(18) << "S_z_max"
+        << setw(18) << "S_z_max_MAX"
+        << setw(18) << "S_p_max"
+        << setw(18) << "S_p_max_MAX"
         << endl;
     monitorfile << "#=======================================================================================================================================================================" << endl;
     //
     rho_center = rho_c_max = drhoddr = 0.0;
     rho_max = rho_max_MAX = 0.0;
+    S_z_max = S_z_max_MAX = 0.0;
+    S_p_max = S_p_max_MAX = 0.0;
 };
 
 DualMaxwell::~DualMaxwell() {
@@ -288,10 +292,10 @@ void DualMaxwell::Note(int time_step, double time, double tau_c) {
             << setprecision(10) << setw(18) << rho_c_max
             << setprecision(10) << setw(18) << rho_max
             << setprecision(10) << setw(18) << rho_max_MAX
-            << setprecision(10) << setw(18) << grid->r(rho_i)
-            << setprecision(10) << setw(18) << grid->theta(rho_j)
-            << setprecision(10) << setw(18) << grid->r(lapse_i)
-            << setprecision(10) << setw(18) << grid->theta(lapse_j)
+            << setprecision(10) << setw(18) << S_z_max
+            << setprecision(10) << setw(18) << S_z_max_MAX
+            << setprecision(10) << setw(18) << S_p_max
+            << setprecision(10) << setw(18) << S_p_max_MAX
             << endl;
     }
 };
@@ -476,6 +480,7 @@ void DualMaxwell::ADM_Sources(state* s, curvature* c) {
                 adm_sources->S_r[i][j][k] = psi6 * oo4p * (e_t * b_p - e_p * b_t);
                 adm_sources->S_t[i][j][k] = psi6 * oo4p * (e_p * b_r - e_r * b_p) * rl;
                 adm_sources->S_p[i][j][k] = psi6 * oo4p * (e_r * b_t - e_t * b_r) * rst;
+                adm_sources->S_z[i][j][k] = psi6 * oo4p * (e_r * b_t - e_t * b_r) * rst * Container::manager->constraints->s_axial[i][j][k];
                 //
                 // compute *unrescaled* downstairs components of the stress tensor
                 //
@@ -518,13 +523,18 @@ void DualMaxwell::ADM_Sources(state* s, curvature* c) {
     adm_sources->S_r.fill_ghosts();
     adm_sources->S_t.fill_ghosts();
     adm_sources->S_p.fill_ghosts();
+    adm_sources->S_z.fill_ghosts();
     adm_sources->rho_ADM.fill_ghosts();
     rho_center = adm_sources->rho_ADM(0.0, N_g, N_g);
     if (rho_center > rho_c_max) rho_c_max = rho_center;
-    rho_max = adm_sources->rho_ADM.max(rho_i, rho_j, rho_k);
+    rho_max = adm_sources->rho_ADM.max();
     if (rho_max > rho_max_MAX) rho_max_MAX = rho_max;
+    S_p_max = adm_sources->S_p.abs_max();
+    if (S_p_max > S_p_max_MAX) S_p_max_MAX = S_p_max;
+    S_z_max = adm_sources->S_z.abs_max();
+    if (S_z_max > S_z_max_MAX) S_z_max_MAX = S_z_max;
     drhoddr = adm_sources->rho_ADM.ddr(N_g, N_g, N_g);
-    s->lapse.min(lapse_i, lapse_j, lapse_k);
+
     //
     // compute diagnostic function Omega
     //

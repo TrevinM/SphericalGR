@@ -3,8 +3,10 @@
 #define DUALMAXWELL_H
 
 
+#include "Matter.h"
 #include "DualMaxwell_State.h"
 #include "DualMaxwell_Aux.h"
+
 #include "Monitor.h"
 #include "CheckPoint.h"
 
@@ -14,13 +16,20 @@
 //
 //================================================
 class DualMaxwell : public Matter {
-public:
-    double rho_center, rho_c_max, rho_max, rho_max_MAX, drhoddr;    // diagnostics 
-    int lapse_i, lapse_j, lapse_k, rho_i, rho_j, rho_k;
+private:
+    // Diagnostic values for monitoring
+    double S_z_max, S_z_max_MAX, S_p_max, S_p_max_MAX;
+    double rho_center, rho_c_max, rho_max, rho_max_MAX;
+    double drhoddr;
+
+    // Matter States
     dualmaxwell_state* last, * derivs, * inter, * updates;
     dualmaxwell_aux* aux;
+
+    // Depreciated
     Monitor* monitor;
     CheckPoint* checkpoint;
+
     ofstream monitorfile;
     double eta_KO;   // Kreiss-Oliger coefficient
     int char_OB;    // decides how Sommerfeld BCs are implemented

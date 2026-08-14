@@ -17,7 +17,6 @@
 #include "EOS.h"
 #include "State.h"
 #include "Curvature.h"
-#include "Maxwell_State.h"
 
 enum {
     linwave, schwarzschild, flat, tov, trumpet, rns, brill,

@@ -27,10 +27,12 @@ bool Manager::Integrate(double t_max) {
             return false;
         }
         step++;
+
         //================================================
         // check for regridding
         //================================================
         Regrid(t, tau_c, step, t_max);
+
         //================================================
         // update photons
         //================================================
@@ -43,6 +45,7 @@ bool Manager::Integrate(double t_max) {
                 constraints->J_Re.Address(),
                 Container::grid->r_max());
         }
+
         //================================================
         // extract waves
         //================================================
@@ -52,6 +55,7 @@ bool Manager::Integrate(double t_max) {
                 t, tau_c, step);
             Container::waves->Update(dt);
         }
+
         //================================================
         //  check whether it's finished
         //================================================ 
@@ -74,6 +78,7 @@ bool Manager::Integrate(double t_max) {
         //================================================ 
         if (step % Container::checkpoint->CheckPointStep() == 0 || finished)
             Container::checkpoint->WriteCheckPoint(step, t, tau_c);
+
         //================================================
         // check whether it's time to dump
         //================================================ 
@@ -84,12 +89,14 @@ bool Manager::Integrate(double t_max) {
             last->dump_fcts(t, tau_c, step);
             curve->dump_fcts(t, tau_c, step);
             aux->dump_fcts(t, tau_c, step);
+
             //================================================
             // Compute matter diagnostics
             //================================================ 
             constraints->Compute_Proper_Radius(last, curve, aux, sigma);
             Container::matter->Compute_Diagnostics(last, curve);
             Container::matter->dump_fcts(t, tau_c, step);
+
             //================================================
             // Also force a search for horizon, so that we have
             // horizon data at the same time
@@ -99,6 +106,7 @@ bool Manager::Integrate(double t_max) {
             constraints->FindHorizon(step, t, tau_c, last, curve,
                 Container::matter->adm_sources, Container::matter->fluxes,
                 aux, mass, lin_mom_guess, force);
+
             //================================================
             // evaluate constraints
             //================================================ 
@@ -120,6 +128,7 @@ bool Manager::Integrate(double t_max) {
             Container::monitor->note_constraints(step, t, tau_c, Ham_norm, Ham_norm_ex,
                 Mom_r_norm, Mom_t_norm, Mom_p_norm,
                 CFC_r_norm, CFC_t_norm, CFC_p_norm);
+
             //================================================
             // evaluate curvature invariants
             //================================================ 
@@ -129,6 +138,7 @@ bool Manager::Integrate(double t_max) {
                     t, tau_c, step);
             constraints->Note_Invariants(step, t, tau_c, Container::monitor);
         }
+
         //================================================
         // check whether it's time to note...
         //================================================
@@ -172,13 +182,16 @@ bool Manager::Integrate(double t_max) {
             if (Container::waves != NULL) Container::waves->write_wave_data(t, tau_c);
             Container::matter->Compute_Diagnostics(last, curve);
             Container::matter->Note(step, t, tau_c);
+            Container::tracker->Note();
         }
+
         //================================================
         // look for horizons
         //================================================
         constraints->FindHorizon(step, t, tau_c, last, curve,
             Container::matter->adm_sources, Container::matter->fluxes,
             aux, mass);
+
         //================================================
         // Finally: check for NaN's...
         //================================================

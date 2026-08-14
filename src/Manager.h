@@ -8,12 +8,13 @@
 #include "Curvature.h"
 #include "Auxiliary.h"
 #include "Diagnostics.h"
-#include "Matter.h"
 #include "HorizonFinder.h"
 #include "ConstraintSolver.h"
 
 class Manager {
 private:
+    double t, tau_c, t_max; // coordinate time and proper time at center
+    int step;        // step counter
     double dt;
     int sigma;      // decides between Eulerian and Lagrangian formalism
     int cowling;    // Cowling approximation (0: no, 1: fix gravity, 2: fix matter)
@@ -24,22 +25,21 @@ private:
     int char_OB;     // switch for implementation of Sommerfeld BCs
     int solve_constraints; // whether or not to solve constraints 
     VecDoub r, r2, theta, sintheta, sin2theta, costheta, phi;
-    int N_g, N_r, N_t, N_p;   // number of ghost and grid points
+    int N_g, N_r, N_t, N_p;   // number of ghost and grid points (total not internal)
     //
     int steps_between_regrids, timestep_last_regrid;
     double PI;
 public:
-    double t, tau_c, t_max; // coordinate time and proper time at center
-    int step;        // step counter
-    static diagnostics* constraints;
-    static state* last;
-    static state* derivs;
-    static state* inter;
-    static state* updates;
-    static curvature* curve;
-    static auxiliary* aux;
-    static HorizonFinder* horizonfinder;
 
+    inline static diagnostics* constraints = nullptr;
+    inline static state* last = nullptr;
+    inline static state* derivs = nullptr;
+    inline static state* inter = nullptr;
+    inline static state* updates = nullptr;
+    inline static curvature* curve = nullptr;
+    inline static auxiliary* aux = nullptr;
+    inline static HorizonFinder* horizonfinder = nullptr;
+    
     //===========================================
     // Constructor
     //===========================================
@@ -47,6 +47,14 @@ public:
         int z4_i, double kappa_11_i, double kappa_12_i, double kappa_2_i,
         double kappa_ric_i, int RK_order_i,
         int char_OB_i, int solve_constraints_i);
+
+    //===========================================
+    // Public Getters
+    //===========================================
+    double Time();
+    double Tau_C();
+    double TMax();
+    int Step();
 
     //===========================================
     // Integrate (in Integrate.C)

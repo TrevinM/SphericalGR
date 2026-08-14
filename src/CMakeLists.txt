@@ -31,6 +31,8 @@ MESSAGE("   Trilinos_TPL_LIBRARY_DIRS = ${Trilinos_TPL_LIBRARY_DIRS}")
 MESSAGE("   Trilinos_BUILD_SHARED_LIBS = ${Trilinos_BUILD_SHARED_LIBS}")
 MESSAGE("End of Trilinos details\n")
 
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+
 # Make sure to use same compilers and flags as Trilinos
 set(CMAKE_CXX_COMPILER ${Trilinos_CXX_COMPILER} )
 set(CMAKE_C_COMPILER ${Trilinos_C_COMPILER} )
@@ -54,7 +56,7 @@ endif()
 # so we make the enable of Fortran optional based on it's enable in Trilinos.
 
 # add_compile_options(-DSR)
-# add_compile_options(-DFINISHCONDITION)
+add_compile_options(-DFINISHCONDITION)
 
 # add_compile_options(-DNoEllSolver)
 add_compile_options(-DEIGHTHORDER)  
@@ -72,27 +74,23 @@ add_executable(SphericalGR ${CMAKE_CURRENT_SOURCE_DIR}/GR.C)
 
 target_sources(SphericalGR
     PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/Manager.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Compute_RHS.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/ConstraintSolver.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Curvature.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Diagnostics.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/dumper.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Grid.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Gridfunction.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/HorizonFinder.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Initialize.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Integrate.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/Curvature.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/Compute_RHS.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/Diagnostics.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/ScalarField.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/Maxwell.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/DualMaxwell.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/Hydro.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/RadHydro.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/Tests.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/HorizonFinder.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/dumper.C /
+    ${CMAKE_CURRENT_SOURCE_DIR}/Matters.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C
-    ${CMAKE_CURRENT_SOURCE_DIR}/Manager.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grid.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/InData.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Tracker.C /
-    ${CMAKE_CURRENT_SOURCE_DIR}/ConstraintSolver.C /
-    
-    
+    ${CMAKE_CURRENT_SOURCE_DIR}/Tests.C /
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/InData.C /    
     ${CMAKE_CURRENT_SOURCE_DIR}/INDATA/DualEMWave.C /
 )
 

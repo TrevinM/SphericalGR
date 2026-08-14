@@ -23,14 +23,14 @@ private:
     VecDoub* r_p, * dxdr_p, * ddxdr_p, * theta_p, * ct_p, * dydtheta_p, * ddydtheta_p, * phi_p;
     VecDoub* st_p;
     // NOTE: r and phi are functions of uniform grids in x and y; see Grid.h
-    Doub delta_x, delta_y, delta_phi;
+    double delta_x, delta_y, delta_phi;
     // Avoid divisions in derivatives...
-    Doub Inv12dx, Inv12dy, Inv12dphi, Inv12dxdx, Inv12dydy, Inv12dphidphi;
-    Doub Inv6dx, Inv6dy, Inv6dphi;
-    Doub Inv60dx, Inv60dy;
-    Doub Inv180dxdx, Inv180dydy;
-    Doub Inv840dx, Inv840dy;
-    Doub Inv5040dxdx, Inv5040dydy;
+    double Inv12dx, Inv12dy, Inv12dphi, Inv12dxdx, Inv12dydy, Inv12dphidphi;
+    double Inv6dx, Inv6dy, Inv6dphi;
+    double Inv60dx, Inv60dy;
+    double Inv180dxdx, Inv180dydy;
+    double Inv840dx, Inv840dy;
+    double Inv5040dxdx, Inv5040dydy;
     int gfn; // optional gridfunction number
     int center_par, axis_par, eq_par;   // parity, set to 1 by default
     const char* name;
@@ -46,11 +46,8 @@ public:
     //================================================
     // Constructor
     //================================================
-    gf3d() : nr(0), nt(0), np(0), v(NULL), center_par(1), axis_par(1), eq_par(1),
-        PI(acos(-1.0))
-        //	, r(NULL), theta(NULL), x(NULL), phi(NULL) 
-    { // cout << " in default gridfunction constructor " << endl; 
-    };
+    gf3d();
+
     //================================================
     // Set up grid functions 
     //================================================
@@ -58,392 +55,85 @@ public:
     // Version that allows to specify function name, number, parity, wave speed and background 
     // 
     gf3d* setup(Grid* grid_i, int fall_off_i, const char* name_i,
-        int gfn_i, int center_i, int axis_i, int eq_i, double wave_speed_i, double background_i) {
-        gf3d* address = setup(grid_i, fall_off_i);
-        center_par = center_i;
-        axis_par = axis_i;
-#ifdef EQSYMMETRY
-        eq_par = eq_i;
-#endif
-        gfn = gfn_i;
-        name = name_i;
-        wave_speed = wave_speed_i;
-        background = background_i;
-        return address;
-    }
+        int gfn_i, int center_i, int axis_i, int eq_i, double wave_speed_i, double background_i);
     //
     // Version that allows to specify function name, number and parity and wave speed
     // 
     gf3d* setup(Grid* grid_i, int fall_off_i, const char* name_i,
-        int gfn_i, int center_i, int axis_i, int eq_i, double wave_speed_i) {
-        gf3d* address = setup(grid_i, fall_off_i);
-        center_par = center_i;
-        axis_par = axis_i;
-#ifdef EQSYMMETRY
-        eq_par = eq_i;
-#endif
-        gfn = gfn_i;
-        name = name_i;
-        wave_speed = wave_speed_i;
-        return address;
-    }
+        int gfn_i, int center_i, int axis_i, int eq_i, double wave_speed_i);
+
     //
     // Version that allows to specify function name, number and parity
     // 
     gf3d* setup(Grid* grid_i, int fall_off_i, const char* name_i,
-        int gfn_i, int center_i, int axis_i, int eq_i) {
-        gf3d* address = setup(grid_i, fall_off_i);
-        center_par = center_i;
-        axis_par = axis_i;
-#ifdef EQSYMMETRY
-        eq_par = eq_i;
-#endif
-        gfn = gfn_i;
-        name = name_i;
-        return address;
-    }
+        int gfn_i, int center_i, int axis_i, int eq_i);
+
     //
     // Version that allows to specify both function name and number
     // 
-    gf3d* setup(Grid* grid_i, int fall_off_i, const char* name_i, int gfn_i) {
-        gf3d* address = setup(grid_i, fall_off_i);
-        gfn = gfn_i;
-        name = name_i;
-        return address;
-    }
+    gf3d* setup(Grid* grid_i, int fall_off_i, const char* name_i, int gfn_i);
+
     //
     // Version that allows to specify function number
     // 
-    gf3d* setup(Grid* grid_i, int fall_off_i, int gfn_i) {
-        gf3d* address = setup(grid_i, fall_off_i);
-        gfn = gfn_i;
-        return address;
-    }
+    gf3d* setup(Grid* grid_i, int fall_off_i, int gfn_i);
+
     //
     // Minimum version
     //
-    gf3d* setup(Grid* grid_i, int fall_off_i) {
-        grid = grid_i;
-        gfn = 0;
-        N_g = grid->N_ghosts();
-        nr = grid->N_r_tot();
-        nt = grid->N_theta_tot();
-        np = grid->N_phi_tot();
-        fall_off = fall_off_i;
-        wave_speed = 1.0;
-        background = 0.0;
-        // sanity check...
-        if (!((fall_off == 1) || (fall_off == 2) || (fall_off == 3)
-            || (fall_off == -1)))
-            cerr << " Fall_off = " << fall_off << " not installed! " << endl;
-        r_p = grid->r();
-        dxdr_p = grid->dxdr();
-        ddxdr_p = grid->ddxdr();
-        theta_p = grid->theta();
-        dydtheta_p = grid->dydtheta();
-        ddydtheta_p = grid->ddydtheta();
-        phi_p = grid->phi();
-        ct_p = grid->costheta();
-        st_p = grid->sintheta();
-        phi_p = grid->phi();
-        int i, j;
-        v = new Doub * *[nr];
-        v[0] = new Doub * [nr * nt];
-        v[0][0] = new Doub[nr * nt * np];
-        for (j = 1; j < nt; j++) v[0][j] = v[0][j - 1] + np;
-        for (i = 1; i < nr; i++) {
-            v[i] = v[i - 1] + nt;
-            v[i][0] = v[i - 1][0] + nt * np;
-            for (j = 1; j < nt; j++) v[i][j] = v[i][j - 1] + np;
-        }
-        delta_x = grid->delta_x();
-        delta_y = grid->delta_y();
-        delta_phi = grid->delta_phi();
-        //
-        Inv12dx = 1.0 / (12.0 * delta_x);
-        Inv12dy = 1.0 / (12.0 * delta_y);
-        Inv60dx = 1.0 / (60.0 * delta_x);
-        Inv60dy = 1.0 / (60.0 * delta_y);
-        Inv840dx = 1.0 / (840.0 * delta_x);
-        Inv840dy = 1.0 / (840.0 * delta_y);
-        Inv180dxdx = 1.0 / (180.0 * delta_x * delta_x);
-        Inv180dydy = 1.0 / (180.0 * delta_y * delta_y);
-        Inv5040dxdx = 1.0 / (5040.0 * delta_x * delta_x);
-        Inv5040dydy = 1.0 / (5040.0 * delta_y * delta_y);
-        Inv12dphi = 1.0 / (12.0 * delta_phi);
-        Inv12dxdx = 1.0 / (12.0 * delta_x * delta_x);
-        Inv12dydy = 1.0 / (12.0 * delta_y * delta_y);
-        Inv12dphidphi = 1.0 / (12.0 * delta_phi * delta_phi);
-        Inv6dx = 1.0 / (6.0 * delta_x);
-        Inv6dy = 1.0 / (6.0 * delta_y);
-        Inv6dphi = 1.0 / (6.0 * delta_phi);
-        //
-        // quick sanity check to make sure ghost zones can be filled correctly
-        //
-        //    cout << " GRIDFUNCTION: " << nr << "  " << N_g << "  " << endl;
-        if (N_g > 4 && nt - 2 * N_g < 3) {
-            cout << "GRIDFUNCTION: Cannot set ghost zones correctly for theta - check order of operations..." << endl;
-            exit(0);
-        }
-        // Factor for Kreiss-Oliger dissipation (see eq. (7) in arXiv:2104.06978)
-        // assuming order p for dissipation term
-#if defined SIXTHORDER || defined EIGHTHORDER
-        KO_order = 7;
-#else
-        KO_order = 5;
-#endif
-        if ((KO_order + 1) > 2.0 * N_g) {
-            cerr << " Cannot use " << KO_order << "-order Kreiss-Oliger with " << N_g
-                << " ghosts zones " << endl;
-            exit(1);
-        }
-        KO_factor = double(pow(-1.0, (KO_order + 3.0) / 2.0)) / double(pow(2.0, KO_order + 1));
-        // finally: set order of interpolations in () operators
-#if defined SIXTHORDER || defined EIGHTHORDER
-        order = 6;
-#else
-        order = 4;
-#endif   
-        return this;
-    }
+    gf3d* setup(Grid* grid_i, int fall_off_i);
+
     //================================================
     // access memory...
     //================================================
     inline Doub** operator[](const int i) { return v[i]; } //subscripting: pointer to row i
     inline const Doub* const* operator[](const int i) const { return v[i]; }
-    inline Doub operator()(int i, int j, int k) { return v[i][j][k]; }
+    inline double operator()(int i, int j, int k) { return v[i][j][k]; }
 
     inline int dim1() const { return nr; }
     inline int dim2() const { return nt; }
     inline int dim3() const { return np; }
     inline int N_ghosts() { return N_g; }
-    inline Doub r(int i) { return (*r_p)[i]; }
-    inline Doub dxdr(int i) { return (*dxdr_p)[i]; }
-    inline Doub ddxdr(int i) { return (*ddxdr_p)[i]; }
-    inline Doub theta(int j) { return (*theta_p)[j]; }
-    inline Doub dydtheta(int j) { return (*dydtheta_p)[j]; }
-    inline Doub ddydtheta(int j) { return (*ddydtheta_p)[j]; }
-    inline Doub costheta(int j) { return (*ct_p)[j]; }
-    inline Doub sintheta(int j) { return (*st_p)[j]; }
-    inline Doub phi(int k) { return (*phi_p)[k]; }
+    inline double r(int i) { return (*r_p)[i]; }
+    inline double dxdr(int i) { return (*dxdr_p)[i]; }
+    inline double ddxdr(int i) { return (*ddxdr_p)[i]; }
+    inline double theta(int j) { return (*theta_p)[j]; }
+    inline double dydtheta(int j) { return (*dydtheta_p)[j]; }
+    inline double ddydtheta(int j) { return (*ddydtheta_p)[j]; }
+    inline double costheta(int j) { return (*ct_p)[j]; }
+    inline double sintheta(int j) { return (*st_p)[j]; }
+    inline double phi(int k) { return (*phi_p)[k]; }
     inline void constants() { cout << " constant in " << name << " : " << Inv12dy << endl; }
-    inline Doub dx() const { return delta_x; }
-    inline Doub dy() const { return delta_y; }
-    inline Doub dphi() const { return delta_phi; }
+    inline double dx() const { return delta_x; }
+    inline double dy() const { return delta_y; }
+    inline double dphi() const { return delta_phi; }
     inline int GridFunctionNumber() { return gfn; }
     inline int Center_Parity() const { return center_par; }
     inline int Axis_Parity() const { return axis_par; }
     inline int Eq_Parity() const { return eq_par; }
     inline int Fall_Off() const { return fall_off; }
-    inline Doub WaveSpeed() const { return wave_speed; }
-    inline Doub Background() const { return background; }
+    inline double WaveSpeed() const { return wave_speed; }
+    inline double Background() const { return background; }
     inline int NumberGhostZones() { return N_g; }
     const char* Name() { return name; }
     inline gf3d* Address() { return this; }
+
     //================================================
     // Fill inner ghost zones, assuming a spherical grid.
     //================================================
-    int fill_ghosts() {
-        //    cout << " filling ghosts of function " << name << endl;
-        //
-        // start with lower r:
-        // 
-        for (int j = N_g; j < nt - N_g; j++) {
-#ifdef EQSYMMETRY
-            const int J = j;
-#else
-            if (eq_par != 1) cout << " messup with equatorial symmetry!! " << endl;  // Sanity check...
-            const int J = nt - j - 1;
-#endif /* EQSYMMETRY */
-            for (int k = N_g; k < np - N_g; k++) {
-#ifdef AXISYMMETRY
-                const int K = k;
-#else
-                const int K = (k - N_g + (np - 2 * N_g) / 2) % (np - 2 * N_g) + N_g;
-#endif /* AXISYMMETRY */
-                for (int i = 0; i < N_g; i++)
-                    v[i][j][k] = eq_par * center_par * v[2 * N_g - 1 - i][J][K];
-                //	v[0][j][k] = eq_par * center_par * v[5][J][K];
-                //	v[1][j][k] = eq_par * center_par * v[4][J][K];
-                //	v[2][j][k] = eq_par * center_par * v[3][J][K];
-            }
-        }
-        //
-        // now both lower and upper theta:
-        //
-        for (int i = 0; i < nr; i++)
-            for (int k = N_g; k < np - N_g; k++) {
-#ifdef AXISYMMETRY
-                const int K = k;
-#else
-                const int K = (k - N_g + (np - 2 * N_g) / 2) % (np - 2 * N_g) + N_g;
-#endif /* AXISYMMETRY */
-                // do the upper two first, in case there are only two interior grid points...
-                //  	v[i][1][k]    = axis_par * v[i][4][K];
-                //  	v[i][2][k]    = axis_par * v[i][3][K];
-                v[i][N_g - 2][k] = axis_par * v[i][N_g + 1][K];
-                v[i][N_g - 1][k] = axis_par * v[i][N_g][K];
-#ifdef EQSYMMETRY
-                for (int j = 0; j < N_g; j++)
-                    v[i][nt - j - 1][k] = eq_par * v[i][nt - 2 * N_g + j][k];
-                //  	v[i][nt-3][k] = eq_par * v[i][nt-4][k];
-                //	v[i][nt-2][k] = eq_par * v[i][nt-5][k];
-                //  	v[i][nt-1][k] = eq_par * v[i][nt-6][k];
-#else
-                for (int j = 0; j < N_g; j++)
-                    v[i][nt - j - 1][k] = axis_par * v[i][nt - 2 * N_g + j][k];
-                //  	v[i][nt-3][k] = axis_par * v[i][nt-4][K];
-                //  	v[i][nt-2][k] = axis_par * v[i][nt-5][K];
-                //  	v[i][nt-1][k] = axis_par * v[i][nt-6][K];
-#endif /* EQSYMMETRY */
-    // ... now fill in the lower ones
-                for (int j = 0; j < N_g - 2; j++)
-                    v[i][j][k] = axis_par * v[i][2 * N_g - 1 - j][K];
-                // v[i][0][k]    = axis_par * v[i][5][K];
-            }
-        //
-        // finally both lower and upper phi:
-        //
-        for (int i = 0; i < nr; i++)
-            for (int j = 0; j < nt; j++) {
-#ifdef AXISYMMETRY
-                for (int k = 0; k < N_g; k++) {
-                    v[i][j][k] = v[i][j][N_g];
-                    v[i][j][np - 1 - k] = v[i][j][N_g];
-                }
-                // v[i][j][0]    = v[i][j][N_g];
-                // v[i][j][1]    = v[i][j][N_g];
-                // v[i][j][2]    = v[i][j][N_g];
-                // v[i][j][np-1] = v[i][j][N_g];
-                // v[i][j][np-2] = v[i][j][N_g];
-                // v[i][j][np-3] = v[i][j][N_g];
-#else
-                for (int k = 0; k < N_g; k++) {
-                    v[i][j][k] = v[i][j][np - 2 * N_g + k];
-                    v[i][j][np - 1 - k] = v[i][j][2 * N_g - 1 - k];
-                }
-                // v[i][j][0]    = v[i][j][np-6];
-                // v[i][j][1]    = v[i][j][np-5];
-                // v[i][j][2]    = v[i][j][np-4];
-                // v[i][j][np-1] = v[i][j][5];
-                // v[i][j][np-2] = v[i][j][4];
-                // v[i][j][np-3] = v[i][j][3];
-#endif /* AXISYMMETRY */
-            }
-        return 1;
-    };
+    int fill_ghosts();
+
     //================================================
     // Compute time derivatives at outer boundary (provide function values)
     //================================================
-    void derivs_outerboundary(gf3d* fct) {
-        //    cout << " using fct " << fct->Name() << " for " << this->Name() << " with wave_speed " << wave_speed <<  endl;
-        for (int j = 0; j < nt; j++) {
-            for (int k = 0; k < np; k++) {
-                for (int i = nr - 1; i >= nr - N_g; i--) {
-                    v[i][j][k] = -wave_speed * (fct->dr_OS(i, j, k, -1) +
-                        fall_off * ((*fct)[i][j][k] - background) / (*r_p)[i]);
-                    // v[nr-2][j][k] = - wave_speed * ( fct->dr(nr-2,j,k,-1) +
-                          // 	 fall_off * ( (*fct)[nr-2][j][k] - background ) / (*r_p)[nr-2] ); 
-                    // v[nr-3][j][k] = - wave_speed * ( fct->dr(nr-3,j,k,-1) +
-                          // 	 fall_off * ( (*fct)[nr-3][j][k] - background ) / (*r_p)[nr-3] ); 
-                }
-            }
-        }
-    }
+    void derivs_outerboundary(gf3d* fct);
+
     //================================================
     // Fill outer boundary points
     //================================================
-    int fill_outerboundary(gf3d& fct_old, double dt, double update_background) {
-        background = update_background;
-        fill_outerboundary(fct_old, dt);
-        return 1;
-    };
-    int fill_outerboundary(gf3d& fct_old, double dt) {
-        // use Neville's algorithm to construct quadratic interpolation to intersection 
-        // of radially outgoing characteristic with previous timeslice
-        //
-        for (int i = nr - 1; i >= nr - N_g; i--) {
-            Doub Courant = wave_speed * dt / delta_x * dxdr(i);
-            Doub r0 = (*r_p)[i - 2];
-            Doub r1 = (*r_p)[i - 1];
-            Doub r2 = (*r_p)[i];
-            Doub r_last = Courant * r1 + (1.0 - Courant) * r2; // intersection
-            Doub factor = r_last / r2;
-            if (fall_off == 2)
-                factor *= factor;
-            else if (fall_off == 3)
-                factor *= factor * factor;
-            else if (fall_off == -1)
-                factor = 1.0 / factor;
-            //
-            for (int j = 0; j < nt; j++)
-                for (int k = 0; k < np; k++) {
-                    const Doub P0 = fct_old[i - 2][j][k];
-                    const Doub P1 = fct_old[i - 1][j][k];
-                    const Doub P2 = fct_old[i][j][k];
-                    // Now use Neville's algorithm...
-                    const Doub P01 = ((r_last - r1) * P0 + (r0 - r_last) * P1) / (r0 - r1);
-                    const Doub P12 = ((r_last - r2) * P1 + (r1 - r_last) * P2) / (r1 - r2);
-                    const Doub P012 = ((r_last - r2) * P01 + (r0 - r_last) * P12) / (r0 - r2);
-                    v[i][j][k] = factor * (P012 - background) + background;
-                }
-        }
-        //
-        // now same thing for one point in...
-        //
-        // Courant = wave_speed * dt/delta_x * dxdr(nr-2);
-        // r0 = (*r_p)[nr-4];
-        // r1 = (*r_p)[nr-3];
-        // r2 = (*r_p)[nr-2];
-        // r_last = Courant * r1 + (1.0 - Courant) * r2; // intersection
-        // factor = r_last/r2;
-        // if (fall_off == 2)
-        //   factor *= factor;
-        // else if (fall_off == 3)
-        //   factor *= factor*factor;
-        // else if (fall_off == -1)
-        //   factor = 1.0 / factor;
-        // //
-        // for (int j = 0; j < nt; j++) 
-        //   for (int k = 0; k < np; k++) {	  
-        // 	const Doub P0 = fct_old[nr-4][j][k];
-        // 	const Doub P1 = fct_old[nr-3][j][k];
-        // 	const Doub P2 = fct_old[nr-2][j][k];
-        // 	// Now use Neville's algorithm...
-        // 	const Doub P01  = ( (r_last - r1) * P0  + (r0 - r_last) * P1  ) / (r0 - r1);
-        // 	const Doub P12  = ( (r_last - r2) * P1  + (r1 - r_last) * P2  ) / (r1 - r2);
-        // 	const Doub P012 = ( (r_last - r2) * P01 + (r0 - r_last) * P12 ) / (r0 - r2);
-        // 	v[nr-2][j][k] = factor * (P012 - background) + background;
-        //   }
-        // //
-        // // ... and two points in...
-        // //
-        // Courant = wave_speed * dt/delta_x * dxdr(nr-2);
-        // r0 = (*r_p)[nr-5];
-        // r1 = (*r_p)[nr-4];
-        // r2 = (*r_p)[nr-3];
-        // r_last = Courant * r1 + (1.0 - Courant) * r2; // intersection
-        // factor = r_last/r2;
-        // if (fall_off == 2)
-        //   factor *= factor;
-        // else if (fall_off == 3)
-        //   factor *= factor*factor;
-        // else if (fall_off == -1)
-        //   factor = 1.0 / factor;
-        // //
-        // for (int j = 0; j < nt; j++) 
-        //   for (int k = 0; k < np; k++) {	  
-        // 	const Doub P0 = fct_old[nr-5][j][k];
-        // 	const Doub P1 = fct_old[nr-4][j][k];
-        // 	const Doub P2 = fct_old[nr-3][j][k];
-        // 	// Now use Neville's algorithm...
-        // 	const Doub P01  = ( (r_last - r1) * P0  + (r0 - r_last) * P1  ) / (r0 - r1);
-        // 	const Doub P12  = ( (r_last - r2) * P1  + (r1 - r_last) * P2  ) / (r1 - r2);
-        // 	const Doub P012 = ( (r_last - r2) * P01 + (r0 - r_last) * P12 ) / (r0 - r2);
-        // 	v[nr-3][j][k] = factor * (P012 - background) + background;
-        //   }
-        return 1;
-    }
+    int fill_outerboundary(gf3d& fct_old, double dt, double update_background);
+    int fill_outerboundary(gf3d& fct_old, double dt);
+
     //    
     //================================================
     //================================================
@@ -453,1267 +143,682 @@ public:
     //
     // flat Laplace operator
     //
-    inline Doub Laplace(int i, int j, int k) {
-        return ddr(i, j, k) + 2.0 * dr(i, j, k) / r(i)
-            + (ddtheta(i, j, k) + (*ct_p)[j] * dtheta(i, j, k) / (*st_p)[j]
-                + ddphi(i, j, k) / ((*st_p)[j] * (*st_p)[j])) / (r(i) * r(i));
-    }
-    //
+    double Laplace(int i, int j, int k);
+
     // flat Laplace operator to second order
     //
-    inline Doub Laplace_so(int i, int j, int k) {
-        return ddr_so(i, j, k) + 2.0 * dr_so(i, j, k) / r(i)
-            + (ddtheta_so(i, j, k) + (*ct_p)[j] * dtheta_so(i, j, k) / (*st_p)[j]
-                + ddphi_so(i, j, k) / ((*st_p)[j] * (*st_p)[j])) / (r(i) * r(i));
-    }
+    double Laplace_so(int i, int j, int k);
+
     //
     // first derivatives
     // 
-    inline Doub dr(int i, int j, int k) {
-#ifdef EIGHTHORDER
-        return Inv840dx * (-3.0 * (v[i + 4][j][k] - v[i - 4][j][k])
-            + 32.0 * (v[i + 3][j][k] - v[i - 3][j][k])
-            - 168.0 * (v[i + 2][j][k] - v[i - 2][j][k])
-            + 672.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * dxdr(i);
-#elif SIXTHORDER
-        return Inv60dx * (v[i + 3][j][k] - v[i - 3][j][k] -
-            9.0 * (v[i + 2][j][k] - v[i - 2][j][k]) +
-            45.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * dxdr(i);
-#else /* fourth-order by default... */
-        return (v[i - 2][j][k] - 8.0 * (v[i - 1][j][k] - v[i + 1][j][k]) - v[i + 2][j][k]) * Inv12dx * dxdr(i);
-#endif  /* ORDER... */
-    }
-    inline Doub dtheta(int i, int j, int k) {
-#ifdef EIGHTHORDER
-        return Inv840dy * (-3.0 * (v[i][j + 4][k] - v[i][j - 4][k])
-            + 32.0 * (v[i][j + 3][k] - v[i][j - 3][k])
-            - 168.0 * (v[i][j + 2][k] - v[i][j - 2][k])
-            + 672.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * dydtheta(j);
-#elif SIXTHORDER
-        return Inv60dy * (v[i][j + 3][k] - v[i][j - 3][k]
-            - 9.0 * (v[i][j + 2][k] - v[i][j - 2][k])
-            + 45.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * dydtheta(j);
-#else
-        return (v[i][j - 2][k] - 8.0 * (v[i][j - 1][k] - v[i][j + 1][k]) - v[i][j + 2][k]) * Inv12dy * dydtheta(j);
-#endif  /* ORDER... */
-    }
-    inline Doub dphi(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return (v[i][j][k - 2] - 8.0 * (v[i][j][k - 1] - v[i][j][k + 1]) - v[i][j][k + 2]) * Inv12dphi;
-#endif  /* AXISYMMETRY */
-    }
+    double dr(int i, int j, int k);
+    double dtheta(int i, int j, int k);
+    double dphi(int i, int j, int k);
+
     //
     // second derivatives
     //
-    inline Doub ddr(int i, int j, int k) {
-#ifdef EIGHTHORDER
-        return Inv5040dxdx * (-9.0 * (v[i + 4][j][k] + v[i - 4][j][k])
-            + 128.0 * (v[i + 3][j][k] + v[i - 3][j][k])
-            - 1008.0 * (v[i + 2][j][k] + v[i - 2][j][k])
-            + 8064.0 * (v[i + 1][j][k] + v[i - 1][j][k])
-            - 14350.0 * v[i][j][k]) * dxdr(i) * dxdr(i) +
-            Inv840dx * (-3.0 * (v[i + 4][j][k] - v[i - 4][j][k])
-                + 32.0 * (v[i + 3][j][k] - v[i - 3][j][k])
-                - 168.0 * (v[i + 2][j][k] - v[i - 2][j][k])
-                + 672.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * ddxdr(i);
+    double ddr(int i, int j, int k);
+    double ddtheta(int i, int j, int k);
+    double ddphi(int i, int j, int k);
 
-#elif SIXTHORDER
-        return Inv180dxdx * (2.0 * (v[i + 3][j][k] + v[i - 3][j][k]) -
-            27.0 * (v[i + 2][j][k] + v[i - 2][j][k]) +
-            270.0 * (v[i + 1][j][k] + v[i - 1][j][k]) -
-            490.0 * v[i][j][k]) * dxdr(i) * dxdr(i) +
-            Inv60dx * (v[i + 3][j][k] - v[i - 3][j][k] -
-                9.0 * (v[i + 2][j][k] - v[i - 2][j][k]) +
-                45.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * ddxdr(i);
-#else
-        return (-(v[i - 2][j][k] + v[i + 2][j][k]) - 30.0 * v[i][j][k] + 16.0 * (v[i + 1][j][k] + v[i - 1][j][k])) *
-            Inv12dxdx * (dxdr(i) * dxdr(i)) +
-            (v[i - 2][j][k] - 8.0 * (v[i - 1][j][k] - v[i + 1][j][k]) - v[i + 2][j][k]) * Inv12dx * ddxdr(i);
-#endif   /* ORDER... */
-    }
-    inline Doub ddtheta(int i, int j, int k) {
-#ifdef EIGHTHORDER
-        return Inv5040dydy * (-9.0 * (v[i][j + 4][k] + v[i][j - 4][k])
-            + 128.0 * (v[i][j + 3][k] + v[i][j - 3][k])
-            - 1008.0 * (v[i][j + 2][k] + v[i][j - 2][k])
-            + 8064.0 * (v[i][j + 1][k] + v[i][j - 1][k])
-            - 14350.0 * v[i][j][k]) * dydtheta(j) * dydtheta(j) +
-            Inv840dy * (-3.0 * (v[i][j + 4][k] - v[i][j - 4][k])
-                + 32.0 * (v[i][j + 3][k] - v[i][j - 3][k])
-                - 168.0 * (v[i][j + 2][k] - v[i][j - 2][k])
-                + 672.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * ddydtheta(j);
-#elif SIXTHORDER
-        return Inv180dydy * (2.0 * (v[i][j + 3][k] + v[i][j - 3][k]) -
-            27.0 * (v[i][j + 2][k] + v[i][j - 2][k]) +
-            270.0 * (v[i][j + 1][k] + v[i][j - 1][k]) -
-            490.0 * v[i][j][k]) * dydtheta(j) * dydtheta(j) +
-            Inv60dy * (v[i][j + 3][k] - v[i][j - 3][k] -
-                9.0 * (v[i][j + 2][k] - v[i][j - 2][k]) +
-                45.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * ddydtheta(j);
-#else
-        return (-(v[i][j - 2][k] + v[i][j + 2][k]) - 30.0 * v[i][j][k] + 16.0 * (v[i][j + 1][k] + v[i][j - 1][k])) *
-            Inv12dydy * (dydtheta(j) * dydtheta(j)) +
-            (v[i][j - 2][k] - 8.0 * (v[i][j - 1][k] - v[i][j + 1][k]) - v[i][j + 2][k]) * Inv12dy * ddydtheta(j);
-#endif  /* ORDER */
-    }
-    inline Doub ddphi(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return (-(v[i][j][k - 2] + v[i][j][k + 2]) - 30.0 * v[i][j][k] + 16.0 * (v[i][j][k + 1] + v[i][j][k - 1])) *
-            Inv12dphidphi;
-#endif  /* AXISYMMETRY */
-    }
     //
     // mixed second derivatives
     //  
-    inline Doub dthetadr(int i, int j, int k) { return drdtheta(i, j, k); }
-    inline Doub drdtheta(int i, int j, int k) {
-#ifdef EIGHTHORDER
-        return (
-            -3.0 * (-3.0 * (v[i + 4][j + 4][k] - v[i + 4][j - 4][k]) + 32.0 * (v[i + 4][j + 3][k] - v[i + 4][j - 3][k]) - 168.0 * (v[i + 4][j + 2][k] - v[i + 4][j - 2][k]) + 672.0 * (v[i + 4][j + 1][k] - v[i + 4][j - 1][k]))
-            + 32.0 * (-3.0 * (v[i + 3][j + 4][k] - v[i + 3][j - 4][k]) + 32.0 * (v[i + 3][j + 3][k] - v[i + 3][j - 3][k]) - 168.0 * (v[i + 3][j + 2][k] - v[i + 3][j - 2][k]) + 672.0 * (v[i + 3][j + 1][k] - v[i + 3][j - 1][k]))
-            - 168.0 * (-3.0 * (v[i + 2][j + 4][k] - v[i + 2][j - 4][k]) + 32.0 * (v[i + 2][j + 3][k] - v[i + 2][j - 3][k]) - 168.0 * (v[i + 2][j + 2][k] - v[i + 2][j - 2][k]) + 672.0 * (v[i + 2][j + 1][k] - v[i + 2][j - 1][k]))
-            + 672.0 * (-3.0 * (v[i + 1][j + 4][k] - v[i + 1][j - 4][k]) + 32.0 * (v[i + 1][j + 3][k] - v[i + 1][j - 3][k]) - 168.0 * (v[i + 1][j + 2][k] - v[i + 1][j - 2][k]) + 672.0 * (v[i + 1][j + 1][k] - v[i + 1][j - 1][k]))
-            - 672.0 * (-3.0 * (v[i - 1][j + 4][k] - v[i - 1][j - 4][k]) + 32.0 * (v[i - 1][j + 3][k] - v[i - 1][j - 3][k]) - 168.0 * (v[i - 1][j + 2][k] - v[i - 1][j - 2][k]) + 672.0 * (v[i - 1][j + 1][k] - v[i - 1][j - 1][k]))
-            + 168.0 * (-3.0 * (v[i - 2][j + 4][k] - v[i - 2][j - 4][k]) + 32.0 * (v[i - 2][j + 3][k] - v[i - 2][j - 3][k]) - 168.0 * (v[i - 2][j + 2][k] - v[i - 2][j - 2][k]) + 672.0 * (v[i - 2][j + 1][k] - v[i - 2][j - 1][k]))
-            - 32.0 * (-3.0 * (v[i - 3][j + 4][k] - v[i - 3][j - 4][k]) + 32.0 * (v[i - 3][j + 3][k] - v[i - 3][j - 3][k]) - 168.0 * (v[i - 3][j + 2][k] - v[i - 3][j - 2][k]) + 672.0 * (v[i - 3][j + 1][k] - v[i - 3][j - 1][k]))
-            + 3.0 * (-3.0 * (v[i - 4][j + 4][k] - v[i - 4][j - 4][k]) + 32.0 * (v[i - 4][j + 3][k] - v[i - 4][j - 3][k]) - 168.0 * (v[i - 4][j + 2][k] - v[i - 4][j - 2][k]) + 672.0 * (v[i - 4][j + 1][k] - v[i - 4][j - 1][k]))
-            ) *
-            Inv840dx * Inv840dy * dxdr(i) * dydtheta(j);
-#elif SIXTHORDER
-        return (
-            (v[i + 3][j + 3][k] - v[i + 3][j - 3][k] - 9.0 * (v[i + 3][j + 2][k] - v[i + 3][j - 2][k]) + 45.0 * (v[i + 3][j + 1][k] - v[i + 3][j - 1][k]))
-            - 9.0 * (v[i + 2][j + 3][k] - v[i + 2][j - 3][k] - 9.0 * (v[i + 2][j + 2][k] - v[i + 2][j - 2][k]) + 45.0 * (v[i + 2][j + 1][k] - v[i + 2][j - 1][k]))
-            + 45.0 * (v[i + 1][j + 3][k] - v[i + 1][j - 3][k] - 9.0 * (v[i + 1][j + 2][k] - v[i + 1][j - 2][k]) + 45.0 * (v[i + 1][j + 1][k] - v[i + 1][j - 1][k]))
-            - 45.0 * (v[i - 1][j + 3][k] - v[i - 1][j - 3][k] - 9.0 * (v[i - 1][j + 2][k] - v[i - 1][j - 2][k]) + 45.0 * (v[i - 1][j + 1][k] - v[i - 1][j - 1][k]))
-            + 9.0 * (v[i - 2][j + 3][k] - v[i - 2][j - 3][k] - 9.0 * (v[i - 2][j + 2][k] - v[i - 2][j - 2][k]) + 45.0 * (v[i - 2][j + 1][k] - v[i - 2][j - 1][k]))
-            - (v[i - 3][j + 3][k] - v[i - 3][j - 3][k] - 9.0 * (v[i - 3][j + 2][k] - v[i - 3][j - 2][k]) + 45.0 * (v[i - 3][j + 1][k] - v[i - 3][j - 1][k]))) *
-            Inv60dx * Inv60dy * dxdr(i) * dydtheta(j);
-#else
-        return (
-            (v[i - 2][j - 2][k] - 8.0 * (v[i - 2][j - 1][k] - v[i - 2][j + 1][k]) - v[i - 2][j + 2][k])
-            - 8.0 * (v[i - 1][j - 2][k] - 8.0 * (v[i - 1][j - 1][k] - v[i - 1][j + 1][k]) - v[i - 1][j + 2][k])
-            + 8.0 * (v[i + 1][j - 2][k] - 8.0 * (v[i + 1][j - 1][k] - v[i + 1][j + 1][k]) - v[i + 1][j + 2][k])
-            - (v[i + 2][j - 2][k] - 8.0 * (v[i + 2][j - 1][k] - v[i + 2][j + 1][k]) - v[i + 2][j + 2][k])) *
-            Inv12dx * Inv12dy * dxdr(i) * dydtheta(j);
-#endif
-    }
-    inline Doub dphidr(int i, int j, int k) { return drdphi(i, j, k); }
-    inline Doub drdphi(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return ((v[i - 2][j][k - 2] - 8.0 * (v[i - 2][j][k - 1] - v[i - 2][j][k + 1]) - v[i - 2][j][k + 2])
-            - 8.0 * (v[i - 1][j][k - 2] - 8.0 * (v[i - 1][j][k - 1] - v[i - 1][j][k + 1]) - v[i - 1][j][k + 2])
-            + 8.0 * (v[i + 1][j][k - 2] - 8.0 * (v[i + 1][j][k - 1] - v[i + 1][j][k + 1]) - v[i + 1][j][k + 2])
-            - (v[i + 2][j][k - 2] - 8.0 * (v[i + 2][j][k - 1] - v[i + 2][j][k + 1]) - v[i + 2][j][k + 2])) *
-            Inv12dx * Inv12dphi * dxdr(i);
-#endif  /* AXISYMMETRY */
-    }
-    inline Doub dphidtheta(int i, int j, int k) { return dthetadphi(i, j, k); }
-    inline Doub dthetadphi(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return ((v[i][j - 2][k - 2] - 8.0 * (v[i][j - 2][k - 1] - v[i][j - 2][k + 1]) - v[i][j - 2][k + 2])
-            - 8.0 * (v[i][j - 1][k - 2] - 8.0 * (v[i][j - 1][k - 1] - v[i][j - 1][k + 1]) - v[i][j - 1][k + 2])
-            + 8.0 * (v[i][j + 1][k - 2] - 8.0 * (v[i][j + 1][k - 1] - v[i][j + 1][k + 1]) - v[i][j + 1][k + 2])
-            - (v[i][j + 2][k - 2] - 8.0 * (v[i][j + 2][k - 1] - v[i][j + 2][k + 1]) - v[i][j + 2][k + 2])) *
-            Inv12dy * Inv12dphi * dydtheta(j);
-#endif  /* AXISYMMETRY */
-    }
+    double dthetadr(int i, int j, int k);
+    double drdtheta(int i, int j, int k);
+    double dphidr(int i, int j, int k);
+    double drdphi(int i, int j, int k);
+    double dphidtheta(int i, int j, int k);
+    double dthetadphi(int i, int j, int k);
+    
     //
     // second-order versions of second derivatives
     //
-    inline Doub ddr_so(int i, int j, int k) {
-        return (-2.0 * v[i][j][k] + (v[i + 1][j][k] + v[i - 1][j][k])) / (delta_x * delta_x)
-            * (dxdr(i) * dxdr(i)) +
-            (v[i + 1][j][k] - v[i - 1][j][k]) / (2.0 * delta_x) * ddxdr(i);
-    }
-    inline Doub ddtheta_so(int i, int j, int k) {
-        return (-2.0 * v[i][j][k] + (v[i][j + 1][k] + v[i][j - 1][k])) / (delta_y * delta_y)
-            * (dydtheta(j) * dydtheta(j)) +
-            (v[i][j + 1][k] - v[i][j - 1][k]) / (2.0 * delta_y) * ddydtheta(j);
-    }
-    inline Doub ddphi_so(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return (-2.0 * v[i][j][k] + (v[i][j][k + 1] + v[i][j][k - 1])) / (delta_phi * delta_phi);
-#endif  /* AXISYMMETRY */
-    }
+    double ddr_so(int i, int j, int k);
+    double ddtheta_so(int i, int j, int k);
+    double ddphi_so(int i, int j, int k);
+
     //
     // second-order versions of first derivatives
     //
-    inline Doub dr_so(int i, int j, int k) {
-        return (v[i + 1][j][k] - v[i - 1][j][k]) / (2.0 * delta_x) * dxdr(i);
-    }
-    inline Doub dtheta_so(int i, int j, int k) {
-        return (v[i][j + 1][k] - v[i][j - 1][k]) / (2.0 * delta_y) * dydtheta(j);
-    }
-    inline Doub dphi_so(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return (v[i][j][k + 1] - v[i][j][k - 1]) / (2.0 * delta_phi);
-#endif  /* AXISYMMETRY */
-    }
+    double dr_so(int i, int j, int k);
+    double dtheta_so(int i, int j, int k);
+    double dphi_so(int i, int j, int k);
+
     //
     // second-order versions of mixed derivatives
     //
-    inline Doub dthetadr_so(int i, int j, int k) { return drdtheta_so(i, j, k); }
-    inline Doub drdtheta_so(int i, int j, int k) {
-        return (v[i + 1][j + 1][k] - v[i + 1][j - 1][k] - v[i - 1][j + 1][k] + v[i - 1][j - 1][k])
-            / (4.0 * delta_x * delta_y) * dxdr(i) * dydtheta(j);
-    }
-    inline Doub dphidr_so(int i, int j, int k) { return drdphi_so(i, j, k); }
-    inline Doub drdphi_so(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return (v[i - 1][j][k - 1] - v[i - 1][j][k + 1] - v[i + 1][j][k - 1] + v[i + 1][j][k + 1])
-            / (4.0 * delta_x * delta_phi) * dxdr(i);
-#endif
-    }
-    inline Doub dphidtheta_so(int i, int j, int k) { return dthetadphi_so(i, j, k); }
-    inline Doub dthetadphi_so(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return (v[i][j - 1][k - 1] - v[i][j - 1][k + 1] - v[i][j + 1][k - 1] + v[i][j + 1][k + 1])
-            / (4.0 * delta_y * delta_phi) * dydtheta(j);
-#endif
-    }
+    double dthetadr_so(int i, int j, int k);
+    double drdtheta_so(int i, int j, int k);
+    double dphidr_so(int i, int j, int k);
+    double drdphi_so(int i, int j, int k);
+    double dphidtheta_so(int i, int j, int k);
+    double dthetadphi_so(int i, int j, int k);
+    
     //
     // first derivatives in UPWIND differencing (NOTE: same name for routine, but extra argument for shift) 
     // 
-    inline Doub dr(int i, int j, int k, double shift) {
-        if (shift < 0.0) {
-#if defined SIXTHORDER || defined EIGHTHORDER
-            return (v[i - 4][j][k] - 8.0 * v[i - 3][j][k] + 30.0 * v[i - 2][j][k] - 80.0 * v[i - 1][j][k] + 35.0 * v[i][j][k] + 24.0 * v[i + 1][j][k] - 2.0 * v[i + 2][j][k])
-                * Inv60dx * dxdr(i);
-#else
-            return   (-0.5 * v[i - 3][j][k] + 3.0 * v[i - 2][j][k] - 9.0 * v[i - 1][j][k] + 5.0 * v[i][j][k] + 1.5 * v[i + 1][j][k])
-                * Inv6dx * dxdr(i);
-#endif  /* ORDER */
-        } else {   // now shift > 0...
-#if defined SIXTHORDER || defined EIGHTHORDER
-            return -(v[i + 4][j][k] - 8.0 * v[i + 3][j][k] + 30.0 * v[i + 2][j][k] - 80.0 * v[i + 1][j][k] + 35.0 * v[i][j][k] + 24.0 * v[i - 1][j][k] - 2.0 * v[i - 2][j][k])
-                * Inv60dx * dxdr(i);
-#else
-            return -(-0.5 * v[i + 3][j][k] + 3.0 * v[i + 2][j][k] - 9.0 * v[i + 1][j][k] + 5.0 * v[i][j][k] + 1.5 * v[i - 1][j][k])
-                * Inv6dx * dxdr(i);
-#endif  /* ORDER */
-        }
-    }
-    inline Doub dtheta(int i, int j, int k, double shift) {
-        if (shift < 0.0) {
-#if defined SIXTHORDER || defined EIGHTHORDER
-            return (v[i][j - 4][k] - 8.0 * v[i][j - 3][k] + 30.0 * v[i][j - 2][k] - 80.0 * v[i][j - 1][k] + 35.0 * v[i][j][k] + 24.0 * v[i][j + 1][k] - 2.0 * v[i][j + 2][k])
-                * Inv60dy * dydtheta(j);
-#else
-            return   (-0.5 * v[i][j - 3][k] + 3.0 * v[i][j - 2][k] - 9.0 * v[i][j - 1][k] + 5.0 * v[i][j][k] + 1.5 * v[i][j + 1][k])
-                * Inv6dy * dydtheta(j);
-#endif  /* ORDER */
-        } else { // now shift > 0...
-#if defined SIXTHORDER || defined EIGHTHORDER
-            return -(v[i][j + 4][k] - 8.0 * v[i][j + 3][k] + 30.0 * v[i][j + 2][k] - 80.0 * v[i][j + 1][k] + 35.0 * v[i][j][k] + 24.0 * v[i][j - 1][k] - 2.0 * v[i][j - 2][k])
-                * Inv60dy * dydtheta(j);
-#else
-            return -(-0.5 * v[i][j + 3][k] + 3.0 * v[i][j + 2][k] - 9.0 * v[i][j + 1][k] + 5.0 * v[i][j][k] + 1.5 * v[i][j - 1][k])
-                * Inv6dy * dydtheta(j);
-#endif  /* ORDER */
-        }
-    }
-    inline Doub dphi(int i, int j, int k, double shift) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        if (shift < 0.0)
-            return   (-0.5 * v[i][j][k - 3] + 3.0 * v[i][j][k - 2] - 9.0 * v[i][j][k - 1] + 5.0 * v[i][j][k] + 1.5 * v[i][j][k + 1])
-            * Inv6dphi;
-        else
-            return -(-0.5 * v[i][j][k + 3] + 3.0 * v[i][j][k + 2] - 9.0 * v[i][j][k + 1] + 5.0 * v[i][j][k] + 1.5 * v[i][j][k - 1])
-            * Inv6dphi;
-#endif  /* AXISYMMETRY */
-    }
+    double dr(int i, int j, int k, double shift);
+    double dtheta(int i, int j, int k, double shift);
+    double dphi(int i, int j, int k, double shift);
+
     //
     // first derivatives in UPWIND differencing (NOTE: same name for routine, but extra argument for shift) 
     // Now third-order versions
     //
-    inline Doub dr_to(int i, int j, int k, double shift) {
-        if (shift < 0.0)
-            return   (v[i - 2][j][k] - 6.0 * v[i - 1][j][k] + 3.0 * v[i][j][k] + 2.0 * v[i + 1][j][k])
-            * Inv6dx * dxdr(i);
-        else
-            return -(v[i + 2][j][k] - 6.0 * v[i + 1][j][k] + 3.0 * v[i][j][k] + 2.0 * v[i - 1][j][k])
-            * Inv6dx * dxdr(i);
-    }
-    inline Doub dtheta_to(int i, int j, int k, double shift) {
-        if (shift < 0.0)
-            return   (v[i][j - 2][k] - 6.0 * v[i][j - 1][k] + 3.0 * v[i][j][k] + 2.0 * v[i][j + 1][k])
-            * Inv6dy * dydtheta(j);
-        else
-            return -(v[i][j + 2][k] - 6.0 * v[i][j + 1][k] + 3.0 * v[i][j][k] + 2.0 * v[i][j - 1][k])
-            * Inv6dy * dydtheta(j);
-    }
-    inline Doub dphi_to(int i, int j, int k, double shift) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        if (shift < 0.0)
-            return   (v[i][j][k - 2] - 6.0 * v[i][j][k - 1] + 3.0 * v[i][j][k] + 2.0 * v[i][j][k + 1])
-            * Inv6dphi;
-        else
-            return -(v[i][j][k + 2] - 6.0 * v[i][j][k + 1] + 3.0 * v[i][j][k] + 2.0 * v[i][j][k - 1])
-            * Inv6dphi;
-#endif  /* AXISYMMETRY */
-    }
+    double dr_to(int i, int j, int k, double shift);
+    double dtheta_to(int i, int j, int k, double shift);
+    double dphi_to(int i, int j, int k, double shift);
+
     //
     // One-sided version (for use at boundaries)
     //
-    inline Doub dr_OS(int i, int j, int k, double shift) {
-        // if (shift < 0.0) 
-        //   return ( Hm2 * v[i-2][j][k] + Hm1 * v[i-1][j][k] + H0 * v[i][j][k]) / Delta_r(i);
-        // else
-        //   return ( Gp2 * v[i+2][j][k] + Gp1 * v[i+1][j][k] + G0 * v[i][j][k]) / Delta_r(i);
-        if (shift < 0.0)
-            return (v[i - 2][j][k] - 4.0 * v[i - 1][j][k] + 3.0 * v[i][j][k]) / (2.0 * delta_x) * dxdr(i);
-        else
-            return -(v[i + 2][j][k] - 4.0 * v[i + 1][j][k] + 3.0 * v[i][j][k]) / (2.0 * delta_x) * dxdr(i);
-    }
+    double dr_OS(int i, int j, int k, double shift);
     //
     // NOTE: these return derivatives * (dx)^3 !
     //
-    inline Doub d4r(int i, int j, int k) {
-        return (v[i - 2][j][k] + v[i + 2][j][k] - 4.0 * (v[i - 1][j][k] + v[i + 1][j][k]) + 6.0 * v[i][j][k])
-            * dxdr(i) / delta_x;
-        // / (delta_r*delta_r*delta_r*delta_r);
-    }
-    inline Doub d4theta(int i, int j, int k) {
-        return (v[i][j - 2][k] + v[i][j + 2][k] - 4.0 * (v[i][j - 1][k] + v[i][j + 1][k]) + 6.0 * v[i][j][k])
-            * dydtheta(j) / delta_y;
-        // / (delta_theta*delta_theta*delta_theta*delta_theta);
-    }
-    inline Doub d4phi(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        return (v[i][j][k - 2] + v[i][j][k + 2] - 4.0 * (v[i][j][k - 1] + v[i][j][k + 1]) + 6.0 * v[i][j][k]) / delta_phi;
-#endif  /* AXISYMMETRY */
-    }
-    inline Doub d4(int i, int j, int k) {
-        return d4r(i, j, k) + d4theta(i, j, k) + d4phi(i, j, k);
-    }
+    double d4r(int i, int j, int k);
+    double d4theta(int i, int j, int k);
+    double d4phi(int i, int j, int k);
+    double d4(int i, int j, int k) ;
+
     //
     // Derivatives for Kreiss-Oliger terms - for a *uniform* grid,
     // these return (Delta x)^p \partial_x^{p+1} f 
     //
-    inline Doub D8r(int i, int j, int k) {
-        const double zero = 70.0;
-        const double one = -56.0;
-        const double two = 28.0;
-        const double three = -8.0;
-        const double four = 1.0;
-        return (four * (v[i + 4][j][k] + v[i - 4][j][k]) +
-            three * (v[i + 3][j][k] + v[i - 3][j][k]) +
-            two * (v[i + 2][j][k] + v[i - 2][j][k]) +
-            one * (v[i + 1][j][k] + v[i - 1][j][k]) +
-            zero * v[i][j][k]) * dxdr(i) / delta_x;
-    }
-    inline Doub D8theta(int i, int j, int k) {
-        const double zero = 70.0;
-        const double one = -56.0;
-        const double two = 28.0;
-        const double three = -8.0;
-        const double four = 1.0;
-        return (four * (v[i][j + 4][k] + v[i][j - 4][k]) +
-            three * (v[i][j + 3][k] + v[i][j - 3][k]) +
-            two * (v[i][j + 2][k] + v[i][j - 2][k]) +
-            one * (v[i][j + 1][k] + v[i][j - 1][k]) +
-            zero * v[i][j][k]) * dydtheta(j) / delta_y;
-    }
-    inline Doub D8phi(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        const double zero = 70.0;
-        const double one = -56.0;
-        const double two = 28.0;
-        const double three = -8.0;
-        const double four = 1.0;
-        return (four * (v[i][j][k + 4] + v[i][j][k - 4]) +
-            three * (v[i][j][k + 3] + v[i][j][k - 3]) +
-            two * (v[i][j][k + 2] + v[i][j][k - 2]) +
-            one * (v[i][j][k + 1] + v[i][j][k - 1]) +
-            zero * v[i][j][k]) / delta_phi;
-#endif
-    }
-    //
-    inline Doub D6r(int i, int j, int k) {
-        const double zero = -20.0;
-        const double one = 15.0;
-        const double two = -6.0;
-        const double three = 1.0;
-        return (three * (v[i + 3][j][k] + v[i - 3][j][k]) +
-            two * (v[i + 2][j][k] + v[i - 2][j][k]) +
-            one * (v[i + 1][j][k] + v[i - 1][j][k]) +
-            zero * v[i][j][k]) * dxdr(i) / delta_x;
-    }
-    inline Doub D6theta(int i, int j, int k) {
-        const double zero = -20.0;
-        const double one = 15.0;
-        const double two = -6.0;
-        const double three = 1.0;
-        return (three * (v[i][j + 3][k] + v[i][j - 3][k]) +
-            two * (v[i][j + 2][k] + v[i][j - 2][k]) +
-            one * (v[i][j + 1][k] + v[i][j - 1][k]) +
-            zero * v[i][j][k]) * dydtheta(j) / delta_y;
-    }
-    inline Doub D6phi(int i, int j, int k) {
-#ifdef AXISYMMETRY
-        return 0.0;
-#else
-        const double zero = -20.0;
-        const double one = 15.0;
-        const double two = -6.0;
-        const double three = 1.0;
-        return (three * (v[i][j][k + 3] + v[i][j][k - 3]) +
-            two * (v[i][j][k + 2] + v[i][j][k - 2]) +
-            one * (v[i][j][k + 1] + v[i][j][k - 1]) +
-            zero * v[i][j][k]) / delta_phi;
-#endif  /* AXISYMMETRY */
-    }
-    inline Doub KO(int i, int j, int k) {
-        // see Appendix C in Babiuc et.al, arxiv:0709.3559 
-        // note wrong sign in (C7); see also eq. (7) in
-        // Bozzola & Paschalidis, arXiv:2104.06978
-        double KO_term = 0.0;
-        if (KO_order == 5)
-            KO_term = KO_factor * (D6r(i, j, k) + D6theta(i, j, k) + D6phi(i, j, k));
-        else if (KO_order == 7)
-            KO_term = KO_factor * (D8r(i, j, k) + D8theta(i, j, k) + D8phi(i, j, k));
-        else {
-            cerr << " Kreiss-Oliger of order " << KO_order << " not implemented! " << endl;
-            exit(1);
-        }
-        return KO_term;
-    }
+    double D8r(int i, int j, int k);
+    double D8theta(int i, int j, int k);
+    double D8phi(int i, int j, int k);
+
+    double D6r(int i, int j, int k);
+    double D6theta(int i, int j, int k);
+    double D6phi(int i, int j, int k);
+    double KO(int i, int j, int k);
+
     //================================================
     // a hand-full of global derivative operators...
     //================================================
     // take radial derivative of function and store in derivs
     //================================================
-    int dr(gf3d* derivs) {
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-#ifdef EIGHTHORDER
-                    (*derivs)[i][j][k] = Inv840dx * (-3.0 * (v[i + 4][j][k] - v[i - 4][j][k])
-                        + 32.0 * (v[i + 3][j][k] - v[i - 3][j][k])
-                        - 168.0 * (v[i + 2][j][k] - v[i - 2][j][k])
-                        + 672.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * dxdr(i);
-#elif SIXTHORDER
-                    (*derivs)[i][j][k] = Inv60dx * (v[i + 3][j][k] - v[i - 3][j][k] -
-                        9.0 * (v[i + 2][j][k] - v[i - 2][j][k]) +
-                        45.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * dxdr(i);
-#else
-                    (*derivs)[i][j][k] = Inv12dx * (v[i - 2][j][k] - v[i + 2][j][k]
-                        - 8.0 * (v[i - 1][j][k] - v[i + 1][j][k])) * dxdr(i);
-#endif
-                }
-        derivs->fill_ghosts();
-        return 1;
-    };
-    int dtheta(gf3d* derivs) {
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-#ifdef EIGHTHORDER
-                    (*derivs)[i][j][k] = Inv840dy * (-3.0 * (v[i][j + 4][k] - v[i][j - 4][k])
-                        + 32.0 * (v[i][j + 3][k] - v[i][j - 3][k])
-                        - 168.0 * (v[i][j + 2][k] - v[i][j - 2][k])
-                        + 672.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * dydtheta(j);
-#elif SIXTHORDER
-                    (*derivs)[i][j][k] = Inv60dy * (v[i][j + 3][k] - v[i][j - 3][k]
-                        - 9.0 * (v[i][j + 2][k] - v[i][j - 2][k])
-                        + 45.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * dydtheta(j);
-#else
-                    (*derivs)[i][j][k] = Inv12dx * (v[i][j - 2][k] - v[i][j + 2][k]
-                        - 8.0 * (v[i][j - 1][k] - v[i][j + 1][k])) * dydtheta(j);
-#endif
-                }
-        derivs->fill_ghosts();
-        return 1;
-    };
+    int dr(gf3d* derivs);
+    int dtheta(gf3d* derivs);
+
     //================================================
     // utilities...
     //================================================
-    void add(double factor, gf3d* rhs) {
-        for (int i = 0; i < nr; i++)
-            for (int j = 0; j < nt; j++)
-                for (int k = 0; k < np; k++) {
-                    v[i][j][k] += factor * (*rhs)(i, j, k);
-                }
-    };
-    void add(gf3d* term1, double factor, gf3d* term2) {
-        for (int i = 0; i < nr; i++)
-            for (int j = 0; j < nt; j++)
-                for (int k = 0; k < np; k++) {
-                    v[i][j][k] = (*term1)(i, j, k) + factor * (*term2)(i, j, k);
-                }
-    };
-    double equals(double value) {
-        for (int i = 0; i < nr; i++)
-            for (int j = 0; j < nt; j++)
-                for (int k = 0; k < np; k++) {
-                    v[i][j][k] = value;
-                }
-        return value;
-    };
-    void equals(gf3d* rhs) {
-        for (int i = 0; i < nr; i++)
-            for (int j = 0; j < nt; j++)
-                for (int k = 0; k < np; k++) {
-                    v[i][j][k] = (*rhs)(i, j, k);
-                }
-    };
-    bool IsEqualTo(gf3d* rhs) {
-        bool equal = true;
-        for (int i = 0; i < nr; i++)
-            for (int j = 0; j < nt; j++)
-                for (int k = 0; k < np; k++) {
-                    if (v[i][j][k] != (*rhs)(i, j, k)) {
-                        equal = false;
-                        cout << Name() << "  " << i << " " << j << " " << k << " : "
-                            << setprecision(16) << v[i][j][k] << "   "
-                            << (*rhs)(i, j, k) << endl;
-                    }
-                }
-        return equal;
-    };
-    double min() {
-        double min = v[N_g][N_g][N_g];
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    if (v[i][j][k] < min) min = v[i][j][k];
-                }
-        return min;
-    };
-    double min(int& i_min, int& j_min, int& k_min) {
-        double min = v[N_g][N_g][N_g];
-        i_min = j_min = k_min = N_g;
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    if (v[i][j][k] < min) {
-                        min = v[i][j][k];
-                        i_min = i;
-                        j_min = j;
-                        k_min = k;
-                    }
-                }
-        return min;
-    };
-    double max() {
-        double max = v[N_g][N_g][N_g];
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    if (v[i][j][k] > max) max = v[i][j][k];
-                }
-        return max;
-    };
-    double max(int& i_max, int& j_max, int& k_max) {
-        double max = v[N_g][N_g][N_g];
-        i_max = j_max = k_max = N_g;
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    if (v[i][j][k] > max) {
-                        max = v[i][j][k];
-                        i_max = i;
-                        j_max = j;
-                        k_max = k;
-                    }
-                }
-        return max;
-    };
-    double abs_max(int& i_max, int& j_max, int& k_max) {
-        double max = abs(v[N_g][N_g][N_g]);
-        i_max = j_max = k_max = N_g;
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    if (abs(v[i][j][k]) > max) {
-                        max = abs(v[i][j][k]);
-                        i_max = i;
-                        j_max = j;
-                        k_max = k;
-                    }
-                }
-        return max;
-    };
-    double max(double r_min) {   // finds maximum for all r > r_min
-        double max = v[nr - N_g][N_g][N_g];
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    if (v[i][j][k] > max && r(i) > r_min) max = v[i][j][k];
-                }
-        return max;
-    };
+    void add(double factor, gf3d* rhs);
+    void add(gf3d* term1, double factor, gf3d* term2);
+    double equals(double value);
+    void equals(gf3d* rhs);
+    bool IsEqualTo(gf3d* rhs);
+    double min();
+    double min(int& i_min, int& j_min, int& k_min);
+    double max();
+    double max(int& i_max, int& j_max, int& k_max);
+    double abs_max();
+    double abs_max(int& i_max, int& j_max, int& k_max);
+    double max(double r_min);
+
     //
     // Use polynomial interpolation to find maximum in direction theta or j, fixed value of k (for phi)
     // 
-    double radialmax(double theta, int k, double& r_max) {
-        double v_max = (*this)(N_g, theta, k);
-        int i_max = N_g;
-        // find index of maximum
-        for (int i = N_g; i < nr - N_g; i++) {
-            const double vl = (*this)(i, theta, k);
-            if (vl > v_max) { v_max = vl; i_max = i; }
-        }
-        // now construct polynomial through three points
-        const double r_0 = r(i_max - 1);
-        const double r_1 = r(i_max);
-        const double r_2 = r(i_max + 1);
-        const double f_0 = (*this)(i_max - 1, theta, N_g);
-        const double f_1 = (*this)(i_max, theta, N_g);
-        const double f_2 = (*this)(i_max + 1, theta, N_g);
-        return max(r_0, r_1, r_2, f_0, f_1, f_2, r_max);
-    }
-    double radialmax(int j, int k, double& r_max) {
-        double v_max = (*this)(N_g, j, k);
-        int i_max = N_g;
-        // find index of maximum
-        for (int i = N_g; i < nr - N_g; i++) {
-            const double vl = (*this)(i, j, k);
-            if (vl > v_max) { v_max = vl; i_max = i; }
-        }
-        // now construct polynomial through three points
-        const double r_0 = r(i_max - 1);
-        const double r_1 = r(i_max);
-        const double r_2 = r(i_max + 1);
-        const double f_0 = (*this)(i_max - 1, j, N_g);
-        const double f_1 = (*this)(i_max, j, N_g);
-        const double f_2 = (*this)(i_max + 1, j, N_g);
-        return max(r_0, r_1, r_2, f_0, f_1, f_2, r_max);
-        // const double X_12 = (r_0 - r_1) * (r_0 - r_2);
-        // const double X_02 = (r_1 - r_0) * (r_1 - r_2);
-        // const double X_01 = (r_2 - r_0) * (r_2 - r_1);
-        // // find location of maximum 
-        // const double rhs = 
-        //      (r_1 + r_2)/X_12 * f_0
-        //   +  (r_0 + r_2)/X_02 * f_1
-        //   +  (r_0 + r_1)/X_01 * f_2;
-        // const double factor = 2.0 * ( f_0/X_12 + f_1/X_02 + f_2/X_01 );
-        // r_max = rhs / factor;
-        // // find function value at maximum
-        // const double term1 = (r_max - r_1)*(r_max - r_2)*f_0/X_12;
-        // const double term2 = (r_max - r_0)*(r_max - r_2)*f_1/X_02;
-        // const double term3 = (r_max - r_0)*(r_max - r_1)*f_2/X_01;
-        // return term1 + term2 + term3; 
-    }
+    double radialmax(double theta, int k, double& r_max);
+    double radialmax(int j, int k, double& r_max);
     //
     // Use polynomial interpolation to find maximum in slice for fixed value of k (for phi)
     // 
-    double slicemax(int k) {
-        double r_max, theta_max;
-        return slicemax(k, r_max, theta_max);
-    }
-    double slicemax(int k, double& r_max, double& theta_max) {
-        //
-        // first find radial maxima for all values of j
-        //
-        VecDoub* f_max_j, * r_max_j;
-        f_max_j = new VecDoub(nt);
-        r_max_j = new VecDoub(nt);
-        double r_max_l = 0.0;
-        for (int j = 0; j < nt; j++) {
-            double v_max = (*this)(N_g, j, k);
-            int i_max = N_g;
-            // find index of maximum
-            for (int i = N_g + 1; i < nr - N_g; i++) {
-                const double vl = (*this)(i, j, k);
-                if (vl > v_max) { v_max = vl; i_max = i; }
-            }
-            // construct polynomial through three points to find maximum
-            const double r_0 = r(i_max - 1);
-            const double r_1 = r(i_max);
-            const double r_2 = r(i_max + 1);
-            const double f_0 = (*this)(i_max - 1, j, k);
-            const double f_1 = (*this)(i_max, j, k);
-            const double f_2 = (*this)(i_max + 1, j, k);
-            (*f_max_j)[j] = max(r_0, r_1, r_2, f_0, f_1, f_2, r_max_l);
-            (*r_max_j)[j] = r_max_l;
-        }
-        //
-        // now find maximum of maxima...
-        // 
-        double f_max = (*f_max_j)[N_g];
-        int j_max = N_g;
-        for (int j = N_g + 1; j < nt - N_g; j++) {
-            const double fl = (*f_max_j)[j];
-            if (fl > f_max) { f_max = fl; j_max = j; }
-        }
-        // construct polynomial through three points
-        const double theta_0 = theta(j_max - 1);
-        const double theta_1 = theta(j_max);
-        const double theta_2 = theta(j_max + 1);
-        const double f_0 = (*f_max_j)[j_max - 1];
-        const double f_1 = (*f_max_j)[j_max];
-        const double f_2 = (*f_max_j)[j_max + 1];
-        f_max = max(theta_0, theta_1, theta_2, f_0, f_1, f_2, theta_max);
-
-        delete f_max_j;
-        delete r_max_j;
-        return f_max;
-    }
+    double slicemax(int k);
+    double slicemax(int k, double& r_max, double& theta_max);
     //
     // generic routine that returns maximum of polynomial fit through three points
     // 
-    double max(double x_0, double x_1, double x_2, double f_0, double f_1, double f_2, double& x_max) {
-        const double X_12 = (x_0 - x_1) * (x_0 - x_2);
-        const double X_02 = (x_1 - x_0) * (x_1 - x_2);
-        const double X_01 = (x_2 - x_0) * (x_2 - x_1);
-        // find location of maximum 
-        const double rhs =
-            (x_1 + x_2) / X_12 * f_0
-            + (x_0 + x_2) / X_02 * f_1
-            + (x_0 + x_1) / X_01 * f_2;
-        const double factor = 2.0 * (f_0 / X_12 + f_1 / X_02 + f_2 / X_01);
-        if (factor == 0.0) return f_1;
-        x_max = rhs / factor;
-        // find function value at maximum
-        const double term1 = (x_max - x_1) * (x_max - x_2) * f_0 / X_12;
-        const double term2 = (x_max - x_0) * (x_max - x_2) * f_1 / X_02;
-        const double term3 = (x_max - x_0) * (x_max - x_1) * f_2 / X_01;
-        return term1 + term2 + term3;
-    }
-
+    double max(double x_0, double x_1, double x_2, double f_0, double f_1, double f_2, double& x_max);
     //
     // Use polynomial interpolation to find minimum in direction theta, fixed value of k (for phi)
     // 
-    double radialmin(double theta, int k, double& r_min) {
-        double v_min = (*this)(N_g, theta, k);
-        int i_min = N_g;
-        // find index of minimum
-        for (int i = N_g; i < nr - N_g; i++) {
-            const double vl = (*this)(i, theta, k);
-            if (vl < v_min) { v_min = vl; i_min = i; }
-        }
-        // now construct polynomial through three points
-        const double r_0 = r(i_min - 1);
-        const double r_1 = r(i_min);
-        const double r_2 = r(i_min + 1);
-        const double f_0 = (*this)(i_min - 1, theta, N_g);
-        const double f_1 = (*this)(i_min, theta, N_g);
-        const double f_2 = (*this)(i_min + 1, theta, N_g);
-        const double X_12 = (r_0 - r_1) * (r_0 - r_2);
-        const double X_02 = (r_1 - r_0) * (r_1 - r_2);
-        const double X_01 = (r_2 - r_0) * (r_2 - r_1);
-        // find location of minimum 
-        const double rhs =
-            (r_1 + r_2) / X_12 * f_0
-            + (r_0 + r_2) / X_02 * f_1
-            + (r_0 + r_1) / X_01 * f_2;
-        const double factor = 2.0 * (f_0 / X_12 + f_1 / X_02 + f_2 / X_01);
-        r_min = rhs / factor;
-        // find function value at minimum
-        const double term1 = (r_min - r_1) * (r_min - r_2) * f_0 / X_12;
-        const double term2 = (r_min - r_0) * (r_min - r_2) * f_1 / X_02;
-        const double term3 = (r_min - r_0) * (r_min - r_1) * f_2 / X_01;
-        return term1 + term2 + term3;
-    }
-    bool FINITE() {
-        bool fine = true;
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    if (!isfinite(v[i][j][k])) fine = false;
-                }
-        return fine;
-    };
-    double center(int j, int k) {
-        if (center_par != 1) {
-            cerr << " Can only interpolate to center with center_parity = 1 " << endl;
-            return -137.0;
-        } else if (v[N_g - 1][j][k] != v[N_g][j][k]) {
-            cerr << " Cannot use gridfunction.center(j,k) for function that is not symmetric about origin " << endl;
-            return -137.0;
-        } else {
-            // return (450.0*v[3][j][k] - 75.0*v[4][j][k] + 9.0*v[5][j][k])/384.0;
-            return (450.0 * v[N_g][j][k] - 75.0 * v[N_g + 1][j][k] + 9.0 * v[N_g + 2][j][k]) / 384.0;
-        }
-    }
+    double radialmin(double theta, int k, double& r_min);
+    bool FINITE();
+    double center(int j, int k);
     //
     // takes norm only inside r_frac * r_out
     // 
-    double L2_norm(double r_frac = 1.1) {
-        double norm = 0.0;
-        double vol_int = 0.0;
-        for (int i = N_g; i < nr - N_g; i++) {
-            double rl = (*r_p)[i];
-            if (rl < r_frac * grid->r_max())
-                for (int j = N_g; j < nt - N_g; j++) {
-                    double tl = (*theta_p)[j];
-                    for (int k = N_g; k < np - N_g; k++) {
-                        const double dr = delta_x / dxdr(i);
-                        const double dtheta = delta_y / dydtheta(j);
-                        const double SqrtJac = rl * rl * sin(tl) * dr * dtheta * delta_phi;
-                        // NOTE: integration in *conformal* space; could
-                        //       multiply with conformal factor to obtain 
-                        //       proper integral in physcical space
-                        norm += SqrtJac * v[i][j][k] * v[i][j][k];
-                        vol_int += SqrtJac;
-                    }
-                }
-        }
-        return sqrt(norm);
-    }
-    double L2_norm(gf3d& det) {
-        double norm = 0.0;
-        double vol_int = 0.0;
-        for (int i = N_g; i < nr - N_g; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    double rl = (*r_p)[i];
-                    double tl = (*theta_p)[j];
-                    const double dr = delta_x / dxdr(i);
-                    const double dtheta = delta_y / dydtheta(j);
-                    const double SqrtJac = sqrt(det(i, j, k)) * rl * rl * sin(tl) * dr * dtheta * delta_phi;
-                    // NOTE: integration in *conformal* space; could
-                    //       multiply with conformal factor to obtain 
-                    //       proper integral in physical space
-                    norm += SqrtJac * v[i][j][k] * v[i][j][k];
-                    vol_int += SqrtJac;
-                }
-        return sqrt(norm);
-    }
+    double L2_norm(double r_frac = 1.1);
+    double L2_norm(gf3d& det);
+
     //================================================
     // proper integrals
     //================================================
-    double PropInt(gf3d& phi, gf3d& det, double low_lim_r = 0.0) {
-        double vol_int = 0.0;
-        for (int i = N_g; i < nr - N_g; i++) {
-            const double rl = r(i);
-            const double r2 = rl * rl;
-            const double r_up = 0.5 * (r(i + 1) + r(i));
-            const double r_low = 0.5 * (r(i - 1) + r(i));
-            //      const double dr = delta_x / dxdr(i);
-            const double dr = r_up - r_low;
-            double factor = 1.0;
-            if (r_up < low_lim_r)
-                factor = 0.0;
-            else if (r_low < low_lim_r)
-                factor = (r_up - low_lim_r) / (r_up - r_low);
-            for (int j = N_g; j < nt - N_g; j++) {
-                const double stl = sintheta(j);
-                const double dtheta = delta_y / dydtheta(j);
-                for (int k = N_g; k < np - N_g; k++) {
-                    const double SqrtJac = sqrt(det(i, j, k)) * exp(6.0 * phi(i, j, k)) * r2 * stl;
-                    vol_int += factor * v[i][j][k] * SqrtJac * dr * dtheta * delta_phi;
-                }
-            }
-        }
-        return sqrt(vol_int);
-    }
-    double PropIntMag(gf3d& phi, gf3d& det, double low_lim_r = 0.0) {
-        double vol_int = 0.0;
-        for (int i = N_g; i < nr - N_g; i++) {
-            const double rl = r(i);
-            const double r2 = rl * rl;
-            const double r_up = 0.5 * (r(i + 1) + r(i));
-            const double r_low = 0.5 * (r(i - 1) + r(i));
-            //      const double dr = delta_x / dxdr(i);
-            const double dr = r_up - r_low;
-            double factor = 1.0;
-            if (r_up < low_lim_r)
-                factor = 0.0;
-            else if (r_low < low_lim_r)
-                factor = (r_up - low_lim_r) / (r_up - r_low);
-            for (int j = N_g; j < nt - N_g; j++) {
-                const double stl = sintheta(j);
-                const double dtheta = delta_y / dydtheta(j);
-                for (int k = N_g; k < np - N_g; k++) {
-                    const double SqrtJac = sqrt(det(i, j, k)) * exp(6.0 * phi(i, j, k)) * r2 * stl;
-                    vol_int += factor * fabs(v[i][j][k]) * SqrtJac * dr * dtheta * delta_phi;
-                }
-            }
-        }
-        return vol_int;
-    }
+    double PropInt(gf3d& phi, gf3d& det, double low_lim_r = 0.0);
+    double PropIntMag(gf3d& phi, gf3d& det, double low_lim_r = 0.0);
 
     //================================================
     // Interpolator to arbitrary value of rl > 0
     //================================================
-    Doub operator()(double rl, int j, int k, int ilo = -1) {
-        // if no ilo provided, first find ilo so that r(ilo) <= rl < r(ilo+1):
-        if (ilo < 0) ilo = grid->i_ind(rl);
-        //    if ( (*this).GridFunctionNumber() == 18 && j == 2 && k == 2 )
-        //      cout << " in () : ilo = " << ilo << " rl = " << rl << endl;
-        // now make ilo lowest index of interpolation stencil:
-        ilo -= order / 2 - 1;
-        // make sure that we interpolate only between positive r gridpoints
-        // (since gridfunction may not be smooth across r = 0)
-        if (ilo < N_g) ilo = N_g;
-        // ... and that we take care of boundaries
-        if (ilo < 0) ilo = 0;
-        if (ilo > nr - order) ilo = nr - order;
-        //    cout << " ilo : " << ilo << endl;
-        Doub* ra, * ya;
-        ra = new Doub[order];      // allocate data arrays... 
-        ya = new Doub[order];
-        for (int i = 0; i < order; i++) {
-            ra[i] = (*r_p)[ilo + i];      // ...and fill them with data
-            ya[i] = v[ilo + i][j][k];
-            // cout << " ra = " << ra[i] << " ya = " << ya[i] << endl;
-        }
-        //
-        // Now follow numerical recipes routine Poly_interp
-        // 
-        Doub* c, * d;
-        c = new Doub[order];      // allocate arrays that store differences in tableaus
-        d = new Doub[order];
-        Doub dif = abs(rl - ra[0]);
-        Doub dift;
-        int ns = 0;
-        for (int i = 0; i < order; i++) {
-            if ((dift = abs(rl - ra[i])) < dif) {
-                ns = i;
-                dif = dift;
-            }
-            c[i] = ya[i];
-            d[i] = ya[i];
-        }
-        Doub y = ya[ns--];
-        Doub den, ho, hp, w, dy;
-        for (int m = 1; m < order; m++) {
-            for (int i = 0; i < order - m; i++) {
-                ho = ra[i] - rl;
-                hp = ra[i + m] - rl;
-                w = c[i + 1] - d[i];
-                den = ho - hp;
-                den = w / den;
-                d[i] = hp * den;
-                c[i] = ho * den;
-            }
-            y += (dy = (2 * (ns + 1) < (order - m) ? c[ns + 1] : d[ns--]));
-        }
-        // CHECK!!!
-        // if (abs(dy) > abs(y))
-        //   // cout << " LARGE INTERPOLATION ERROR for function " << (*this).Name() << " at r = " << rl << " : y = " 
-        //   // 	   << y << ", dy = " << dy << endl;
-        //   y = 0.5*(ya[1] + ya[2]);
-        //    if ( (*this).GridFunctionNumber() == 18 && j == 2 && k == 2 )
-        //      cout << " in (): " << rl << "  " << ra[0] << "  " << ya[0] << "  " <<  ilo << "  " << y << endl;
-        delete ra;
-        delete ya;
-        delete c;
-        delete d;
-        return y;
-    };
+    double operator()(double rl, int j, int k, int ilo = -1);
+
     //================================================
     // Interpolator to arbitrary value of theta >= 0
     //================================================
-    Doub operator()(int i, double theta, int k) {
-        // find jlo so that theta[jlo] <= theta < theta[jlo+1]
-        int jlo = grid->j_ind(theta);
-        // now make ilo lowest index of interpolation stencil:
-        jlo -= order / 2 - 1;
-        if (jlo < 0) jlo = 0;
-        if (jlo > nt - order) jlo = nt - order; // take care of upper boundary
-        //    cout << " m = " << m << ", jlo : " << jlo << endl;
-        Doub* ta, * ya;
-        ta = new Doub[order];      // allocate data arrays... 
-        ya = new Doub[order];
-        for (int j = 0; j < order; j++) {
-            ta[j] = (*theta_p)[jlo + j];      // ...and fill them with data
-            ya[j] = v[i][jlo + j][k];
-        }
-        //
-        // Now follow numerical recipes routine Poly_interp
-        // 
-        Doub* c, * d;
-        c = new Doub[order];      // allocate arrays that store differenes in tableaus
-        d = new Doub[order];
-        Doub dif = abs(theta - ta[0]);
-        Doub dift;
-        int ns = 0;
-        for (int j = 0; j < order; j++) {
-            if ((dift = abs(theta - ta[j])) < dif) {
-                ns = j;
-                dif = dift;
-            }
-            c[j] = ya[j];
-            d[j] = ya[j];
-        }
-        Doub y = ya[ns--];
-        Doub den, ho, hp, w, dy;
-        for (int m = 1; m < order; m++) {
-            for (int j = 0; j < order - m; j++) {
-                ho = ta[j] - theta;
-                hp = ta[j + m] - theta;
-                w = c[j + 1] - d[j];
-                den = ho - hp;
-                den = w / den;
-                d[j] = hp * den;
-                c[j] = ho * den;
-            }
-            y += (dy = (2 * (ns + 1) < (order - m) ? c[ns + 1] : d[ns--]));
-        }
-        delete ta;
-        delete ya;
-        delete c;
-        delete d;
-        return y;
-    };
+    double operator()(int i, double theta, int k);
+
     //================================================
     // Interpolator to arbitrary value of r > 0 AND theta >= 0
     //================================================
-    Doub operator()(double rl, double theta, int k,
-        int loc_order = 0, int ilo = -1) {
-        // Note: allow interface to overwrite the general order of operation:
-        // try out lower order interpolation for fix-point interpolation in Gauge.h
-        //
-        if (loc_order == 0) loc_order = order;
-        // This routine does interpolation in radial direction, calls ()(i,theta,j) to do 
-        // interpolation in theta direction
-        // if no ilo provided, first find ilo so that r(ilo) <= rl < r(ilo+1):
-        if (ilo < 0) ilo = grid->i_ind(rl);
-        // now make ilo lowest index of interpolation stencil:
-        ilo -= loc_order / 2 - 1;
-        // CHECK: is the following needed?
-        // make sure that we interpolate only between positive r gridpoints...
-        // CHECK!!!
-        // if (ilo < N_g) ilo = N_g;
-        // ... and that we take care of upper boundary
-        if (ilo > nr - loc_order) ilo = nr - loc_order;
-        //    cout << " ilo : " << ilo << endl;
-        Doub* ra, * ya;
-        ra = new Doub[loc_order];      // allocate data arrays... 
-        ya = new Doub[loc_order];
-        for (int i = 0; i < loc_order; i++) {
-            ra[i] = (*r_p)[ilo + i];      // ...and fill them with data
-            ya[i] = (*this)(ilo + i, theta, k);
-        }
-        //
-        // Now follow numerical recipes routine Poly_interp
-        // 
-        Doub* c, * d;
-        c = new Doub[loc_order];      // allocate arrays that store differenes in tableaus
-        d = new Doub[loc_order];
-        Doub dif = abs(rl - ra[0]);
-        Doub dift;
-        int ns = 0;
-        for (int i = 0; i < loc_order; i++) {
-            if ((dift = abs(rl - ra[i])) < dif) {
-                ns = i;
-                dif = dift;
-            }
-            c[i] = ya[i];
-            d[i] = ya[i];
-        }
-        Doub y = ya[ns--];
-        Doub den, ho, hp, w, dy;
-        for (int m = 1; m < loc_order; m++) {
-            for (int i = 0; i < loc_order - m; i++) {
-                ho = ra[i] - rl;
-                hp = ra[i + m] - rl;
-                w = c[i + 1] - d[i];
-                den = ho - hp;
-                den = w / den;
-                d[i] = hp * den;
-                c[i] = ho * den;
-            }
-            y += (dy = (2 * (ns + 1) < (loc_order - m) ? c[ns + 1] : d[ns--]));
-        }
-        delete ra;
-        delete ya;
-        delete c;
-        delete d;
-        return y;
-    };
+    double operator()(double rl, double theta, int k,
+        int loc_order = 0, int ilo = -1);
+
     //================================================
     // Interpolator to arbitrary value of phi >= 0
     //================================================
     //
-    Doub operator()(int i, int j, double phi) {
-        // first find klo
-        int klo = grid->k_ind(phi);
-        klo -= order / 2 - 1;
-        if (klo < 0) klo = 0;
-        if (klo > np - order) klo = np - order; // take care of upper boundary
-        //    cout << " m = " << m << ", jlo : " << jlo << endl;
-        Doub* ta, * ya;
-        ta = new Doub[order];      // allocate data arrays... 
-        ya = new Doub[order];
-        for (int k = 0; k < order; k++) {
-            ta[k] = (*phi_p)[klo + k];      // ...and fill them with data
-            ya[k] = v[i][j][klo + k];
-        }
-        //
-        // Now follow numerical recipes routine Poly_interp
-        // 
-        Doub* c, * d;
-        c = new Doub[order];  // allocate arrays that store differenes in tableaus
-        d = new Doub[order];
-        Doub dif = abs(phi - ta[0]);
-        Doub dift;
-        int ns = 0;
-        for (int k = 0; k < order; k++) {
-            if ((dift = abs(phi - ta[k])) < dif) {
-                ns = k;
-                dif = dift;
-            }
-            c[k] = ya[k];
-            d[k] = ya[k];
-        }
-        Doub y = ya[ns--];
-        Doub den, ho, hp, w, dy;
-        for (int m = 1; m < order; m++) {
-            for (int k = 0; k < order - m; k++) {
-                ho = ta[k] - phi;
-                hp = ta[k + m] - phi;
-                w = c[k + 1] - d[k];
-                den = ho - hp;
-                den = w / den;
-                d[k] = hp * den;
-                c[k] = ho * den;
-            }
-            y += (dy = (2 * (ns + 1) < (order - m) ? c[ns + 1] : d[ns--]));
-        }
-        delete ta;
-        delete ya;
-        delete c;
-        delete d;
-        return y;
-    }
+    double operator()(int i, int j, double phi);
+
     //================================================
     // surface integral
     //================================================
-    Doub surface_integral(int i) {
-        Doub integral = 0.0;
-        int min_ang = 2 * N_g + 2;  // minimum number of ang. grid points
-#ifdef AXISYMMETRY
-        if (nt == min_ang) {
-            //
-            // spherical symmetry
-            // 
-            integral = 4.0 * PI * v[i][N_g][N_g];
-        } else {
-            //
-            // just axisymmetry
-            //
-            for (int j = N_g; j < nt - N_g; j++) {
-                integral += 2.0 * PI * (*st_p)[j] * v[i][j][N_g] * delta_y / dydtheta(j);
-            }
-#ifdef EQSYMMETRY
-            integral *= 2.0;
-#endif
-        }
-#else
-        if ((nt == min_ang) && (np == min_ang)) {
-            //
-            // spherical symmetry
-            //
-            //      cout << "GRIDFUNCTION: assuming spherical symmetry in surface integral." << endl;
-            integral = 4.0 * PI * v[i][N_g][N_g];
-        } else if (np == min_ang) {
-            //
-            // axisymmetry
-            //
-            for (int j = N_g; j < nt - N_g; j++) {
-                integral += 2.0 * PI * (*st_p)[j] * v[i][j][N_g] * delta_y / dydtheta(j);
-            }
-#ifdef EQSYMMETRY
-            integral *= 2.0;
-#endif
-        } else {
-            //
-            // no symmetry
-            //
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    integral += (*st_p)[j] * v[i][j][k] * delta_y * delta_phi / dydtheta(j);
-                }
-#ifdef EQSYMMETRY
-            integral *= 2.0;
-#endif
-        }
-#endif  /* AXISYMMETRY */
-        return integral * r(i) * r(i);
-    };
+    double surface_integral(int i);
+
     //================================================
     // Write check-point file
     // NOTE: This logic has to match that in INDATA/ReadFromCheckPoint.setup_gf
     //================================================
-    bool checkpoint(int timestep) {
-        // cout << " GRIDFUNCTION: writing checkpoint file for function "
-        //	 << name << endl;
-        ofstream outfile;
-        ostringstream outfilename;
-        outfilename << name << "_" << setfill('0') << setw(8) << timestep << ".cpt" << ends;
-        outfile.open(outfilename.str().c_str());
-        if (!outfile) {
-            cerr << " Could not open file " << outfilename.str().c_str() << endl;
-            return false;
-        }
-        for (int i = N_g; i < nr; i++)
-            for (int j = N_g; j < nt - N_g; j++)
-                for (int k = N_g; k < np - N_g; k++) {
-                    outfile << setprecision(16) << v[i][j][k] << endl;
-                }
-        outfile.close();
-        return true;
-    }
+    bool checkpoint(int timestep);
+
     //================================================
     // Regrid
     //================================================
-    int Regrid(VecDoub r_new) {
-        // sanity check:
-        if (nr != r_new.size()) {
-            cerr << " r_new has wrong size in gridfunction.Regrid()! " << endl;
-        }
-        // interpolate to new grid:
-        // 
-        // allocate temporary storage for interpolated functions along
-        // one ray
-        VecDoub fct(nr);
-        // first go to each "ray"
-        for (int j = N_g; j < nt - N_g; j++)
-            for (int k = N_g; k < np - N_g; k++) {
-                // now do interpolations for this ray to temp storage
-                for (int i = N_g; i < nr; i++) {
-                    fct[i] = (*this)(r_new[i], j, k);
-                    //	  if ( ((*this).GridFunctionNumber() == 18) && ( j==2 ) && (k == 2))
-                    //	    cout << " In Regrid: " << r_new[i] << "  " << fct[i] << endl;
-                }
-                // once entire ray has been interpolated, copy data
-                for (int i = N_g; i < nr; i++)
-                    v[i][j][k] = fct[i];
-            }
-        // once we're done with all interior grids, fill ghosts
-        (*this).fill_ghosts();
-        return 1;
-    }
+    int Regrid(VecDoub r_new);
+
     //================================================
     // Destructor
     //================================================
-    ~gf3d() {
-        //      delete st_p;
-        if (v != NULL) {
-            //	cout << " deleting gf3d... " << name << endl; 
-            delete[](v[0][0]);
-            delete[](v[0]);
-            delete[](v);
-        }
-    }
+    ~gf3d();
+
 };
 
 #endif  /* GF_H */
+
+
+
+
+
+
+
+
+
+
+
+//     //    
+//     //================================================
+//     //================================================
+//     // OLD INLINE Derivative operators 
+//     //================================================
+//     //================================================
+
+//     //
+//     // flat Laplace operator
+//     //
+//     inline double Laplace(int i, int j, int k) {
+//         return ddr(i, j, k) + 2.0 * dr(i, j, k) / r(i)
+//             + (ddtheta(i, j, k) + (*ct_p)[j] * dtheta(i, j, k) / (*st_p)[j]
+//                 + ddphi(i, j, k) / ((*st_p)[j] * (*st_p)[j])) / (r(i) * r(i));
+//     }
+
+//     //
+//     // flat Laplace operator to second order
+//     //
+//     inline double Laplace_so(int i, int j, int k) {
+//         return ddr_so(i, j, k) + 2.0 * dr_so(i, j, k) / r(i)
+//             + (ddtheta_so(i, j, k) + (*ct_p)[j] * dtheta_so(i, j, k) / (*st_p)[j]
+//                 + ddphi_so(i, j, k) / ((*st_p)[j] * (*st_p)[j])) / (r(i) * r(i));
+//     }
+
+//     //
+//     // first derivatives
+//     // 
+//     inline double dr(int i, int j, int k) {
+//     #ifdef EIGHTHORDER
+//         return Inv840dx * (-3.0 * (v[i + 4][j][k] - v[i - 4][j][k])
+//             + 32.0 * (v[i + 3][j][k] - v[i - 3][j][k])
+//             - 168.0 * (v[i + 2][j][k] - v[i - 2][j][k])
+//             + 672.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * dxdr(i);
+//     #elif SIXTHORDER
+//         return Inv60dx * (v[i + 3][j][k] - v[i - 3][j][k] -
+//             9.0 * (v[i + 2][j][k] - v[i - 2][j][k]) +
+//             45.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * dxdr(i);
+//     #else /* fourth-order by default... */
+//         return (v[i - 2][j][k] - 8.0 * (v[i - 1][j][k] - v[i + 1][j][k]) - v[i + 2][j][k]) * Inv12dx * dxdr(i);
+//     #endif  /* ORDER... */
+//     }
+
+//     inline double dtheta(int i, int j, int k) {
+//     #ifdef EIGHTHORDER
+//         return Inv840dy * (-3.0 * (v[i][j + 4][k] - v[i][j - 4][k])
+//             + 32.0 * (v[i][j + 3][k] - v[i][j - 3][k])
+//             - 168.0 * (v[i][j + 2][k] - v[i][j - 2][k])
+//             + 672.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * dydtheta(j);
+//     #elif SIXTHORDER
+//         return Inv60dy * (v[i][j + 3][k] - v[i][j - 3][k]
+//             - 9.0 * (v[i][j + 2][k] - v[i][j - 2][k])
+//             + 45.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * dydtheta(j);
+//     #else
+//         return (v[i][j - 2][k] - 8.0 * (v[i][j - 1][k] - v[i][j + 1][k]) - v[i][j + 2][k]) * Inv12dy * dydtheta(j);
+//     #endif  /* ORDER... */
+//     }
+
+//     inline double dphi(int i, int j, int k) {
+//     #ifdef AXISYMMETRY
+//         return 0.0;
+//     #else
+//         return (v[i][j][k - 2] - 8.0 * (v[i][j][k - 1] - v[i][j][k + 1]) - v[i][j][k + 2]) * Inv12dphi;
+//     #endif  /* AXISYMMETRY */
+//     }
+
+//     //
+//     // second derivatives
+//     //
+//     inline double ddr(int i, int j, int k) {
+//     #ifdef EIGHTHORDER
+//         return Inv5040dxdx * (-9.0 * (v[i + 4][j][k] + v[i - 4][j][k])
+//             + 128.0 * (v[i + 3][j][k] + v[i - 3][j][k])
+//             - 1008.0 * (v[i + 2][j][k] + v[i - 2][j][k])
+//             + 8064.0 * (v[i + 1][j][k] + v[i - 1][j][k])
+//             - 14350.0 * v[i][j][k]) * dxdr(i) * dxdr(i) +
+//             Inv840dx * (-3.0 * (v[i + 4][j][k] - v[i - 4][j][k])
+//                 + 32.0 * (v[i + 3][j][k] - v[i - 3][j][k])
+//                 - 168.0 * (v[i + 2][j][k] - v[i - 2][j][k])
+//                 + 672.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * ddxdr(i);
+
+//     #elif SIXTHORDER
+//         return Inv180dxdx * (2.0 * (v[i + 3][j][k] + v[i - 3][j][k]) -
+//             27.0 * (v[i + 2][j][k] + v[i - 2][j][k]) +
+//             270.0 * (v[i + 1][j][k] + v[i - 1][j][k]) -
+//             490.0 * v[i][j][k]) * dxdr(i) * dxdr(i) +
+//             Inv60dx * (v[i + 3][j][k] - v[i - 3][j][k] -
+//                 9.0 * (v[i + 2][j][k] - v[i - 2][j][k]) +
+//                 45.0 * (v[i + 1][j][k] - v[i - 1][j][k])) * ddxdr(i);
+//     #else
+//         return (-(v[i - 2][j][k] + v[i + 2][j][k]) - 30.0 * v[i][j][k] + 16.0 * (v[i + 1][j][k] + v[i - 1][j][k])) *
+//             Inv12dxdx * (dxdr(i) * dxdr(i)) +
+//             (v[i - 2][j][k] - 8.0 * (v[i - 1][j][k] - v[i + 1][j][k]) - v[i + 2][j][k]) * Inv12dx * ddxdr(i);
+//     #endif   /* ORDER... */
+//     }
+
+//     inline double ddtheta(int i, int j, int k) {
+//     #ifdef EIGHTHORDER
+//         return Inv5040dydy * (-9.0 * (v[i][j + 4][k] + v[i][j - 4][k])
+//             + 128.0 * (v[i][j + 3][k] + v[i][j - 3][k])
+//             - 1008.0 * (v[i][j + 2][k] + v[i][j - 2][k])
+//             + 8064.0 * (v[i][j + 1][k] + v[i][j - 1][k])
+//             - 14350.0 * v[i][j][k]) * dydtheta(j) * dydtheta(j) +
+//             Inv840dy * (-3.0 * (v[i][j + 4][k] - v[i][j - 4][k])
+//                 + 32.0 * (v[i][j + 3][k] - v[i][j - 3][k])
+//                 - 168.0 * (v[i][j + 2][k] - v[i][j - 2][k])
+//                 + 672.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * ddydtheta(j);
+//     #elif SIXTHORDER
+//         return Inv180dydy * (2.0 * (v[i][j + 3][k] + v[i][j - 3][k]) -
+//             27.0 * (v[i][j + 2][k] + v[i][j - 2][k]) +
+//             270.0 * (v[i][j + 1][k] + v[i][j - 1][k]) -
+//             490.0 * v[i][j][k]) * dydtheta(j) * dydtheta(j) +
+//             Inv60dy * (v[i][j + 3][k] - v[i][j - 3][k] -
+//                 9.0 * (v[i][j + 2][k] - v[i][j - 2][k]) +
+//                 45.0 * (v[i][j + 1][k] - v[i][j - 1][k])) * ddydtheta(j);
+//     #else
+//         return (-(v[i][j - 2][k] + v[i][j + 2][k]) - 30.0 * v[i][j][k] + 16.0 * (v[i][j + 1][k] + v[i][j - 1][k])) *
+//             Inv12dydy * (dydtheta(j) * dydtheta(j)) +
+//             (v[i][j - 2][k] - 8.0 * (v[i][j - 1][k] - v[i][j + 1][k]) - v[i][j + 2][k]) * Inv12dy * ddydtheta(j);
+//     #endif  /* ORDER */
+//     }
+
+//     inline double ddphi(int i, int j, int k) {
+//     #ifdef AXISYMMETRY
+//         return 0.0;
+//     #else
+//         return (-(v[i][j][k - 2] + v[i][j][k + 2]) - 30.0 * v[i][j][k] + 16.0 * (v[i][j][k + 1] + v[i][j][k - 1])) *
+//             Inv12dphidphi;
+//     #endif  /* AXISYMMETRY */
+//     }
+
+//     //
+//     // mixed second derivatives
+//     //  
+//     inline double dthetadr(int i, int j, int k) { return drdtheta(i, j, k); }
+//     inline double drdtheta(int i, int j, int k) {
+//     #ifdef EIGHTHORDER
+//         return (
+//             -3.0 * (-3.0 * (v[i + 4][j + 4][k] - v[i + 4][j - 4][k]) + 32.0 * (v[i + 4][j + 3][k] - v[i + 4][j - 3][k]) - 168.0 * (v[i + 4][j + 2][k] - v[i + 4][j - 2][k]) + 672.0 * (v[i + 4][j + 1][k] - v[i + 4][j - 1][k]))
+//             + 32.0 * (-3.0 * (v[i + 3][j + 4][k] - v[i + 3][j - 4][k]) + 32.0 * (v[i + 3][j + 3][k] - v[i + 3][j - 3][k]) - 168.0 * (v[i + 3][j + 2][k] - v[i + 3][j - 2][k]) + 672.0 * (v[i + 3][j + 1][k] - v[i + 3][j - 1][k]))
+//             - 168.0 * (-3.0 * (v[i + 2][j + 4][k] - v[i + 2][j - 4][k]) + 32.0 * (v[i + 2][j + 3][k] - v[i + 2][j - 3][k]) - 168.0 * (v[i + 2][j + 2][k] - v[i + 2][j - 2][k]) + 672.0 * (v[i + 2][j + 1][k] - v[i + 2][j - 1][k]))
+//             + 672.0 * (-3.0 * (v[i + 1][j + 4][k] - v[i + 1][j - 4][k]) + 32.0 * (v[i + 1][j + 3][k] - v[i + 1][j - 3][k]) - 168.0 * (v[i + 1][j + 2][k] - v[i + 1][j - 2][k]) + 672.0 * (v[i + 1][j + 1][k] - v[i + 1][j - 1][k]))
+//             - 672.0 * (-3.0 * (v[i - 1][j + 4][k] - v[i - 1][j - 4][k]) + 32.0 * (v[i - 1][j + 3][k] - v[i - 1][j - 3][k]) - 168.0 * (v[i - 1][j + 2][k] - v[i - 1][j - 2][k]) + 672.0 * (v[i - 1][j + 1][k] - v[i - 1][j - 1][k]))
+//             + 168.0 * (-3.0 * (v[i - 2][j + 4][k] - v[i - 2][j - 4][k]) + 32.0 * (v[i - 2][j + 3][k] - v[i - 2][j - 3][k]) - 168.0 * (v[i - 2][j + 2][k] - v[i - 2][j - 2][k]) + 672.0 * (v[i - 2][j + 1][k] - v[i - 2][j - 1][k]))
+//             - 32.0 * (-3.0 * (v[i - 3][j + 4][k] - v[i - 3][j - 4][k]) + 32.0 * (v[i - 3][j + 3][k] - v[i - 3][j - 3][k]) - 168.0 * (v[i - 3][j + 2][k] - v[i - 3][j - 2][k]) + 672.0 * (v[i - 3][j + 1][k] - v[i - 3][j - 1][k]))
+//             + 3.0 * (-3.0 * (v[i - 4][j + 4][k] - v[i - 4][j - 4][k]) + 32.0 * (v[i - 4][j + 3][k] - v[i - 4][j - 3][k]) - 168.0 * (v[i - 4][j + 2][k] - v[i - 4][j - 2][k]) + 672.0 * (v[i - 4][j + 1][k] - v[i - 4][j - 1][k]))
+//             ) *
+//             Inv840dx * Inv840dy * dxdr(i) * dydtheta(j);
+//     #elif SIXTHORDER
+//         return (
+//             (v[i + 3][j + 3][k] - v[i + 3][j - 3][k] - 9.0 * (v[i + 3][j + 2][k] - v[i + 3][j - 2][k]) + 45.0 * (v[i + 3][j + 1][k] - v[i + 3][j - 1][k]))
+//             - 9.0 * (v[i + 2][j + 3][k] - v[i + 2][j - 3][k] - 9.0 * (v[i + 2][j + 2][k] - v[i + 2][j - 2][k]) + 45.0 * (v[i + 2][j + 1][k] - v[i + 2][j - 1][k]))
+//             + 45.0 * (v[i + 1][j + 3][k] - v[i + 1][j - 3][k] - 9.0 * (v[i + 1][j + 2][k] - v[i + 1][j - 2][k]) + 45.0 * (v[i + 1][j + 1][k] - v[i + 1][j - 1][k]))
+//             - 45.0 * (v[i - 1][j + 3][k] - v[i - 1][j - 3][k] - 9.0 * (v[i - 1][j + 2][k] - v[i - 1][j - 2][k]) + 45.0 * (v[i - 1][j + 1][k] - v[i - 1][j - 1][k]))
+//             + 9.0 * (v[i - 2][j + 3][k] - v[i - 2][j - 3][k] - 9.0 * (v[i - 2][j + 2][k] - v[i - 2][j - 2][k]) + 45.0 * (v[i - 2][j + 1][k] - v[i - 2][j - 1][k]))
+//             - (v[i - 3][j + 3][k] - v[i - 3][j - 3][k] - 9.0 * (v[i - 3][j + 2][k] - v[i - 3][j - 2][k]) + 45.0 * (v[i - 3][j + 1][k] - v[i - 3][j - 1][k]))) *
+//             Inv60dx * Inv60dy * dxdr(i) * dydtheta(j);
+//     #else
+//         return (
+//             (v[i - 2][j - 2][k] - 8.0 * (v[i - 2][j - 1][k] - v[i - 2][j + 1][k]) - v[i - 2][j + 2][k])
+//             - 8.0 * (v[i - 1][j - 2][k] - 8.0 * (v[i - 1][j - 1][k] - v[i - 1][j + 1][k]) - v[i - 1][j + 2][k])
+//             + 8.0 * (v[i + 1][j - 2][k] - 8.0 * (v[i + 1][j - 1][k] - v[i + 1][j + 1][k]) - v[i + 1][j + 2][k])
+//             - (v[i + 2][j - 2][k] - 8.0 * (v[i + 2][j - 1][k] - v[i + 2][j + 1][k]) - v[i + 2][j + 2][k])) *
+//             Inv12dx * Inv12dy * dxdr(i) * dydtheta(j);
+//     #endif
+//     }
+
+//     inline double dphidr(int i, int j, int k) { return drdphi(i, j, k); }
+//     inline double drdphi(int i, int j, int k) {
+//     #ifdef AXISYMMETRY
+//         return 0.0;
+//     #else
+//         return ((v[i - 2][j][k - 2] - 8.0 * (v[i - 2][j][k - 1] - v[i - 2][j][k + 1]) - v[i - 2][j][k + 2])
+//             - 8.0 * (v[i - 1][j][k - 2] - 8.0 * (v[i - 1][j][k - 1] - v[i - 1][j][k + 1]) - v[i - 1][j][k + 2])
+//             + 8.0 * (v[i + 1][j][k - 2] - 8.0 * (v[i + 1][j][k - 1] - v[i + 1][j][k + 1]) - v[i + 1][j][k + 2])
+//             - (v[i + 2][j][k - 2] - 8.0 * (v[i + 2][j][k - 1] - v[i + 2][j][k + 1]) - v[i + 2][j][k + 2])) *
+//             Inv12dx * Inv12dphi * dxdr(i);
+//     #endif  /* AXISYMMETRY */
+//     }
+//     inline double dphidtheta(int i, int j, int k) { return dthetadphi(i, j, k); }
+//     inline double dthetadphi(int i, int j, int k) {
+//     #ifdef AXISYMMETRY
+//         return 0.0;
+//     #else
+//         return ((v[i][j - 2][k - 2] - 8.0 * (v[i][j - 2][k - 1] - v[i][j - 2][k + 1]) - v[i][j - 2][k + 2])
+//             - 8.0 * (v[i][j - 1][k - 2] - 8.0 * (v[i][j - 1][k - 1] - v[i][j - 1][k + 1]) - v[i][j - 1][k + 2])
+//             + 8.0 * (v[i][j + 1][k - 2] - 8.0 * (v[i][j + 1][k - 1] - v[i][j + 1][k + 1]) - v[i][j + 1][k + 2])
+//             - (v[i][j + 2][k - 2] - 8.0 * (v[i][j + 2][k - 1] - v[i][j + 2][k + 1]) - v[i][j + 2][k + 2])) *
+//             Inv12dy * Inv12dphi * dydtheta(j);
+//     #endif  /* AXISYMMETRY */
+//     }
+
+//     //
+//     // second-order versions of second derivatives
+//     //
+//     inline double ddr_so(int i, int j, int k) {
+//         return (-2.0 * v[i][j][k] + (v[i + 1][j][k] + v[i - 1][j][k])) / (delta_x * delta_x)
+//             * (dxdr(i) * dxdr(i)) +
+//             (v[i + 1][j][k] - v[i - 1][j][k]) / (2.0 * delta_x) * ddxdr(i);
+//     }
+
+//     inline double ddtheta_so(int i, int j, int k) {
+//         return (-2.0 * v[i][j][k] + (v[i][j + 1][k] + v[i][j - 1][k])) / (delta_y * delta_y)
+//             * (dydtheta(j) * dydtheta(j)) +
+//             (v[i][j + 1][k] - v[i][j - 1][k]) / (2.0 * delta_y) * ddydtheta(j);
+//     }
+
+//     inline double ddphi_so(int i, int j, int k) {
+//     #ifdef AXISYMMETRY
+//         return 0.0;
+//     #else
+//         return (-2.0 * v[i][j][k] + (v[i][j][k + 1] + v[i][j][k - 1])) / (delta_phi * delta_phi);
+//     #endif  /* AXISYMMETRY */
+//     }
+
+//     //
+//     // second-order versions of first derivatives
+//     //
+//     inline double dr_so(int i, int j, int k) {
+//         return (v[i + 1][j][k] - v[i - 1][j][k]) / (2.0 * delta_x) * dxdr(i);
+//     }
+//     inline double dtheta_so(int i, int j, int k) {
+//         return (v[i][j + 1][k] - v[i][j - 1][k]) / (2.0 * delta_y) * dydtheta(j);
+//     }
+//     inline double dphi_so(int i, int j, int k) {
+//     #ifdef AXISYMMETRY
+//         return 0.0;
+//     #else
+//         return (v[i][j][k + 1] - v[i][j][k - 1]) / (2.0 * delta_phi);
+//     #endif
+//     }
+
+//     inline double dthetadr_so(int i, int j, int k) { return drdtheta_so(i, j, k); }
+//     inline double drdtheta_so(int i, int j, int k) {
+//         return (v[i + 1][j + 1][k] - v[i + 1][j - 1][k] - v[i - 1][j + 1][k] + v[i - 1][j - 1][k])
+//             / (4.0 * delta_x * delta_y) * dxdr(i) * dydtheta(j);
+//     }
+//     inline double dphidr_so(int i, int j, int k) { return drdphi_so(i, j, k); }
+//     inline double drdphi_so(int i, int j, int k) {
+// #ifdef AXISYMMETRY
+//         return 0.0;
+// #else
+//         return (v[i - 1][j][k - 1] - v[i - 1][j][k + 1] - v[i + 1][j][k - 1] + v[i + 1][j][k + 1])
+//             / (4.0 * delta_x * delta_phi) * dxdr(i);
+// #endif
+//     }
+//     inline double dphidtheta_so(int i, int j, int k) { return dthetadphi_so(i, j, k); }
+//     inline double dthetadphi_so(int i, int j, int k) {
+// #ifdef AXISYMMETRY
+//         return 0.0;
+// #else
+//         return (v[i][j - 1][k - 1] - v[i][j - 1][k + 1] - v[i][j + 1][k - 1] + v[i][j + 1][k + 1])
+//             / (4.0 * delta_y * delta_phi) * dydtheta(j);
+// #endif
+//     }
+//     //
+//     // first derivatives in UPWIND differencing (NOTE: same name for routine, but extra argument for shift) 
+//     // 
+//     inline double dr(int i, int j, int k, double shift) {
+//         if (shift < 0.0) {
+// #if defined SIXTHORDER || defined EIGHTHORDER
+//             return (v[i - 4][j][k] - 8.0 * v[i - 3][j][k] + 30.0 * v[i - 2][j][k] - 80.0 * v[i - 1][j][k] + 35.0 * v[i][j][k] + 24.0 * v[i + 1][j][k] - 2.0 * v[i + 2][j][k])
+//                 * Inv60dx * dxdr(i);
+// #else
+//             return   (-0.5 * v[i - 3][j][k] + 3.0 * v[i - 2][j][k] - 9.0 * v[i - 1][j][k] + 5.0 * v[i][j][k] + 1.5 * v[i + 1][j][k])
+//                 * Inv6dx * dxdr(i);
+// #endif  /* ORDER */
+//         }
+//         else {   // now shift > 0...
+// #if defined SIXTHORDER || defined EIGHTHORDER
+//             return -(v[i + 4][j][k] - 8.0 * v[i + 3][j][k] + 30.0 * v[i + 2][j][k] - 80.0 * v[i + 1][j][k] + 35.0 * v[i][j][k] + 24.0 * v[i - 1][j][k] - 2.0 * v[i - 2][j][k])
+//                 * Inv60dx * dxdr(i);
+// #else
+//             return -(-0.5 * v[i + 3][j][k] + 3.0 * v[i + 2][j][k] - 9.0 * v[i + 1][j][k] + 5.0 * v[i][j][k] + 1.5 * v[i - 1][j][k])
+//                 * Inv6dx * dxdr(i);
+// #endif  /* ORDER */
+//         }
+//     }
+//     inline double dtheta(int i, int j, int k, double shift) {
+//         if (shift < 0.0) {
+// #if defined SIXTHORDER || defined EIGHTHORDER
+//             return (v[i][j - 4][k] - 8.0 * v[i][j - 3][k] + 30.0 * v[i][j - 2][k] - 80.0 * v[i][j - 1][k] + 35.0 * v[i][j][k] + 24.0 * v[i][j + 1][k] - 2.0 * v[i][j + 2][k])
+//                 * Inv60dy * dydtheta(j);
+// #else
+//             return   (-0.5 * v[i][j - 3][k] + 3.0 * v[i][j - 2][k] - 9.0 * v[i][j - 1][k] + 5.0 * v[i][j][k] + 1.5 * v[i][j + 1][k])
+//                 * Inv6dy * dydtheta(j);
+// #endif  /* ORDER */
+//         }
+//         else { // now shift > 0...
+// #if defined SIXTHORDER || defined EIGHTHORDER
+//             return -(v[i][j + 4][k] - 8.0 * v[i][j + 3][k] + 30.0 * v[i][j + 2][k] - 80.0 * v[i][j + 1][k] + 35.0 * v[i][j][k] + 24.0 * v[i][j - 1][k] - 2.0 * v[i][j - 2][k])
+//                 * Inv60dy * dydtheta(j);
+// #else
+//             return -(-0.5 * v[i][j + 3][k] + 3.0 * v[i][j + 2][k] - 9.0 * v[i][j + 1][k] + 5.0 * v[i][j][k] + 1.5 * v[i][j - 1][k])
+//                 * Inv6dy * dydtheta(j);
+// #endif  /* ORDER */
+//         }
+//     }
+//     inline double dphi(int i, int j, int k, double shift) {
+// #ifdef AXISYMMETRY
+//         return 0.0;
+// #else
+//         if (shift < 0.0)
+//             return   (-0.5 * v[i][j][k - 3] + 3.0 * v[i][j][k - 2] - 9.0 * v[i][j][k - 1] + 5.0 * v[i][j][k] + 1.5 * v[i][j][k + 1])
+//             * Inv6dphi;
+//         else
+//             return -(-0.5 * v[i][j][k + 3] + 3.0 * v[i][j][k + 2] - 9.0 * v[i][j][k + 1] + 5.0 * v[i][j][k] + 1.5 * v[i][j][k - 1])
+//             * Inv6dphi;
+// #endif  /* AXISYMMETRY */
+//     }
+//     //
+//     // first derivatives in UPWIND differencing (NOTE: same name for routine, but extra argument for shift) 
+//     // Now third-order versions
+//     //
+//     inline double dr_to(int i, int j, int k, double shift) {
+//         if (shift < 0.0)
+//             return   (v[i - 2][j][k] - 6.0 * v[i - 1][j][k] + 3.0 * v[i][j][k] + 2.0 * v[i + 1][j][k])
+//             * Inv6dx * dxdr(i);
+//         else
+//             return -(v[i + 2][j][k] - 6.0 * v[i + 1][j][k] + 3.0 * v[i][j][k] + 2.0 * v[i - 1][j][k])
+//             * Inv6dx * dxdr(i);
+//     }
+//     inline double dtheta_to(int i, int j, int k, double shift) {
+//         if (shift < 0.0)
+//             return   (v[i][j - 2][k] - 6.0 * v[i][j - 1][k] + 3.0 * v[i][j][k] + 2.0 * v[i][j + 1][k])
+//             * Inv6dy * dydtheta(j);
+//         else
+//             return -(v[i][j + 2][k] - 6.0 * v[i][j + 1][k] + 3.0 * v[i][j][k] + 2.0 * v[i][j - 1][k])
+//             * Inv6dy * dydtheta(j);
+//     }
+//     inline double dphi_to(int i, int j, int k, double shift) {
+// #ifdef AXISYMMETRY
+//         return 0.0;
+// #else
+//         if (shift < 0.0)
+//             return   (v[i][j][k - 2] - 6.0 * v[i][j][k - 1] + 3.0 * v[i][j][k] + 2.0 * v[i][j][k + 1])
+//             * Inv6dphi;
+//         else
+//             return -(v[i][j][k + 2] - 6.0 * v[i][j][k + 1] + 3.0 * v[i][j][k] + 2.0 * v[i][j][k - 1])
+//             * Inv6dphi;
+// #endif  /* AXISYMMETRY */
+//     }
+//     //
+//     // One-sided version (for use at boundaries)
+//     //
+//     inline double dr_OS(int i, int j, int k, double shift) {
+//         // if (shift < 0.0) 
+//         //   return ( Hm2 * v[i-2][j][k] + Hm1 * v[i-1][j][k] + H0 * v[i][j][k]) / Delta_r(i);
+//         // else
+//         //   return ( Gp2 * v[i+2][j][k] + Gp1 * v[i+1][j][k] + G0 * v[i][j][k]) / Delta_r(i);
+//         if (shift < 0.0)
+//             return (v[i - 2][j][k] - 4.0 * v[i - 1][j][k] + 3.0 * v[i][j][k]) / (2.0 * delta_x) * dxdr(i);
+//         else
+//             return -(v[i + 2][j][k] - 4.0 * v[i + 1][j][k] + 3.0 * v[i][j][k]) / (2.0 * delta_x) * dxdr(i);
+//     }
+//     //
+//     // NOTE: these return derivatives * (dx)^3 !
+//     //
+//     inline double d4r(int i, int j, int k) {
+//         return (v[i - 2][j][k] + v[i + 2][j][k] - 4.0 * (v[i - 1][j][k] + v[i + 1][j][k]) + 6.0 * v[i][j][k])
+//             * dxdr(i) / delta_x;
+//         // / (delta_r*delta_r*delta_r*delta_r);
+//     }
+//     inline double d4theta(int i, int j, int k) {
+//         return (v[i][j - 2][k] + v[i][j + 2][k] - 4.0 * (v[i][j - 1][k] + v[i][j + 1][k]) + 6.0 * v[i][j][k])
+//             * dydtheta(j) / delta_y;
+//         // / (delta_theta*delta_theta*delta_theta*delta_theta);
+//     }
+//     inline double d4phi(int i, int j, int k) {
+// #ifdef AXISYMMETRY
+//         return 0.0;
+// #else
+//         return (v[i][j][k - 2] + v[i][j][k + 2] - 4.0 * (v[i][j][k - 1] + v[i][j][k + 1]) + 6.0 * v[i][j][k]) / delta_phi;
+// #endif  /* AXISYMMETRY */
+//     }
+//     inline double d4(int i, int j, int k) {
+//         return d4r(i, j, k) + d4theta(i, j, k) + d4phi(i, j, k);
+//     }
+//     //
+//     // Derivatives for Kreiss-Oliger terms - for a *uniform* grid,
+//     // these return (Delta x)^p \partial_x^{p+1} f 
+//     //
+//     inline double D8r(int i, int j, int k) {
+//         const double zero = 70.0;
+//         const double one = -56.0;
+//         const double two = 28.0;
+//         const double three = -8.0;
+//         const double four = 1.0;
+//         return (four * (v[i + 4][j][k] + v[i - 4][j][k]) +
+//             three * (v[i + 3][j][k] + v[i - 3][j][k]) +
+//             two * (v[i + 2][j][k] + v[i - 2][j][k]) +
+//             one * (v[i + 1][j][k] + v[i - 1][j][k]) +
+//             zero * v[i][j][k]) * dxdr(i) / delta_x;
+//     }
+//     inline double D8theta(int i, int j, int k) {
+//         const double zero = 70.0;
+//         const double one = -56.0;
+//         const double two = 28.0;
+//         const double three = -8.0;
+//         const double four = 1.0;
+//         return (four * (v[i][j + 4][k] + v[i][j - 4][k]) +
+//             three * (v[i][j + 3][k] + v[i][j - 3][k]) +
+//             two * (v[i][j + 2][k] + v[i][j - 2][k]) +
+//             one * (v[i][j + 1][k] + v[i][j - 1][k]) +
+//             zero * v[i][j][k]) * dydtheta(j) / delta_y;
+//     }
+//     inline double D8phi(int i, int j, int k) {
+// #ifdef AXISYMMETRY
+//         return 0.0;
+// #else
+//         const double zero = 70.0;
+//         const double one = -56.0;
+//         const double two = 28.0;
+//         const double three = -8.0;
+//         const double four = 1.0;
+//         return (four * (v[i][j][k + 4] + v[i][j][k - 4]) +
+//             three * (v[i][j][k + 3] + v[i][j][k - 3]) +
+//             two * (v[i][j][k + 2] + v[i][j][k - 2]) +
+//             one * (v[i][j][k + 1] + v[i][j][k - 1]) +
+//             zero * v[i][j][k]) / delta_phi;
+// #endif
+//     }
+//     //
+//     inline double D6r(int i, int j, int k) {
+//         const double zero = -20.0;
+//         const double one = 15.0;
+//         const double two = -6.0;
+//         const double three = 1.0;
+//         return (three * (v[i + 3][j][k] + v[i - 3][j][k]) +
+//             two * (v[i + 2][j][k] + v[i - 2][j][k]) +
+//             one * (v[i + 1][j][k] + v[i - 1][j][k]) +
+//             zero * v[i][j][k]) * dxdr(i) / delta_x;
+//     }
+//     inline double D6theta(int i, int j, int k) {
+//         const double zero = -20.0;
+//         const double one = 15.0;
+//         const double two = -6.0;
+//         const double three = 1.0;
+//         return (three * (v[i][j + 3][k] + v[i][j - 3][k]) +
+//             two * (v[i][j + 2][k] + v[i][j - 2][k]) +
+//             one * (v[i][j + 1][k] + v[i][j - 1][k]) +
+//             zero * v[i][j][k]) * dydtheta(j) / delta_y;
+//     }
+//     inline double D6phi(int i, int j, int k) {
+// #ifdef AXISYMMETRY
+//         return 0.0;
+// #else
+//         const double zero = -20.0;
+//         const double one = 15.0;
+//         const double two = -6.0;
+//         const double three = 1.0;
+//         return (three * (v[i][j][k + 3] + v[i][j][k - 3]) +
+//             two * (v[i][j][k + 2] + v[i][j][k - 2]) +
+//             one * (v[i][j][k + 1] + v[i][j][k - 1]) +
+//             zero * v[i][j][k]) / delta_phi;
+// #endif  /* AXISYMMETRY */
+//     }
+//     inline double KO(int i, int j, int k) {
+//         // see Appendix C in Babiuc et.al, arxiv:0709.3559 
+//         // note wrong sign in (C7); see also eq. (7) in
+//         // Bozzola & Paschalidis, arXiv:2104.06978
+//         double KO_term = 0.0;
+//         if (KO_order == 5)
+//             KO_term = KO_factor * (D6r(i, j, k) + D6theta(i, j, k) + D6phi(i, j, k));
+//         else if (KO_order == 7)
+//             KO_term = KO_factor * (D8r(i, j, k) + D8theta(i, j, k) + D8phi(i, j, k));
+//         else {
+//             cerr << " Kreiss-Oliger of order " << KO_order << " not implemented! " << endl;
+//             exit(1);
+//         }
+//         return KO_term;
+//     }

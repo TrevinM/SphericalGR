@@ -1,8 +1,9 @@
+//================================================
 //
-//=======================================================
-// Now include files for individual types of initial data
-//=======================================================
+// A quick way to include all matter types
 //
+//================================================
+
 #include "InData.h"
 #include "INDATA/LinWave.h"
 #include "INDATA/Schwarzschild.h"

@@ -19,7 +19,6 @@ DualEMWave::DualEMWave(char* indata_input, Grid* grid_i, Cosmology* cosmology) :
         cout << " DUALEMWAVE: Reading initial data parameters from file "
             << indata_input << endl;
     }
-    cout << " About to read file " << endl;
     char buf[600], c;
     infile.get(buf, 100, '='); infile.get(c); infile >> a1_amp;
     infile.get(buf, 100, '='); infile.get(c); infile >> a2_amp;
@@ -35,10 +34,7 @@ DualEMWave::DualEMWave(char* indata_input, Grid* grid_i, Cosmology* cosmology) :
     infile.get(buf, 100, '='); infile.get(c); infile >> tol;
     infile.get(buf, 100, '='); infile.get(c); infile >> tau_star;
     infile.get(buf, 100, '='); infile.get(c); infile >> xi;
-
-    cout << "before ?" << endl;
     infile.get(buf, 600, '='); infile.get(c); infile >> dual_sign;
-    cout << "after ?" << endl;
 
     cout << " DUALEMWAVE: Will set up E&M wave initial data with" << endl;
     cout << "      amplitude parameters a1_amp = " << a1_amp
