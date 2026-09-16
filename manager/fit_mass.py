@@ -20,7 +20,7 @@ def main():
             eta.append(vals[0])
             data.append(vals[1])
 
-    popt, pcov = curve_fit(power_law, eta, data, p0=[lower, 0.377], bounds=([lower, 0], [upper, 1]))
+    popt, pcov = curve_fit(power_law, eta, data, p0=[lower, 0.377], bounds=([lower, 0.1], [upper, 1]))
 
     print(f"{popt[0]} {popt[1]}")
 

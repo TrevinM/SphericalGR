@@ -61,10 +61,10 @@ int main(int argc, char* argv[]) {
     // get rid of old output
     //================================================================
     if (get_rid_of_output == 1) {
-        system("rm -f *_rays_*\n");
-        system("rm -f *_slice_*\n");
-        system("rm -f *Photon*.mon\n");
-        system("rm -f Particles_*_*_*\n");
+        system("rm -f **/*_rays_*\n");
+        system("rm -f **/*_slice_*\n");
+        system("rm -f **/*Photon*.mon\n");
+        system("rm -f **/Particles_*_*_*\n");
     }
 #ifdef AXISYMMETRY
     cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << endl;
@@ -322,12 +322,20 @@ int main(int argc, char* argv[]) {
     //================================================================
     if (success) Container::manager->Integrate(t_max);
     //
-    if (Container::eos != NULL) delete Container::eos;
-    if (Container::profiles != NULL) delete Container::profiles;
-    if (Container::waves != NULL) delete Container::waves;
-    delete Container::gauge;
-    delete Container::slicing;
-    delete Container::cosmology;
+    if (Container::eos != nullptr) delete Container::eos;
+    if (Container::profiles != nullptr) delete Container::profiles;
+    if (Container::waves != nullptr) delete Container::waves;
+
     delete Container::grid;
+    delete Container::manager;
+    delete Container::cosmology;
+    delete Container::indata;
+    delete Container::slicing;
+    delete Container::gauge;
+    delete Container::dump;
+    delete Container::monitor;
+    delete Container::photons;
+    delete Container::checkpoint;
+
     return error;
 }

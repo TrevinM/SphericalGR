@@ -266,9 +266,10 @@ int gf3d::fill_ghosts() {
 //================================================
 void gf3d::derivs_outerboundary(gf3d* fct) {
     //    cout << " using fct " << fct->Name() << " for " << this->Name() << " with wave_speed " << wave_speed <<  endl;
-    for (int j = 0; j < nt; j++) {
-        for (int k = 0; k < np; k++) {
-            for (int i = nr - 1; i >= nr - N_g; i--) {
+#pragma omp parallel for collapse(3)
+    for (int i = nr - 1; i >= nr - N_g; i--) {
+        for (int j = 0; j < nt; j++) {
+            for (int k = 0; k < np; k++) {
                 v[i][j][k] = -wave_speed * (fct->dr_OS(i, j, k, -1) +
                     fall_off * ((*fct)[i][j][k] - background) / (*r_p)[i]);
                 // v[nr-2][j][k] = - wave_speed * ( fct->dr(nr-2,j,k,-1) +
@@ -307,6 +308,7 @@ int gf3d::fill_outerboundary(gf3d& fct_old, double dt) {
         else if (fall_off == -1)
             factor = 1.0 / factor;
         //
+#pragma omp parallel for collapse(2)
         for (int j = 0; j < nt; j++)
             for (int k = 0; k < np; k++) {
                 const double P0 = fct_old[i - 2][j][k];
@@ -863,6 +865,7 @@ Doub gf3d::KO(int i, int j, int k) {
 // take radial derivative of function and store in derivs
 //================================================
 int gf3d::dr(gf3d* derivs) {
+#pragma omp parallel for collapse(3)
     for (int i = N_g; i < nr - N_g; i++)
         for (int j = N_g; j < nt - N_g; j++)
             for (int k = N_g; k < np - N_g; k++) {
@@ -884,6 +887,7 @@ int gf3d::dr(gf3d* derivs) {
     return 1;
 };
 int gf3d::dtheta(gf3d* derivs) {
+#pragma omp parallel for collapse(3)
     for (int i = N_g; i < nr - N_g; i++)
         for (int j = N_g; j < nt - N_g; j++)
             for (int k = N_g; k < np - N_g; k++) {
@@ -910,6 +914,7 @@ int gf3d::dtheta(gf3d* derivs) {
 // utilities...
 //================================================
 void gf3d::add(double factor, gf3d* rhs) {
+#pragma omp parallel for collapse(3)
     for (int i = 0; i < nr; i++)
         for (int j = 0; j < nt; j++)
             for (int k = 0; k < np; k++) {
@@ -917,6 +922,7 @@ void gf3d::add(double factor, gf3d* rhs) {
             }
 };
 void gf3d::add(gf3d* term1, double factor, gf3d* term2) {
+#pragma omp parallel for collapse(3)
     for (int i = 0; i < nr; i++)
         for (int j = 0; j < nt; j++)
             for (int k = 0; k < np; k++) {
@@ -924,6 +930,7 @@ void gf3d::add(gf3d* term1, double factor, gf3d* term2) {
             }
 };
 double gf3d::equals(double value) {
+#pragma omp parallel for collapse(3)
     for (int i = 0; i < nr; i++)
         for (int j = 0; j < nt; j++)
             for (int k = 0; k < np; k++) {
@@ -932,6 +939,7 @@ double gf3d::equals(double value) {
     return value;
 };
 void gf3d::equals(gf3d* rhs) {
+#pragma omp parallel for collapse(3)
     for (int i = 0; i < nr; i++)
         for (int j = 0; j < nt; j++)
             for (int k = 0; k < np; k++) {
@@ -940,6 +948,7 @@ void gf3d::equals(gf3d* rhs) {
 };
 bool gf3d::IsEqualTo(gf3d* rhs) {
     bool equal = true;
+#pragma omp parallel for collapse(3)
     for (int i = 0; i < nr; i++)
         for (int j = 0; j < nt; j++)
             for (int k = 0; k < np; k++) {
@@ -1201,6 +1210,7 @@ double gf3d::radialmin(double theta, int k, double& r_min) {
 }
 bool gf3d::FINITE() {
     bool fine = true;
+#pragma omp parallel for collapse(3)
     for (int i = N_g; i < nr - N_g; i++)
         for (int j = N_g; j < nt - N_g; j++)
             for (int k = N_g; k < np - N_g; k++) {
@@ -1233,8 +1243,8 @@ double gf3d::L2_norm(double r_frac) {
         double rl = (*r_p)[i];
         if (rl < r_frac * grid->r_max())
             for (int j = N_g; j < nt - N_g; j++) {
-                double tl = (*theta_p)[j];
                 for (int k = N_g; k < np - N_g; k++) {
+                    double tl = (*theta_p)[j];
                     const double dr = delta_x / dxdr(i);
                     const double dtheta = delta_y / dydtheta(j);
                     const double SqrtJac = rl * rl * sin(tl) * dr * dtheta * delta_phi;
@@ -1251,6 +1261,7 @@ double gf3d::L2_norm(double r_frac) {
 double gf3d::L2_norm(gf3d& det) {
     double norm = 0.0;
     double vol_int = 0.0;
+#pragma omp parallel for collapse(3)
     for (int i = N_g; i < nr - N_g; i++)
         for (int j = N_g; j < nt - N_g; j++)
             for (int k = N_g; k < np - N_g; k++) {
@@ -1273,6 +1284,7 @@ double gf3d::L2_norm(gf3d& det) {
 //================================================
 double gf3d::PropInt(gf3d& phi, gf3d& det, double low_lim_r) {
     double vol_int = 0.0;
+#pragma omp parallel for
     for (int i = N_g; i < nr - N_g; i++) {
         const double rl = r(i);
         const double r2 = rl * rl;
@@ -1298,6 +1310,7 @@ double gf3d::PropInt(gf3d& phi, gf3d& det, double low_lim_r) {
 }
 double gf3d::PropIntMag(gf3d& phi, gf3d& det, double low_lim_r) {
     double vol_int = 0.0;
+#pragma omp parallel for
     for (int i = N_g; i < nr - N_g; i++) {
         const double rl = r(i);
         const double r2 = rl * rl;

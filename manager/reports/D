@@ -1,0 +1,10 @@
+Wed Sep 16 12:05:18 PM EDT 2026      Suite: D
+Wed Sep 16 12:05:18 PM EDT 2026      Family: DualEM
+Wed Sep 16 12:05:18 PM EDT 2026      Precision: 14
+Wed Sep 16 12:05:18 PM EDT 2026      Cores: 4
+Wed Sep 16 12:05:18 PM EDT 2026      SubTest: sub_lapse.sh
+Wed Sep 16 12:05:18 PM EDT 2026      SupTest: sup_lapse.sh
+Wed Sep 16 12:05:18 PM EDT 2026      FastConv: 0
+Wed Sep 16 12:05:18 PM EDT 2026      Slurm ID: 67828
+Wed Sep 16 12:05:18 PM EDT 2026      ========= Iteration 9 =========
+Wed Sep 16 12:05:19 PM EDT 2026      Etas: 2.93299651 2.93299652 2.93299653 2.93299654 2.93299655 2.93299656 2.93299657 2.93299658 2.93299659

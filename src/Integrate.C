@@ -59,17 +59,18 @@ bool Manager::Integrate(double t_max) {
         //================================================
         //  check whether it's finished
         //================================================ 
-        bool finish_dump = false;
-        bool finish_note = false;
         bool finished = false;
 
-#ifdef FINISHCONIDITION
+#ifdef FINISHCONDITION
         //Flatspace Condition
-        if (last->lapse.min() > 0.9 && t > 5.) {
+        if (last->lapse.min() > 0.8 && t > 5.) {
             finished = true;
-            finish_note = true;
-            finish_dump = true;
-            cout << "Minimum lapse " << last->lapse.min() << " has exceeded 0.9. Ending integration..." << endl;
+            cout << "Minimum lapse " << last->lapse.min() << " has exceeded 0.8. Ending integration..." << endl;
+        }
+        //Supercritical Condition
+        if (last->lapse.min() < 0.0005 && t > 5.) {
+            finished = true;
+            cout << "Minimum lapse " << last->lapse.min() << " has dropped below 0.001. Ending integration..." << endl;
         }
 #endif
 
@@ -142,10 +143,10 @@ bool Manager::Integrate(double t_max) {
         //================================================
         // check whether it's time to note...
         //================================================
-        if (Container::monitor->time_to_note(step) || finish_note) {
+        if (Container::monitor->time_to_note(step) || finished) {
             double ang_mom = constraints->Angular_Momentum(last, curve, aux, i);
             double lin_mom = constraints->Linear_Momentum(last, curve, aux, i);
-            bool force = finish_note;
+            bool force = finished;
             Container::monitor->note(step, t, tau_c, mass, ang_mom,
                 lin_mom, last->phi(0.0, N_g, N_g),
                 last->lapse(0.0, N_g, N_g), last->lapse.min(),
@@ -206,13 +207,11 @@ bool Manager::Integrate(double t_max) {
 
 #ifdef FINISHCONDITION
         if (finished) {
-            if (finish_dump) {
-                last->dump_fcts(t, tau_c, step, "_end");
-                curve->dump_fcts(t, tau_c, step, "_end");
-                aux->dump_fcts(t, tau_c, step, "_end");
-                constraints->dump_fcts(t, tau_c, step, "_end");
-                Container::matter->dump_fcts(t, tau_c, step, "_end");
-            }
+            last->dump_fcts(t, tau_c, step, "_end");
+            curve->dump_fcts(t, tau_c, step, "_end");
+            aux->dump_fcts(t, tau_c, step, "_end");
+            constraints->dump_fcts(t, tau_c, step, "_end");
+            Container::matter->dump_fcts(t, tau_c, step, "_end");
             break;
         }
 #endif
@@ -236,7 +235,7 @@ void Manager::Step_RK4(double& t, double& tau_c) {
     Compute_RHS(t);              // computes derivs from inter
     Container::matter->Compute_RHS(inter, curve, t);
     updates->add(last, dt / 6.0, derivs);
-    Container::matter->Update(dt / 6.0);
+    Container::matter->Update(dt / 6.0); // This only changes inter
     tau_c += inter->lapse(0.0, N_g, N_g) * dt / 6.0;
     //
     // evaluate k_2 at middle point
@@ -244,7 +243,7 @@ void Manager::Step_RK4(double& t, double& tau_c) {
     inter->add(last, 0.5 * dt, derivs);
     inter->fill_ghosts();
     if (char_OB == 1) inter->char_OB(last, 0.5 * dt);
-    curve->Update(inter);
+    curve->Update(inter); // This seems to actually change curve
     Container::matter->Compute_inter(0.5 * dt);
     Container::matter->ADM_Sources(inter, curve);
     Compute_RHS(t + 0.5 * dt);    // always compute derivs from inter

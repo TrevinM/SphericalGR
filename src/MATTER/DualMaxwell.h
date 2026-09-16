@@ -24,7 +24,7 @@ private:
 
     // Matter States
     dualmaxwell_state* last, * derivs, * inter, * updates;
-    dualmaxwell_aux* aux;
+    dualmaxwell_aux* aux, * aux_inter;
 
     // Depreciated
     Monitor* monitor;

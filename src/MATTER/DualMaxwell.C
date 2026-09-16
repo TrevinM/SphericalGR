@@ -153,14 +153,17 @@ void DualMaxwell::dot_a_as(dualmaxwell_state* m, state* s, double time) {
     //
     // now go to each gridpoint
     //
+#pragma omp parallel for collapse(3)
     for (int i = N_g; i < N_r - N_g; i++) {
-        const double rl = grid->r(i);
         for (int j = N_g; j < N_t - N_g; j++) {
-            const double sinthetal = grid->sintheta(j);
-            const double costhetal = grid->costheta(j);
-            const double cotthetal = costhetal / sinthetal;
-            // const double rst = rl*sinthetal;
             for (int k = N_g; k < N_p - N_g; k++) {
+                const double rl = grid->r(i);
+
+                // const double rst = rl*sinthetal;
+                const double sinthetal = grid->sintheta(j);
+                const double costhetal = grid->costheta(j);
+                const double cotthetal = costhetal / sinthetal;
+
                 const double psil = exp(s->phi(i, j, k));
                 const double psi2 = psil * psil;
                 const double psi4 = psil * psil * psil * psil;
@@ -423,14 +426,17 @@ void DualMaxwell::ADM_Sources(state* s, curvature* c) {
     // define 1 / ( 4 \pi )...
     // 
     const double oo4p = 1.0 / (4.0 * PI);
+#pragma omp parallel for collapse(3)
     for (int i = N_g; i < N_r - N_g; i++) {
-        const double rl = grid->r(i);
-        const double r2 = rl * rl;
         for (int j = N_g; j < N_t - N_g; j++) {
-            const double sinthetal = grid->sintheta(j);
-            const double costhetal = grid->costheta(j);
-            const double rst = rl * sinthetal;
             for (int k = N_g; k < N_p - N_g; k++) {
+                const double rl = grid->r(i);
+                const double r2 = rl * rl;
+
+                const double sinthetal = grid->sintheta(j);
+                const double costhetal = grid->costheta(j);
+                const double rst = rl * sinthetal;
+
                 const double psil = exp(s->phi(i, j, k));
                 const double psi2 = psil * psil;
                 const double psi4 = psil * psil * psil * psil;

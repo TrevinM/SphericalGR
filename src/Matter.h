@@ -33,7 +33,7 @@ public:
     //  matter_state * m_state;
     int cowling;    // Cowling approximation 
     // (0: no, 1: fix gravity, 2: fix matter)  
-    ADM_Source_Terms* adm_sources;
+    ADM_Source_Terms* adm_sources, * adm_inter;
     Fluxes* fluxes;
     int N_g, N_r, N_t, N_p;   // number of ghost and grid points
     double PI;
@@ -71,6 +71,7 @@ public:
     // Compute ADM Sources
     //================================================
     virtual void ADM_Sources(state* s, curvature* c) = 0;
+    
     //===============================================
     // Compute RHS sides for matter equations
     //===============================================

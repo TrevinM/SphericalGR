@@ -1,4 +1,5 @@
 #include "DualEMWave.h"
+#include "Container.h"
 
 //================================================
 // Constructor
@@ -53,6 +54,7 @@ DualEMWave::DualEMWave(char* indata_input, Grid* grid_i, Cosmology* cosmology) :
     analytical = false;
     PI = acos(-1.0);
     indata_name << "Dual E&M wave initial data";
+
 };
 
 //================================================

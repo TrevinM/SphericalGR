@@ -1,0 +1,23 @@
+Tue Sep  1 10:20:46 AM EDT 2026      Suite: O
+Tue Sep  1 10:20:46 AM EDT 2026      Family: DualEM
+Tue Sep  1 10:20:46 AM EDT 2026      Precision: 14
+Tue Sep  1 10:20:46 AM EDT 2026      Cores: 4
+Tue Sep  1 10:20:46 AM EDT 2026      SubTest: sub_lapse.sh
+Tue Sep  1 10:20:46 AM EDT 2026      SupTest: sup_lapse.sh
+Tue Sep  1 10:20:46 AM EDT 2026      FastConv: 0
+Tue Sep  1 10:20:46 AM EDT 2026      ========= Iteration 5 =========
+Tue Sep  1 10:20:46 AM EDT 2026      Etas: 13.881 13.882 13.883 13.884 13.885 13.886 13.887 13.888 13.889
+Mon Sep  7 08:58:46 PM EDT 2026      Finished in 154.63 hours on 4 cores
+Mon Sep  7 08:58:46 PM EDT 2026      13.881 sub critical
+Mon Sep  7 08:58:46 PM EDT 2026      changed lower bound
+Mon Sep  7 08:58:47 PM EDT 2026      13.882 sub critical
+Mon Sep  7 08:58:47 PM EDT 2026      changed lower bound
+Mon Sep  7 08:58:47 PM EDT 2026      13.883 SUPER critical
+Mon Sep  7 08:58:47 PM EDT 2026      changed upper bound
+Mon Sep  7 08:58:47 PM EDT 2026      13.884 SUPER critical
+Mon Sep  7 08:58:47 PM EDT 2026      13.885 SUPER critical
+Mon Sep  7 08:58:47 PM EDT 2026      13.886 SUPER critical
+Mon Sep  7 08:58:48 PM EDT 2026      13.887 SUPER critical
+Mon Sep  7 08:58:48 PM EDT 2026      13.888 SUPER critical
+Mon Sep  7 08:58:48 PM EDT 2026      13.889 neither
+Mon Sep  7 08:58:48 PM EDT 2026      Quitting Manager...

@@ -1,0 +1,160 @@
+Tue Sep  1 10:12:01 AM EDT 2026      Suite: ODEq
+Tue Sep  1 10:12:01 AM EDT 2026      Family: DualEM
+Tue Sep  1 10:12:01 AM EDT 2026      Precision: 14
+Tue Sep  1 10:12:01 AM EDT 2026      Cores: 8
+Tue Sep  1 10:12:01 AM EDT 2026      SubTest: sub_lapse.sh
+Tue Sep  1 10:12:01 AM EDT 2026      SupTest: sup_lapse.sh
+Tue Sep  1 10:12:01 AM EDT 2026      FastConv: 0
+Tue Sep  1 10:12:01 AM EDT 2026      New SphericalGR
+Tue Sep  1 10:12:01 AM EDT 2026      ========= Iteration 6 =========
+Traceback (most recent call last):
+  File "/mnt/research/tbaumgar/Students/tmacomber/SphericalGR/manager/sub_fit.py", line 28, in <module>
+    main()
+  File "/mnt/research/tbaumgar/Students/tmacomber/SphericalGR/manager/sub_fit.py", line 17, in main
+    with open("data_sub", 'r') as f:
+         ^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'data_sub'
+Tue Sep  1 10:12:17 AM EDT 2026      Etas: 4.76011 4.76012 4.76013 4.76014 4.76015 4.76016 4.76017 4.76018 4.76019
+Fri Sep  4 03:45:39 AM EDT 2026      Finished in 65.55 hours on 8 cores
+Fri Sep  4 03:45:39 AM EDT 2026      4.76011 sub critical
+Fri Sep  4 03:45:39 AM EDT 2026      changed lower bound
+Fri Sep  4 03:45:39 AM EDT 2026      4.76012 sub critical
+Fri Sep  4 03:45:39 AM EDT 2026      changed lower bound
+Fri Sep  4 03:45:39 AM EDT 2026      4.76013 sub critical
+Fri Sep  4 03:45:39 AM EDT 2026      changed lower bound
+Fri Sep  4 03:45:40 AM EDT 2026      4.76014 sub critical
+Fri Sep  4 03:45:40 AM EDT 2026      changed lower bound
+Fri Sep  4 03:45:40 AM EDT 2026      4.76015 sub critical
+Fri Sep  4 03:45:40 AM EDT 2026      changed lower bound
+(standard_in) 1: syntax error
+(standard_in) 1: syntax error
+Fri Sep  4 03:45:40 AM EDT 2026      4.76016 neither
+Fri Sep  4 03:45:40 AM EDT 2026      4.76017 SUPER critical
+Fri Sep  4 03:45:40 AM EDT 2026      changed upper bound
+Fri Sep  4 03:45:40 AM EDT 2026      4.76018 SUPER critical
+Fri Sep  4 03:45:40 AM EDT 2026      4.76019 SUPER critical
+Fri Sep  4 03:45:40 AM EDT 2026      Quitting Manager...
+Mon Sep  7 08:57:54 AM EDT 2026      Suite: ODEq
+Mon Sep  7 08:57:54 AM EDT 2026      Family: DualEM
+Mon Sep  7 08:57:54 AM EDT 2026      Precision: 14
+Mon Sep  7 08:57:54 AM EDT 2026      Cores: 8
+Mon Sep  7 08:57:54 AM EDT 2026      SubTest: sub_lapse.sh
+Mon Sep  7 08:57:54 AM EDT 2026      SupTest: sup_lapse.sh
+Mon Sep  7 08:57:54 AM EDT 2026      FastConv: 0
+Mon Sep  7 08:57:54 AM EDT 2026      ========= Iteration 7 =========
+Mon Sep  7 08:57:59 AM EDT 2026      Etas: 4.760151 4.760152 4.760153 4.760154 4.760155 4.760156 4.760157 4.760158 4.760159
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+sbatch: error: Currently unable to load job state information, retrying: Unable to contact slurm controller (connect failure)
+Wed Sep  9 08:37:27 PM EDT 2026      Finished in 59.65 hours on 8 cores
+Wed Sep  9 08:37:27 PM EDT 2026      4.760151 sub critical
+Wed Sep  9 08:37:27 PM EDT 2026      changed lower bound
+Wed Sep  9 08:37:27 PM EDT 2026      4.760152 sub critical
+Wed Sep  9 08:37:27 PM EDT 2026      changed lower bound
+Wed Sep  9 08:37:28 PM EDT 2026      4.760153 sub critical
+Wed Sep  9 08:37:28 PM EDT 2026      changed lower bound
+Wed Sep  9 08:37:28 PM EDT 2026      4.760154 sub critical
+Wed Sep  9 08:37:28 PM EDT 2026      changed lower bound
+Wed Sep  9 08:37:28 PM EDT 2026      4.760155 sub critical
+Wed Sep  9 08:37:28 PM EDT 2026      changed lower bound
+Wed Sep  9 08:37:28 PM EDT 2026      4.760156 sub critical
+Wed Sep  9 08:37:28 PM EDT 2026      changed lower bound
+Wed Sep  9 08:37:28 PM EDT 2026      4.760157 sub critical
+Wed Sep  9 08:37:28 PM EDT 2026      changed lower bound
+Wed Sep  9 08:37:29 PM EDT 2026      4.760158 sub critical
+Wed Sep  9 08:37:29 PM EDT 2026      changed lower bound
+Wed Sep  9 08:37:29 PM EDT 2026      4.760159 SUPER critical
+Wed Sep  9 08:37:29 PM EDT 2026      changed upper bound
+Wed Sep  9 08:37:29 PM EDT 2026      ========= Iteration 8 =========
+Wed Sep  9 08:37:30 PM EDT 2026      Etas: 4.7601581 4.7601582 4.7601583 4.7601584 4.7601585 4.7601586 4.7601587 4.7601588 4.7601589
+Sat Sep 12 04:34:28 PM EDT 2026      Finished in 67.94 hours on 8 cores
+Sat Sep 12 04:34:29 PM EDT 2026      4.7601581 sub critical
+Sat Sep 12 04:34:29 PM EDT 2026      changed lower bound
+Sat Sep 12 04:34:29 PM EDT 2026      4.7601582 sub critical
+Sat Sep 12 04:34:29 PM EDT 2026      changed lower bound
+Sat Sep 12 04:34:29 PM EDT 2026      4.7601583 sub critical
+Sat Sep 12 04:34:29 PM EDT 2026      changed lower bound
+Sat Sep 12 04:34:29 PM EDT 2026      4.7601584 sub critical
+Sat Sep 12 04:34:29 PM EDT 2026      changed lower bound
+Sat Sep 12 04:34:29 PM EDT 2026      4.7601585 sub critical
+Sat Sep 12 04:34:29 PM EDT 2026      changed lower bound
+Sat Sep 12 04:34:30 PM EDT 2026      4.7601586 SUPER critical
+Sat Sep 12 04:34:30 PM EDT 2026      changed upper bound
+Sat Sep 12 04:34:30 PM EDT 2026      4.7601587 SUPER critical
+Sat Sep 12 04:34:30 PM EDT 2026      4.7601588 SUPER critical
+Sat Sep 12 04:34:30 PM EDT 2026      4.7601589 SUPER critical
+Sat Sep 12 04:34:30 PM EDT 2026      ========= Iteration 9 =========
+Sat Sep 12 04:34:31 PM EDT 2026      Etas: 4.76015851 4.76015852 4.76015853 4.76015854 4.76015855 4.76015856 4.76015857 4.76015858 4.76015859
+Tue Sep 15 06:09:35 PM EDT 2026      Finished in 73.58 hours on 8 cores
+Tue Sep 15 06:09:35 PM EDT 2026      4.76015851 sub critical
+Tue Sep 15 06:09:35 PM EDT 2026      changed lower bound
+Tue Sep 15 06:09:35 PM EDT 2026      4.76015852 sub critical
+Tue Sep 15 06:09:35 PM EDT 2026      changed lower bound
+Tue Sep 15 06:09:35 PM EDT 2026      4.76015853 sub critical
+Tue Sep 15 06:09:35 PM EDT 2026      changed lower bound
+Tue Sep 15 06:09:36 PM EDT 2026      4.76015854 sub critical
+Tue Sep 15 06:09:36 PM EDT 2026      changed lower bound
+Tue Sep 15 06:09:36 PM EDT 2026      4.76015855 sub critical
+Tue Sep 15 06:09:36 PM EDT 2026      changed lower bound
+Tue Sep 15 06:09:36 PM EDT 2026      4.76015856 SUPER critical
+Tue Sep 15 06:09:36 PM EDT 2026      changed upper bound
+Tue Sep 15 06:09:36 PM EDT 2026      4.76015857 SUPER critical
+Tue Sep 15 06:09:37 PM EDT 2026      4.76015858 SUPER critical
+Tue Sep 15 06:09:37 PM EDT 2026      4.76015859 neither
+Tue Sep 15 06:09:37 PM EDT 2026      Quitting Manager...
+Wed Sep 16 12:11:14 PM EDT 2026      Suite: ODEq
+Wed Sep 16 12:11:14 PM EDT 2026      Family: DualEM
+Wed Sep 16 12:11:14 PM EDT 2026      Precision: 14
+Wed Sep 16 12:11:14 PM EDT 2026      Cores: 8
+Wed Sep 16 12:11:14 PM EDT 2026      SubTest: sub_lapse.sh
+Wed Sep 16 12:11:14 PM EDT 2026      SupTest: sup_lapse.sh
+Wed Sep 16 12:11:14 PM EDT 2026      FastConv: 0
+Wed Sep 16 12:11:14 PM EDT 2026      Slurm ID: 67839
+Wed Sep 16 12:11:14 PM EDT 2026      ========= Iteration 10 =========
+/mnt/research/tbaumgar/Students/tmacomber/SphericalGR/manager/sub_fit.py:8: RuntimeWarning: divide by zero encountered in power
+  return np.greater(x_c - x, 0) * np.abs(x_c - x)**(-2*gamma)
+/mnt/research/tbaumgar/Students/tmacomber/SphericalGR/manager/sub_fit.py:8: RuntimeWarning: invalid value encountered in multiply
+  return np.greater(x_c - x, 0) * np.abs(x_c - x)**(-2*gamma)
+Traceback (most recent call last):
+  File "/mnt/research/tbaumgar/Students/tmacomber/SphericalGR/manager/sub_fit.py", line 28, in <module>
+    main()
+  File "/mnt/research/tbaumgar/Students/tmacomber/SphericalGR/manager/sub_fit.py", line 23, in main
+    popt, pcov = curve_fit(power_law, eta, data, p0=[upper, 0.3], bounds=([lower, 0.1], [upper, 1]))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/local/python3.12/lib/python3.12/site-packages/scipy/optimize/_minpack_py.py", line 1011, in curve_fit
+    res = least_squares(func, p0, jac=jac, bounds=bounds, method=method,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/local/python3.12/lib/python3.12/site-packages/scipy/optimize/_lsq/least_squares.py", line 941, in least_squares
+    result = trf(fun_wrapped, jac_wrapped, x0, f0, J0, lb, ub, ftol, xtol,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/local/python3.12/lib/python3.12/site-packages/scipy/optimize/_lsq/trf.py", line 123, in trf
+    return trf_bounds(
+           ^^^^^^^^^^^
+  File "/mnt/local/python3.12/lib/python3.12/site-packages/scipy/optimize/_lsq/trf.py", line 301, in trf_bounds
+    U, s, V = svd(J_augmented, full_matrices=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/local/python3.12/lib/python3.12/site-packages/scipy/linalg/_decomp_svd.py", line 108, in svd
+    a1 = _asarray_validated(a, check_finite=check_finite)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/local/python3.12/lib/python3.12/site-packages/scipy/_lib/_util.py", line 321, in _asarray_validated
+    a = toarray(a)
+        ^^^^^^^^^^
+  File "/mnt/local/python3.12/lib/python3.12/site-packages/numpy/lib/function_base.py", line 630, in asarray_chkfinite
+    raise ValueError(
+ValueError: array must not contain infs or NaNs
+Wed Sep 16 12:11:15 PM EDT 2026      Etas: 4.760158551 4.760158552 4.760158553 4.760158554 4.760158555 4.760158556 4.760158557 4.760158558 4.760158559

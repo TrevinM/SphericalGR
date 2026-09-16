@@ -1,7 +1,6 @@
 #Check if any horizons were found
-bug "Running sup_AH.sh"
 
-if [ -e output/DualMaxwell*.hor_mon ]
+if [ -e **/*.hor_mon ]
 then
     #Check for non header lines
     while read -r line
@@ -11,10 +10,9 @@ then
             exit 1
             break
         fi
-    done < output/DualMaxwell*.hor_mon
+    done < **/*.hor_mon
 
     exit 0
 else
-    log "ERROR: Couldn't open horizon monitor..."
     exit -1
 fi

@@ -87,6 +87,7 @@ target_sources(SphericalGR
     ${CMAKE_CURRENT_SOURCE_DIR}/Integrate.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Matters.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Regrid.C
+    ${CMAKE_CURRENT_SOURCE_DIR}/State.C
     ${CMAKE_CURRENT_SOURCE_DIR}/Tracker.C /
     ${CMAKE_CURRENT_SOURCE_DIR}/Tests.C /
 

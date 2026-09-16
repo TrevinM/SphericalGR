@@ -1,35 +1,26 @@
-#Check for supercritical result using lapse below 0.1
-#Returns 2 if lapse decreases by over 0.2 in one step
+# Check for supercritical result using lapse below 0.1
 
-bug "Running sup_lapse.sh"
-
-if [ -e output/DualMaxwell*.mon ]
-then
-    curr_lapse=0
-    #Get last minimum lapse
-    while read -r line
-    do
-        split=( $line )
-        if [[ ${split[0]} != "#" ]]
-        then
-            new_lapse=${split[7]}
-            #Check for weird end behavior
-            if [[ 1 -eq "$(echo "$curr_lapse - $new_lapse > 0.2" | bc)" ]]
-            then
-                exit 2
-            fi
-            curr_lapse=$new_lapse
-        fi
-    done < output/DualMaxwell*.mon
-    
-    #Check Lapse
-    if [[ 1 -eq "$(echo "$curr_lapse < 0.1" | bc)" ]]
+while read -r line
+do
+    if [[ $line != \#* ]]
     then
-        exit 1
+        mon_split=( $line )
     fi
+done < **/*.mon
+eta=${mon_split[7]}
 
-    exit 0
+#Scientific Notation Check
+if [[ $eta = -*e* || $eta = *e-* ]]
+then
+    eta=0
+elif [[ $eta = e*+* ]]
+then
+    eta=1000
+fi
+
+if [[ 1 -eq "$(echo "$eta < 0.1" | bc)" ]]
+then
+    echo 1
 else
-    log "ERROR: Couldn't open monitor..."
-    exit -1
+    echo 0
 fi

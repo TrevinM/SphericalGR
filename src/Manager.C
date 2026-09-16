@@ -225,7 +225,6 @@ Manager::~Manager() {
     delete curve;
     delete aux;
     delete constraints;
-    delete Container::matter;
     delete horizonfinder;
     cout << " MANAGER: Destructing manager - bye! " << endl;
 }

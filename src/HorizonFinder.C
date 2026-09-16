@@ -395,6 +395,7 @@ double HorizonFinder::Expansion() {
 
     int j_test = -4;
     int k_test = 11;
+#pragma omp parallel for collapse(2)
     for (int j = N_g; j < N_theta - N_g; j++)
         for (int k = N_g; k < N_phi - N_g; k++) {
             bool test = ((j == j_test) && (k == k_test));
@@ -501,7 +502,7 @@ void HorizonFinder::Expansion(gf2d& h_S, gf2d& exp_S, gf2d& nr, gf2d& nt, gf2d& 
     Project(h_S);
     int j_test = -2;
     int k_test = 2;
-
+#pragma omp parallel for collapse(2)
     for (int j = N_g; j < N_theta - N_g; j++)
         for (int k = N_g; k < N_phi - N_g; k++) {
             bool test = ((j == j_test) && (k == k_test));
@@ -604,6 +605,7 @@ void HorizonFinder::Expansion(gf2d& h_S, gf2d& exp_S, gf2d& nr, gf2d& nt, gf2d& 
 // Project 3D functions onto 2D surfaces
 //================================================
 void HorizonFinder::Project(gf2d& h_S) {
+#pragma omp parallel for collapse(2)
     for (int j = N_g; j < N_theta - N_g; j++)
         for (int k = N_g; k < N_phi - N_g; k++) {
             double r = h_S(j, k);
@@ -729,6 +731,7 @@ double HorizonFinder::HorizonMass() {
 // 
 double HorizonFinder::Spin() {
     // first compute spin integrand
+#pragma omp parallel for collapse(2)
     for (int j = N_g; j < N_theta - N_g; j++)
         for (int k = N_g; k < N_phi - N_g; k++) {
             const double psil = exp(phi_c(j, k));
@@ -837,6 +840,7 @@ double HorizonFinder::LinearMomentum() {
 //
 double HorizonFinder::AccretionRate(gf3d& lapse, Fluxes* fluxes) {
     // first compute accretion rate integrand
+#pragma omp parallel for collapse(2)
     for (int j = N_g; j < N_theta - N_g; j++) {
         //    const double sintheta = grid->sintheta(j);
         //    const double costheta = grid->costheta(j);
