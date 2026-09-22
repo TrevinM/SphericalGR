@@ -73,7 +73,7 @@ bool Manager::Initialize() {
   //
   // look for horizons
   //
-  bool force = false;
+  bool force = true;
   constraints->FindHorizon(step, t, tau_c, last, curve,
 			   matter->adm_sources, matter->fluxes,
 			   aux, mass, lin_mom, force);

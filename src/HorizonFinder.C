@@ -42,12 +42,19 @@ int HorizonFinder::ReadInput() {
   }
   return error;
 }
+//=================================================
+// For diagnostics.C: is it a cosmological horizon?
+//=================================================
+bool HorizonFinder::CosmologicalHorizon() {
+  return cosmo_horizonfind;
+}
 //================================================
 //
 // Time to find horizon?
 //
 //================================================
 bool HorizonFinder::TimeToFindHorizon(int currenttimestep, Doub currenttime) {
+  //cout << " HORIZONFINDER: Checking if horizontime" << endl;
   timestep = currenttimestep;
   phystime = currenttime;
   bool search_for_horizon = false;
@@ -55,6 +62,7 @@ bool HorizonFinder::TimeToFindHorizon(int currenttimestep, Doub currenttime) {
     return false;
   }
   if (use_time_step_criterion) {
+    //cout << " HORIZONFINDER: Using time step criterion with next_step = " << next_step << endl;
     // evaluate time step criterion
     if (timestep >= next_step)     
       search_for_horizon = true;
@@ -65,6 +73,7 @@ bool HorizonFinder::TimeToFindHorizon(int currenttimestep, Doub currenttime) {
   };
   // if (timestep == last_step)
   //   search_for_horizon = true;
+  //cout << " HORIZONFINDER: search for horizon = " << search_for_horizon << endl;
   return search_for_horizon;
 }
 //================================================
@@ -76,6 +85,7 @@ bool HorizonFinder::TimeToFindHorizon(int currenttimestep, Doub currenttime) {
 bool HorizonFinder::FindHorizon(int currenttimestep, Doub currenttime,
 				state * s, Fluxes * fluxes, 
 				Doub adm_mass, Doub mom_guess, Doub a) {
+  //cout << " HORIZONFINDER: Finding horizon" << endl;
   a_friedmann = a;
   timestep = currenttimestep;
   phystime = currenttime;
@@ -91,22 +101,25 @@ bool HorizonFinder::FindHorizon(int currenttimestep, Doub currenttime,
   // if we haven't found a horizon yet, initialize h
   //
   // CHECK...
+  //cout << " HORIZONFINDER: Checking if already found horizon. foundhorizon = " << foundhorizon <<endl;
   if (!foundhorizon) { 
     cout << " HORIZONFINDER: Initial guess M = " << adm_mass << ", P = " << mom_guess << endl;
     InitialGuess(adm_mass, mom_guess);
   }
   for (int j = 0; j < N_theta; j++)
-    for (int k = 0; k < N_phi; k++) 
+    for (int k = 0; k < N_phi; k++) {
       h_old[j][k] = h(j,k);
+     // cout << " h = " << h_old[j][k] << endl;
+    }
   //
   // compute initial expansion
   //   
   Project(h);
   double exp = Expansion();
   int its = 0;
-  //  cout << " HORIZONFINDER: Initial L2 Norm of expansion = " << exp << endl;
+  // cout << " HORIZONFINDER: Initial L2 Norm of expansion = " << exp << endl;
   const double constant = - 1.0;
-  const double xi = 0.5;
+  const double xi = .1; 
 #ifndef NoEllSolver
   while ( (exp > tol_exp) && (its < max_iter_exp) ) {
     its++;
@@ -115,23 +128,35 @@ bool HorizonFinder::FindHorizon(int currenttimestep, Doub currenttime,
     //
     for (int j = N_g; j < N_theta-N_g; j++)
       for (int k = N_g; k < N_phi-N_g; k++) {
-	rhs_grid[j][k] = constant * expansion(j,k)/factor(j,k) + h.Laplace(j,k) + eta * h(j,k);
+        if (cosmo_horizonfind == 1) {
+          rhs_grid[j][k] =  -constant * expansion(j,k)/factor(j,k) + h.Laplace(j,k) + eta * h(j,k);
+        } else {
+          rhs_grid[j][k] = constant * expansion(j,k)/factor(j,k) + h.Laplace(j,k) + eta * h(j,k);
+        }
       }
     ellsolver->SetRHS(rhs_grid);
     //
     // solve
     //
     int num_it = 0;
-    ellsolver->Solve(max_iter_ell,num_it,tol_ell);
+    double res_current = ellsolver->Solve(max_iter_ell,num_it,tol_ell);
     //
     // get new h
     //    
     ellsolver->GetSolution(h);
-    for (int j = 0; j < N_theta; j++)
+    for (int j = 0; j < N_theta; j++){
+      const double thetal = rhs_grid.theta(j);
       for (int k = 0; k < N_phi; k++) {
+        const double phil = rhs_grid.phi(k);
+        // cout << h(j,k) - xi * h(j,k) - (1.0 - xi) * h_old(j,k) << endl;
 	h[j][k] = xi * h(j,k) + (1.0 - xi) * h_old(j,k);
 	h_old[j][k] = h(j,k);
       }
+      if (thetal < PI / 2. && thetal > 0.0){
+        // cout << " HORIZONFINDER: currently h = " << h(j, 0) << " at theta = " << thetal << endl;
+      }
+    }
+    //cout << " HORIZONFINDER: h(N_g) - h(n_theta - N_g) = " << h(N_g, 0) - h(N_theta - N_g, 0) << endl;  
     //
     // project grid functions on new surface h...
     //
@@ -140,13 +165,19 @@ bool HorizonFinder::FindHorizon(int currenttimestep, Doub currenttime,
     // ... and re-compute expansion
     //
     exp = Expansion();
-    //    cout << " HORIZONFINDER: expansion = " << exp << " after " << its << " steps " 
+    cout << " HORIZONFINDER: expansion = " << exp << " after " << its << 
+    " steps, with tol_exp =  " << tol_exp 
+    << ", and with h(N_g)= " << h[N_g][N_g] << endl;
     //	 << " (used " << num_it << " trilinos iterations)" << endl;
   }
 #else
   cout << " HORIZONFINDER: Cannot search for horizons without elliptic solver. " << endl;
 #endif
   // CHECK!!! kludge to avoid tiny black holes sometimes found early in evolution  
+  // cout << " HORIZONFINDER: Searching with minimum horizon radius = " << r_min << endl;
+  if ( exp < tol_exp) {
+    //cout << " HORIZONFINDER: exp < tol with h(pi/2) = " << h(PI/2.0,2) << " and r_min = " << r_min << endl;
+  }
   if ( exp < tol_exp && h(PI/2.0,2) > r_min && h(PI/2.0,2) < r_max ) {
     // if ( exp < tol_exp ) {
     //
@@ -174,6 +205,7 @@ bool HorizonFinder::FindHorizon(int currenttimestep, Doub currenttime,
     //
     // did not find horizon...
     //
+    // cout << " HORIZONFINDER: Did not find horizon with expansion = " << exp << endl;
     return false;
   }
 };
@@ -182,8 +214,8 @@ bool HorizonFinder::FindHorizon(int currenttimestep, Doub currenttime,
 // Compute Expansion
 //
 // exp = \bar \lambda \bar m^{ij} h_,{ij} - \bar m^{ij} \bar s_k \bar \Gamma^k_{ij} + 4 \bar s^k \partial_k \phi - (2/3) psi^2 K
-//           + psi^2 \bar A_{ij} \bar s^i \bar s^k
-//
+//           + psi^2 \bar A_{ij} \bar s^i \bar s^j
+// NOTE: Computes psi2 * sqrt(2) * exp ??
 //================================================
 double HorizonFinder::Expansion(){
 
@@ -231,7 +263,7 @@ double HorizonFinder::Expansion(){
       //      if (test) m.print();
       //
       // remember \bar m^{\theta\theta} for FindHorizon()
-      // 
+      //
       factor[j][k] = - lambda(j,k) * m[1][1];
       //
       // also: invert m and remember m_tt and m_pp for circumferences...
@@ -248,12 +280,13 @@ double HorizonFinder::Expansion(){
       //
       // compute 2D Laplace operator on h:
       //
+      double expansion_laplace;
       if (cosmo_horizonfind == 1) {
-      expansion[j][k] = lambda(j,k) * ( m[1][1] * h.ddtheta(j,k) + 
+      expansion_laplace = + lambda(j,k) * ( m[1][1] * h.ddtheta(j,k) + 
 					  2.0 * m[1][2] * h.dthetadphi(j,k) + 
 					  m[2][2] * h.ddphi(j,k) );
       } else {
-      expansion[j][k] = - lambda(j,k) * ( m[1][1] * h.ddtheta(j,k) + 
+      expansion_laplace = - lambda(j,k) * ( m[1][1] * h.ddtheta(j,k) + 
 					  2.0 * m[1][2] * h.dthetadphi(j,k) + 
 					  m[2][2] * h.ddphi(j,k) );
       }
@@ -279,21 +312,32 @@ double HorizonFinder::Expansion(){
       // Note cosmological expansion term
       //
       Doub psi2 = exp(2.0*phi_c[j][k]) * a_friedmann;
-      expansion[j][k] -= 2.0 * psi2 * K[j][k] / 3.0;
+        const double expansion_K = -2.0 * psi2 * K[j][k] / 3.0; // Where does this psi2 come from?
+      double expansion_D_phi = 0.0;
+      double expansion_A = 0.0;
+      double expansion_Gamma = 0.0;
       for (int a = 0; a < 3; a++) {
-	expansion[j][k] += 4.0 * s[a] * D_phi[a];
+  if (cosmo_horizonfind == 1) {
+    
+    expansion_D_phi -= 4.0 * s[a] * D_phi[a];
+  } else {
+    expansion_D_phi += 4.0 * s[a] * D_phi[a];
+  }     
 	for (int b = 0; b < 3; b++) {
-	  expansion[j][k] += psi2 * A[a][b] * s[a] * s[b]; 
+	  expansion_A += psi2 * A[a][b] * s[a] * s[b];  // Where does this psi2 come from?
 	  for (int c = 0; c < 3; c++) {
       if (cosmo_horizonfind == 1) {
-        expansion[j][k] += m[a][b] * s_low[c] * Gamma[c][a][b];
+        expansion_Gamma += m[a][b] * s_low[c] * Gamma[c][a][b];
       }
       else {
-        expansion[j][k] -= m[a][b] * s_low[c] * Gamma[c][a][b];
+        expansion_Gamma -= m[a][b] * s_low[c] * Gamma[c][a][b];
       }  
 	  }
 	}
-      }
+}
+      expansion[j][k] = expansion_laplace + expansion_K + expansion_D_phi + expansion_A + expansion_Gamma;
+    //  cout << " HORIZONFINDER: laplace = " << expansion_laplace << ", K = " << expansion_K << ", D_phi = " 
+    //  << expansion_D_phi << ", A = " << expansion_A << ", Gamma = " << expansion_Gamma << ", total = " << expansion[j][k] <<endl;
     }
   //
   // return integral over expansion^2
@@ -301,7 +345,7 @@ double HorizonFinder::Expansion(){
   return sqrt(SurfaceIntegral2(expansion,unitsphere));
 };
 //================================================
-// Compute expansion for surface h, return local exansion and normal
+// Compute expansion for surface h, return local expansion and normal
 //================================================
 void HorizonFinder::Expansion(gf2d & h_S, gf2d & exp_S, gf2d & nr, gf2d & nt, gf2d & np) {
   Project(h_S);
@@ -399,7 +443,11 @@ void HorizonFinder::Expansion(gf2d & h_S, gf2d & exp_S, gf2d & nr, gf2d & nt, gf
       Doub psi2 = exp(2.0*phi_c[j][k]) * a_friedmann;
       exp_S[j][k] -= 2.0 * psi2 * K[j][k] / 3.0;
       for (int a = 0; a < 3; a++) {
-	exp_S[j][k] += 4.0 * s[a] * D_phi[a];
+  if (cosmo_horizonfind == 1) {
+    exp_S[j][k] -= 4.0 * s[a] * D_phi[a];
+  } else {
+    exp_S[j][k] += 4.0 * s[a] * D_phi[a];
+  }
 	for (int b = 0; b < 3; b++) {
 	  exp_S[j][k] += psi2 * A[a][b] * s[a] * s[b];
 	  for (int c = 0; c < 3; c++) {

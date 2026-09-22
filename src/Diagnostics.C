@@ -370,10 +370,12 @@ bool diagnostics::FindHorizon(int timestep, double t, double tau_c,
   //
   // check whether it's time to search for horizon
   //
+  //cout << " DIAGNOSTICS: Checking if time to search for horizon" << endl;
   bool search_for_horizon = horizonfinder->TimeToFindHorizon(timestep,t);
   //
   // if so...
   // 
+  //cout << " DIAGNOSTICS: search_for_horzion = " << search_for_horizon << " and adm_mass = " << adm_mass << endl;
   if ( (search_for_horizon && adm_mass > 0.0) || force) {
     //
     // first compute curvature invariant
@@ -387,22 +389,45 @@ bool diagnostics::FindHorizon(int timestep, double t, double tau_c,
     // now call horizon finder
     //
     bool found_horizon = false; 
+	bool cosmo_horizonfind = horizonfinder->CosmologicalHorizon();
+
+	double rho_ADM_c = adm->rho_ADM(N_g,N_g,N_g); // Close to r=0 rho
+	double hubble_mass = sqrt(3.0 / (8.0 * PI * rho_ADM_c));
     //      adm_mass = 0.5;
-    double max_mass = 10.0*adm_mass;
-    double delta_mass = adm_mass/10.0;
-    double mass_guess = 1.e-4 * adm_mass;
+	double max_mass;
+	double delta_mass;
+	double mass_guess;
+	double hor_mom_guess;
+	if (cosmo_horizonfind == 1) {
+		cout << " DIAGNOSTICS: hubble_mass = " << hubble_mass << endl;
+		max_mass = 10.0*hubble_mass;
+		delta_mass = hubble_mass/10.0;
+		mass_guess = 1.e-4 * hubble_mass;
+		hor_mom_guess = 0.0 * hubble_mass; // Does this fail for non spherical symmetric
+	} else {
+    	max_mass = 10.0*adm_mass;
+    	delta_mass = adm_mass/10.0;
+    	mass_guess = 1.e-4 * adm_mass;
+		hor_mom_guess = mom_guess;
+	}
+	
     cout << " DIAGNOSTICS: looking for horizon at time t = " << t << endl;
     int it = 0;
     int it_max = 100;
     while ( (mass_guess <= max_mass) && (!found_horizon) && (it < it_max)) {
       it++;
+	  //cout << "mass guess / max mass = " << (mass_guess / max_mass) << endl;
       found_horizon = horizonfinder->FindHorizon(timestep, t,
 						 s, fluxes,
-						 mass_guess, mom_guess,
+						 mass_guess, hor_mom_guess,
 						 (*cosmology).a(t));
       //      mass_guess += delta_mass;
       mass_guess *= 1.3;
+	  // hor_mom_guess *=1.3;
     }
+	if ((mass_guess > max_mass) || (it >= it_max)) {
+		cout << " DIAGNOSTICS: could not find horizon " << endl;
+	}
     return found_horizon;  
   } else {
     return true;

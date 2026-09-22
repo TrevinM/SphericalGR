@@ -61,7 +61,7 @@ EOS type = 0
   3 : piece-polytrope 
   4 : ideal gas
   5 : gas and radiation )
-Slicing type = 9
+Slicing type = 1
  (1 : Geodesic slicing
   2 : (non-advective) 1+log slicing
   3 : advective 1+log slicing
