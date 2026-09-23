@@ -165,9 +165,9 @@ bool HorizonFinder::FindHorizon(int currenttimestep, Doub currenttime,
     // ... and re-compute expansion
     //
     exp = Expansion();
-    cout << " HORIZONFINDER: expansion = " << exp << " after " << its << 
-    " steps, with tol_exp =  " << tol_exp 
-    << ", and with h(N_g)= " << h[N_g][N_g] << endl;
+    // cout << " HORIZONFINDER: expansion = " << exp << " after " << its << 
+    // " steps, with tol_exp =  " << tol_exp 
+    // << ", and with h(N_g)= " << h[N_g][N_g] << endl;
     //	 << " (used " << num_it << " trilinos iterations)" << endl;
   }
 #else

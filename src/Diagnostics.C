@@ -399,7 +399,7 @@ bool diagnostics::FindHorizon(int timestep, double t, double tau_c,
 	double mass_guess;
 	double hor_mom_guess;
 	if (cosmo_horizonfind == 1) {
-		cout << " DIAGNOSTICS: hubble_mass = " << hubble_mass << endl;
+		cout << " DIAGNOSTICS: hubble radius guess = " << hubble_mass << endl;
 		max_mass = 10.0*hubble_mass;
 		delta_mass = hubble_mass/10.0;
 		mass_guess = 1.e-4 * hubble_mass;

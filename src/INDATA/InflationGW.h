@@ -32,7 +32,7 @@ private:
     int nakamura_type; //0 for A, 1 for B. See BGH 2026
 	int branch;
 	double tol;
-	double phi_0, sigma, epsilon, m, GW_amp, step_factor, mom_step_factor;   // parameters for initial data
+	double phi_0, sigma, sigmaGW, epsilon, m, GW_amp, step_factor, mom_step_factor;   // parameters for initial data
 	double PI;
 	bool all_clear;
 	QuadraticPotential* potential;
@@ -60,6 +60,7 @@ public:
 		char buf[100], c;
 		infile.get(buf, 100, '='); infile.get(c); infile >> phi_0;
 		infile.get(buf, 100, '='); infile.get(c); infile >> sigma;
+		infile.get(buf, 100, '='); infile.get(c); infile >> sigmaGW;
 		infile.get(buf, 100, '='); infile.get(c); infile >> epsilon;
 		infile.get(buf, 100, '='); infile.get(c); infile >> branch;
 
@@ -76,6 +77,7 @@ public:
 		cout << " INFLATIONGW: Will set up Inflation GW initial data with" << endl;
 		cout << "      inflaton parameters phi_0 = " << phi_0
 			<< ", sigma = " << sigma
+			<< ", sigmaGW = " << sigmaGW
 			<< ", epsilon = " << epsilon
 			<< ", branch = " << branch << endl;
 

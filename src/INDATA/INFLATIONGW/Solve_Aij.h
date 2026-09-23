@@ -81,7 +81,7 @@ void Compute_Aij() {
   //================================================
   inline double An_rr(double r, double theta) {
     const double r2 = r*r;
-    const double sigma2 = sigma * sigma;
+    const double sigma2 = sigmaGW * sigmaGW;
       if (nakamura_type == 0) {
 	const double costheta = cos(theta);
 	return GW_amp * exp(-r2/2.0) * (1. - 3.0 * costheta * costheta);
@@ -97,7 +97,7 @@ void Compute_Aij() {
 
   inline double An_rt(double r, double theta) {
     const double r2 = r*r;
-    const double sigma2 = sigma * sigma;
+    const double sigma2 = sigmaGW * sigmaGW;
       if (nakamura_type == 0) {
 	return GW_amp * exp(-r2/2.0) * (3.0 - r2) * sin(theta) * cos(theta);
       } else if (nakamura_type == 1) {
@@ -124,7 +124,7 @@ void Compute_Aij() {
         const double costheta = cos(theta);
       const double cos2theta = costheta*costheta;
       const double r6 = r4*r2;
-      const double sigma2 = sigma * sigma;
+      const double sigma2 = sigmaGW * sigmaGW;
       const double sigma4 = sigma2 * sigma2;
       const double sigma6 = sigma4 * sigma2;
       return (GW_amp / 8.0) * exp(-r2/sigma2) *
@@ -149,7 +149,7 @@ void Compute_Aij() {
 	   (6 - 8*r2 + r4)*sintheta*sintheta) / 4.0;
       } else if (nakamura_type == 1) {
         const double costheta = cos(theta);
-        const double sigma2 = sigma * sigma;
+        const double sigma2 = sigmaGW * sigmaGW;
         const double sigma4 = sigma2 * sigma2;
         const double sigma6 = sigma4 * sigma2;
         const double cos2theta = costheta * costheta;
