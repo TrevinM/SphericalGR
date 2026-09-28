@@ -259,6 +259,9 @@ int main(int argc, char* argv[])
 	else if (slicing_type == 9) {
 		slicing = new LocalCosmoBonaMasso(grid, cosmology, eta_KO);
 	}
+	else if (slicing_type == 10) {
+		slicing = new OnePlusLogLim(grid, cosmology, eta_KO);
+	}
 	else {
 		cerr << " No such Slicing type! " << endl;
 		return 1;

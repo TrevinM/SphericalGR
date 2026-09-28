@@ -252,6 +252,8 @@ int Read_Input(int argc, char * argv[],
       cout << "   Running with generalized advective 1+log slicing " << endl;
     else if (slicing_type == 9)
       cout << "   Running with LocalCosmoBonaMasso slicing " << endl;
+    else if (slicing_type == 10)
+      cout << "   Running with negative 1+log slicing (non-advective)" << endl;
     else
       error = 4;
     if (gauge_type == 1)

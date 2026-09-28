@@ -102,6 +102,44 @@ public:
  	}  
   };
 };
+
+
+//================================================
+// (non-advective) 1+log slicing with maximum lapse of 1
+//================================================
+//
+class OnePlusLogLim : public Slicing {
+public:
+  OnePlusLogLim(Grid * grid_i, Cosmology * cosmology_i,
+	     double eta_KO_i) : Slicing(grid_i, cosmology_i, eta_KO_i)
+  {
+    cout << " SLICING: setting up limited (non-advective) 1+log slicing..." << endl;
+    //   slicing_type = oneplusloglim;
+  };
+  ~OnePlusLogLim() {};
+  string Name() { return "limited (non-advective) 1+log slicing"; }
+  //================================================
+  // provide time derivative
+  //================================================
+  void dot_lapse(state * c, state * derivs, double t = 0.0) {
+    const double K_0 = (*cosmology).K0(t);
+    for (int i = N_g; i < N_r - N_g; i++)    
+      for (int j = N_g; j < N_t - N_g; j++)
+	for (int k = N_g; k < N_p - N_g ; k++) {    
+	   if (- 2.0 * c->lapse(i,j,k) * 
+	    ( c->K(i,j,k) - K_0 ) + eta_KO * c->lapse.KO(i,j,k) > 0. && c->lapse(i,j,k) >= 1.) {
+        derivs->lapse[i][j][k] = 0.0;
+      } else {
+        derivs->lapse[i][j][k] = - 2.0 * c->lapse(i,j,k) * 
+	    ( c->K(i,j,k) - K_0 ) + eta_KO * c->lapse.KO(i,j,k);
+      }
+
+      
+ 	}  
+  };
+};
+
+
 //
 //================================================
 // Advective 1+log slicing

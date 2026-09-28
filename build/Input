@@ -61,7 +61,7 @@ EOS type = 0
   3 : piece-polytrope 
   4 : ideal gas
   5 : gas and radiation )
-Slicing type = 1
+Slicing type = 10
  (1 : Geodesic slicing
   2 : (non-advective) 1+log slicing
   3 : advective 1+log slicing
@@ -69,7 +69,8 @@ Slicing type = 1
   5 : maximal slicing
   6 : second-order maximal slicing 
   8 : Bona-Masso
-  9 : LocalCosmoBonaMasso)
+  9 : LocalCosmoBonaMasso
+  10 : Limited non-advective 1+log (lapse <=1))
 Gauge type = 1
  (1 : constant shift
   2 : (non-advective) Gamma-driver
