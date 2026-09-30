@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 
+#Stores 3 dimensional data and includes plotting functions
+
 class Data3D:
 
     def __init__(self, var_name: str, x_var: str, x_grid, y_var: str, y_grid, z_var: str, z_grid, c):
@@ -107,7 +109,7 @@ class Data3D:
                 label = self.legend_prefix
 
             if numerical:
-                ax.scatter(self.x_val, self.num_plot[z][y_iter], label=f'num {label}', marker='.', c=self.c)
+                ax.plot(self.x_val, self.num_plot[z][y_iter], label=f'{label}', marker='.', c=self.c)
 
             if analytical:
                 ax.plot(self.x_val, self.an_plot[z][y_iter], label=f'an {label}', c=self.c)

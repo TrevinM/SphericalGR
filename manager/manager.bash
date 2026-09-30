@@ -89,35 +89,22 @@ fi
 #           EXECUTE           #
 # =========================== #
 
-#Find iteration and constraints
-i=0
-constraint=()
+#Read last line of bounds
+bounds="$(tac $suite_path/bounds |egrep -m 1 .)"
+bounds=( $bounds )
 
-while read -r line
-do
-    if [[ ! -z $line ]]
-    then
-        let i++
-        constraint=($line)
-    fi
+lower_bound=${bounds[0]}
+upper_bound=${bounds[1]}
 
-done < $suite_path/constraints
+#Find position of unknwon digit for use as iteration number
+upper_next_digit="$(echo $upper_bound | sed -e 's/\.//g' -e 's/0*$//g' | wc -c)"
+lower_next_digit="$(echo $lower_bound | sed -e 's/\.//g' -e 's/0*$//g' | wc -c)"
+i=$(( $upper_next_digit > $lower_next_digit ? $upper_next_digit : $lower_next_digit ))
 
-lower_bound=${constraint[0]}
-upper_bound=${constraint[1]}
-
-#Increase precision until bounds fully represented
-for (( curr_precision=0 ; curr_precision<$max_precision ; curr_precision++ ))
-do
-    rounded_l="$(echo "scale=$curr_precision;$lower_bound/1" | bc)"
-    rounded_u="$(echo "scale=$curr_precision;$upper_bound/1" | bc)"
-    if [[ 1 -eq "$(echo "$rounded_l==$lower_bound" | bc)" && 1 -eq "$(echo "$rounded_u==$upper_bound" | bc)" ]]
-    then
-        #Add precision for delta
-        let curr_precision++
-        break
-    fi
-done
+#Count decimal precision of delta
+upper_precision="$(echo $upper_bound | sed -e 's/.*\.//g' -e 's/0*$//g' | wc -c)"
+lower_precision="$(echo $lower_bound | sed -e 's/.*\.//g' -e 's/0*$//g' | wc -c)"
+curr_precision=$(( $upper_precision > $lower_precision ? $upper_precision : $lower_precision ))
 
 if [[ $reconverge -eq 0 ]]
 then
@@ -130,12 +117,13 @@ then
     then
         mkdir $it_path
     else 
-        echo "ERROR: Iteration $i already created but didn't add new constraints..."
+        echo "ERROR: Iteration $i already created but didn't add new bounds..."
         exit 1
     fi
 
     bug "========= Iteration $i ========="
 
+    log ""
     log ""
     log "========= Iteration $i ========="
     log "`date`"
@@ -155,18 +143,17 @@ then
     fi
     
     log "Bounds: $lower_bound and $upper_bound"
-    log "Previous data (rho): $num_data_rho"
-    # log "Previous data (sup): $num_data_sup"
     conv_type=0
 
     #Estimate eta critical
     if [[ $num_data_rho -ge 5 ]]
     then
         cd $suite_path
-        py_out="$(python3 $dir/manager/sub_fit.py $lower_bound $upper_bound)"
+        py_out="$(python3 $dir/manager/fit_rho.py $lower_bound $upper_bound)"
         py_out=( $py_out )
         eta_rho=${py_out[0]}
         eta_c=$eta_rho
+        log "Previous data (rho): $num_data_rho"
         log "Eta (rho): $eta_rho"
         let conv_type++ 
     fi
@@ -177,6 +164,7 @@ then
     #     py_out=( $py_out )
     #     eta_sup=${py_out[0]}
     #     eta_c=$eta_sup
+    #     log "Previous data (sup): $num_data_sup"
     #     log "Eta (sup): $eta_sup"
     #     let conv_type++
     #     let conv_type++
@@ -200,7 +188,7 @@ then
     etas=()
     if [[ $conv_type -eq 0 || "$delta_fast" == "0" || $fast_conv -eq 0 ]]
     then
-        #Simply divide constraints into 10 cells
+        #Simply divide bounds into 10 cells
         # log "Delta: $delta"
         log "Using standard convergence"
 
@@ -319,6 +307,7 @@ else
     bug "========= Reconverge $r ========="
 
     log ""
+    log ""
     log "========= Reconverge $r ========="
     log "`date`"
     log ""
@@ -329,15 +318,21 @@ else
     #Run Lower bounds at very precisions and +1 to the last digit
     etas=(10)
     delta=10
+
     let curr_precision--
+    start_reconverge=$curr_precision-4
+
     for s in $( seq 0 $curr_precision )
     do
         delta="$(echo "scale=$s;$delta/10" | bc)"
-        eta_l="$(echo "scale=$s;$lower_bound/1" | bc)"
-        eta_u="$(echo "scale=$s;$eta_l+$delta" | bc)"
-        [[ $s -eq 0 ]] && log "Bounds: $eta_l and $eta_u"
-        etas=("${etas[@]}" $eta_l)
-        etas=("${etas[@]}" $eta_u)
+        if [[ $s -ge $start_reconverge ]]
+        then
+            eta_l="$(echo "scale=$s;$lower_bound/1" | bc)"
+            eta_u="$(echo "scale=$s;$eta_l+$delta" | bc)"
+            [[ $s -eq $start_reconverge ]] && log "Bounds: $eta_l and $eta_u"
+            etas=("${etas[@]}" $eta_l)
+            etas=("${etas[@]}" $eta_u)
+        fi
     done
     upper_bound=100
     lower_bound=0
@@ -388,7 +383,7 @@ let "len_jobs = ${#jobs[@]} - 1"
 for k in $( seq 0 $len_jobs )
 do
     cd ${job_dirs[k]}
-    sbatch -W -N 1 -n $cores ${jobs[k]} >> $suite_path/log &
+    sbatch -W -N 1 -n $cores ${jobs[k]} &
 done
 wait
 
@@ -557,22 +552,22 @@ else
     warning_prev=0
 fi
 
-#Print out specifics on new constraints
+#Print out specifics on new bounds
 if [[ $conv_type -eq 0 || "$delta_fast" == "0" || $fast_conv -eq 0 ]]
 then
-    log "New constraints: $(echo "scale=1;($lower_new - $lower_bound)/$delta" | bc) and $(echo "scale=1;($upper_new - $lower_bound)/$delta" | bc)"
+    log "New bounds: $(echo "scale=1;($lower_new - $lower_bound)/$delta" | bc) and $(echo "scale=1;($upper_new - $lower_bound)/$delta" | bc)"
 fi
 if [ $conv_type -eq 1 ]
 then
-    log "New constraints: $(echo "scale=1;($lower_new - $eta_sub)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sub)/$delta_fast" | bc) (rho)"
+    log "New bounds: $(echo "scale=1;($lower_new - $eta_rho)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_rho)/$delta_fast" | bc) (rho)"
 elif [ $conv_type -eq 2 ]
 then
-    log "New constraints: $(echo "scale=1;($lower_new - $eta_sup)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sup)/$delta_fast" | bc) (sup)"
+    log "New bounds: $(echo "scale=1;($lower_new - $eta_sup)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sup)/$delta_fast" | bc) (sup)"
 elif [ $conv_type -ge 3 ]
 then
-    log "New constraints: $(echo "scale=1;($lower_new - $eta_sub)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sub)/$delta_fast" | bc) (rho)"
-    log "                 $(echo "scale=1;($lower_new - $eta_sup)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sup)/$delta_fast" | bc) (sup)"
-    log "                 $(echo "scale=1;($lower_new - $eta_avg)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_avg)/$delta_fast" | bc) (avg)"
+    log "New bounds: $(echo "scale=1;($lower_new - $eta_rho)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_rho)/$delta_fast" | bc) (rho)"
+    log "            $(echo "scale=1;($lower_new - $eta_sup)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_sup)/$delta_fast" | bc) (sup)"
+    log "            $(echo "scale=1;($lower_new - $eta_avg)/$delta_fast" | bc) and $(echo "scale=1;($upper_new - $eta_avg)/$delta_fast" | bc) (avg)"
 
 fi
 
@@ -586,18 +581,21 @@ fi
 convergence=$(echo "($upper_bound-$lower_bound)/($upper_new-$lower_new)" | bc)
 log "Converged by ${convergence}x"
 
-if [ $reconverge -eq 0 ]
+#Add the new bounds
+if [[ $reconverge -eq 0 ]]
 then
-    echo $lower_new $upper_new >> $suite_path/constraints
+    #Regular Test
+    echo $lower_new $upper_new >> $suite_path/bounds
 else
-    echo $lower_new $upper_new > $suite_path/constraints
+    #Reconvergence Test
+    echo $lower_new $upper_new >> $suite_path/bounds
     reconverge=0
 fi
 
 if [[ $warning_prev -ge 3 ]]
 then
     log "ERROR: 3 Warning Strikes..."
-    finish 1
+    reconverge=1
 fi
 
 if [[ $max_runs -gt 1 ]]
